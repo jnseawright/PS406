@@ -147,12 +147,12 @@ summary(clfe)
 The analysis here assumes that the treatment and control cases have *parallel time trends* on the dependent variable, conditional on any control variables and other adjustments in the model.
 
 ---
-```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+```{r, echo = FALSE, out.width="80%", fig.retina = 1, fig.align='center'}
 include_graphics("images/parallel1.png")
 ```
 
 ---
-```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+```{r, echo = FALSE, out.width="80%", fig.retina = 1, fig.align='center'}
 include_graphics("images/parallel2.png")
 ```
 
@@ -162,19 +162,19 @@ include_graphics("images/parallel2.png")
 One useful test is to statistically test whether the treatment and control group had equal time trends during the period before the treatment. If we fit a model that estimates separate time slopes for the two groups, and then we test for equality between those two slopes, that is one way of testing the parallel trends assumption. 
 
 ---
-```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
 od$calind <- 1*(od$State=='California')
 odparalleltrends.lm <- lm(Rate~Quarter_Num+Quarter_Num:calind, data=od[od$Quarter_Num<4,])
-summ(odparalleltrends.lm)
+summary(odparalleltrends.lm)
 ```
 
 ---
-```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
 library(interactions)
 ```
 
 ---
-```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+```{r, echo = TRUE, out.width="70%", fig.retina = 1, fig.align='center'}
 interact_plot(odparalleltrends.lm, pred="Quarter_Num", modx="calind", interval=TRUE)
 ```
 
@@ -265,12 +265,12 @@ include_graphics("images/Liu2.png")
 ```
 
 ---
-```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
 library(fect)
 ```
 
 ---
-```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
 od$numerictreat <- 1*od$Treated
 calfect <- fect(Rate ~ numerictreat, index = c("State", "Quarter_Num"), force = "two-way",
                data = od, se=1)
@@ -278,7 +278,7 @@ calfect
 ```
 
 ---
-```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
 calife <- fect(Rate ~ numerictreat, index = c("State", "Quarter_Num"), force = "two-way",
                data = od, method="ife",min.T0=1, se=1)
 calife
