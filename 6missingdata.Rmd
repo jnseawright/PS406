@@ -367,12 +367,12 @@ include_graphics("images/LallRobinson4.png")
 ```
 
 ---
-```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
 library(rMIDAS)
 ```
 
 ---
-```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
 adult <- read.csv("https://raw.githubusercontent.com/MIDASverse/MIDASpy/master/Examples/adult_data.csv",
                   row.names = 1)[1:1000,]
                   
@@ -385,7 +385,7 @@ adult_bin <- c('sex','class_labels')
 ```
 
 ---
-```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
 # Apply rMIDAS preprocessing steps
 adult_conv <- convert(adult, 
                       bin_cols = adult_bin, 
@@ -401,7 +401,7 @@ adult_train <- train(adult_conv,
 ```
                        
 ---
-```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
 # Generate 10 imputed datasets
 adult_complete <- complete(adult_train, m = 10)
 
@@ -410,7 +410,7 @@ head(adult_complete[[1]])
 ```
 
 ---
-```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
 # Estimate logit model on 10 completed datasets (using Rubin's combination rules)
 adult_model <- combine("class_labels ~ hours_per_week + sex", 
                     adult_complete,
@@ -461,7 +461,7 @@ a score of 800, even though it is likely that these students are not
 "truly" equal in aptitude.
 
 ---
-```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
 dat <- read.csv(
      "https://stats.idre.ucla.edu/stat/data/tobit.csv")
 
@@ -469,7 +469,7 @@ library(VGAM)
 ```
 
 ---
-```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
 summary(lm(apt ~ read + math +
           prog,  
           data = dat))
@@ -549,33 +549,33 @@ This is a tobit if we use maximum likelihood and the conditional distribution of
 Heckman instead substitutes the first regression into the second regression. You still need the two error terms to be normally distributed, because their distributions figure into the resulting formula, and the ratio of the normal probability function to the cumulative density function (inverse Mills ratio) actually appears in the equation.
 
 ---
-```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
 library(sampleSelection)
 ```
 
 ---
-```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
 data("Mroz87")
 ols1 = lm(log(wage) ~ educ + exper + I( exper^2 ) + city, data=subset(Mroz87, lfp==1))
-summ(ols1)
+summary(ols1)
 ```
 
 ---
-```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
 data("Mroz87")
 ols1 = lm(log(wage) ~ educ + exper + I( exper^2 ) + city, data=subset(Mroz87, lfp==1))
-summ(ols1)
+summary(ols1)
 ```
 
 ---
-```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
 mroz.tobit = selection( lfp ~ age + I( age^2 ) + kids5 + huswage + educ,
                  log(wage) ~ educ + exper + I( exper^2 ) + city, data=Mroz87 )
 summary(mroz.tobit)
 ```
 
 ---
-```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
 mroz.heckit = heckit( lfp ~ age + I( age^2 ) + kids5 + huswage + educ,
                  log(wage) ~ educ + exper + I( exper^2 ) + city, data=Mroz87 )
 summary(mroz.heckit)
