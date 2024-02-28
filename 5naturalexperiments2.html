@@ -1,0 +1,1965 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>5: Instrumental Variables and RDD</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="J. Seawright" />
+    <meta name="date" content="2024-04-22" />
+    <script src="5naturalexperiments2_files/header-attrs-2.25/header-attrs.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# 5: Instrumental Variables and RDD
+]
+.subtitle[
+## Quantitative Causal Inference
+]
+.author[
+### <large>J. Seawright</large>
+]
+.institute[
+### <small>Northwestern Political Science</small>
+]
+.date[
+### April 22, 2024
+]
+
+---
+
+class: center, middle
+
+&lt;style type="text/css"&gt;
+pre {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+pre[class] {
+  max-height: 200px;
+}
+&lt;/style&gt;
+
+
+
+
+---
+### Endogeneity in OLS
+
+-   `\(E(\mathbf{u} | \mathbf{X}) = 0\)`?
+
+-   As you'll recall,
+    `\(E(\hat{\mathbf{\beta}}) = \beta + (\mathbf{X}^{T} \mathbf{X})^{-1} E(\mathbf{X}^{T} \mathbf{u})\)`.
+    So, if `\(E(\mathbf{X}^{T} \mathbf{u}) = \mathbf{\nu} \neq 0\)`, then
+    `\(E(\hat{\mathbf{\beta}} - \mathbf{\beta}) = (\mathbf{X}^{T} \mathbf{X})^{-1} \mathbf{\nu} \neq 0\)`.
+
+---
+### Consequences of Endogeneity
+
+-   When `\(\mathbf{X}\)` is endogenous, then our estimates of
+    `\(\hat{\mathbf{\beta}}\)` will be a mixture of the desired relationship
+    between `\(\mathbf{X}\)` and `\(\mathbf{y}\)` *and* the nuisance
+    relationship between `\(\mathbf{X}\)` and `\(\mathbf{u}\)`.
+
+---
+### How Can Endogeneity Arise?
+
+-   Omitted explanatory variables
+-   Measurement error on the right-hand side of the model
+-   Simultaneity between the right- and left-hand sides of the model
+-   etc.
+
+---
+### What to Do When Endogeneity Is a Problem?
+
+1.  Give up.
+
+2.  Try to change the model by including all omitted relevant variables.
+
+3.  Find an instrument.
+
+4.  Find other data.
+
+---
+### Instrumental Variables
+
+-   Suppose the model is:
+    `\(\mathbf{y} = \mathbf{W} \mathbf{\gamma} + \mathbf{x} \beta + \mathbf{\epsilon}\)`.
+    The `\(\mathbf{W}\)` variables are exogenous, but the `\(\mathbf{x}\)`
+    variable is endogenous.
+
+-   Now, assume that there exists a variable `\(z\)` that *doesn't* belong
+    in the regression model, with the following two characteristics:
+
+    -   `\(cov(\mathbf{z}^{T} \mathbf{x}) \neq 0\)`
+
+    -   `\(E(\mathbf{z}^{T} \mathbf{\epsilon}) = 0\)`
+
+---
+### Instrumental Variables
+
+If these conditions are met (doesn't belong in the regression, related
+linearly with `\(\mathbf{x}\)`, no connection with `\(\mathbf{\epsilon})\)`,
+then `\(\mathbf{z}\)` meets the mathematical definition of an *instrument*.
+
+---
+### Instrumental Variables
+
+&lt;img src="images/endog5.jpg" width="100%" style="display: block; margin: auto;" /&gt;
+
+---
+### Instrumental Variables
+
+-   Let's momentarily consider a bivariate regression,
+    `\(\mathbf{y} = \mathbf{x} \beta + \mathbf{\epsilon}\)`, with instrument
+    `\(\mathbf{z}\)`.
+
+-   The OLS estimate of `\(\beta\)` is
+    `\((\mathbf{x}^{T}\mathbf{x})^{-1} \mathbf{x}^{T}\mathbf{y}\)`.
+
+-   Consider instead the IV estimate of `\(\beta\)`:
+    `\((\mathbf{z}^{T}\mathbf{x})^{-1} \mathbf{z}^{T}\mathbf{y}\)`.
+
+-   `\(E(\hat{\beta}_{IV}) = E((\mathbf{z}^{T}\mathbf{x})^{-1} \mathbf{z}^{T}\mathbf{y}) = E((\mathbf{z}^{T}\mathbf{x})^{-1} \mathbf{z}^{T} [\mathbf{x} \beta + \mathbf{\epsilon}]) = E((\mathbf{z}^{T}\mathbf{x})^{-1} \mathbf{z}^{T} \mathbf{x} \beta) + E((\mathbf{z}^{T}\mathbf{x})^{-1} \mathbf{z}^{T} \mathbf{\epsilon}) = \beta + 0\)`
+
+---
+### Instrumental Variables
+
+-   Now let's consider a multivariate regression,
+    `\(\mathbf{Y} = \mathbf{X} \mathbf{\beta} + \mathbf{\epsilon}\)`, with
+    some `\(t \leq k\)` of the `\(\mathbf{X}\)` variables endogenous, and with
+    `\(t\)` instruments `\(\mathbf{z}_{1} \ldots \mathbf{z}_{t}\)`.
+
+---
+### Instrumental Variables
+
+-   The OLS estimate of `\(\mathbf{\beta}\)` is
+    `\((\mathbf{X}^{T}\mathbf{X})^{-1} \mathbf{X}^{T}\mathbf{y}\)`.
+
+-   Form the matrix `\(\mathbf{Z}\)`, containing the `\(t\)` instruments, as
+    well as the `\(k - t\)` exogenous elements from `\(\mathbf{X}\)`.
+
+-   The IV estimate of `\(\mathbf{\beta}\)` is:
+    `\((\mathbf{Z}^{T}\mathbf{X})^{-1} \mathbf{Z}^{T}\mathbf{y}\)`.
+
+---
+### Instrumental Variables
+
+-   As in the bivariate situation, given the IV assumptions, the IV
+    estimator eliminates the problem of endogeneity.
+
+-   This estimator only works if the number of instruments is exactly
+    equal to the number of endogenous variables.
+
+---
+### Another Way of Thinking About Instrumental Variables
+
+-   Let's partition the independent variables into two matrices,
+    `\(\mathbf{W}\)`, which has the `\(k - t\)` exogenous variables in the model
+    of `\(\mathbf{y}\)`, and `\(\mathbf{X}\)`, which has the `\(t\)` endogenous
+    variables.
+
+-   So the `\(\mathbf{Z}\)` matrix is the `\(\mathbf{W}\)` matrix with `\(t\)` extra
+    columns containing the instruments.
+
+---
+### Another Way of Thinking About Instrumental Variables
+
+-   Suppose we regress each column of the `\(\mathbf{X}\)` matrix on the
+    matrix `\(\mathbf{Z}\)` and form the fitted values.
+
+-   `\(\hat{\mathbf{X}} = \mathbf{Z} (\mathbf{Z}^{T} \mathbf{Z})^{-1} \mathbf{Z}^{T} \mathbf{X}\)`
+
+-   Now use `\(\hat{\mathbf{X}}\)` in the place of `\(\mathbf{X}\)` in the OLS
+    regression formula.
+
+---
+### Another Way of Thinking About Instrumental Variables
+
+`\(\hat{\mathbf{\beta}}_{IV} = (\mathbf{X}^{T}\mathbf{Z} (\mathbf{Z}^{T} \mathbf{Z})^{-1} \mathbf{Z}^{T} \mathbf{Z} (\mathbf{Z}^{T} \mathbf{Z})^{-1} \mathbf{Z}^{T} \mathbf{X})^{-1} \mathbf{X}^{T}\mathbf{Z} (\mathbf{Z}^{T} \mathbf{Z})^{-1} \mathbf{Z}^{T} \mathbf{y} = (\mathbf{X}^{T}\mathbf{Z} (\mathbf{Z}^{T} \mathbf{Z})^{-1} \mathbf{Z}^{T} \mathbf{X})^{-1} \mathbf{X}^{T}\mathbf{Z} (\mathbf{Z}^{T} \mathbf{Z})^{-1} \mathbf{Z}^{T} \mathbf{y} = (\mathbf{Z}^{T}\mathbf{X})^{-1} \mathbf{Z}^{T}\mathbf{y}\)`
+
+-   So the instrumental variables estimator gives the same coefficient
+    estimates as running an OLS regression using `\(\hat{\mathbf{X}}\)` in
+    the place of `\(\mathbf{X}\)`.
+
+---
+### Variance in Instrumental Variables
+
+-   `\(\hat{\mathbf{X}}\)` is a random variable, so the normal OLS standard
+    errors will underestimate uncertainty when using IV.
+
+-   Instead, the correct estimate of the standard errors of the
+    coefficient estimates in IV is:
+
+    -   `\(\hat{V} (\hat{\mathbf{\beta}}_{IV}) = \hat{\sigma}^{2} (\mathbf{Z}^{T} \mathbf{X})^{-1} \mathbf{Z}^{T} \mathbf{Z} (\mathbf{X}^{T} \mathbf{Z})^{-1}\)`
+
+---
+### Examples of Proposed Instruments
+
+-   Suppose we're interested in the relationship between education and
+    some political variable.
+
+    -   One proposed instrument for education, due to David Card (1995),
+        is residential proximity to a college or university.
+
+    -   A second proposed instrument for education, due to Angrist and
+        Krueger (1991) is month of birth.
+
+    -   A third instrument, from Nguyen et al. (2016), involves genetic
+        risk score for years of schooling.
+
+---
+### Examples of Proposed Instruments
+
+-   Suppose our focus is on the relationship between economic
+    performance and civil war in agricultural countries.
+
+    -   Miguel, Satyanath, Sergenti, E. (2004) suggest using rainfall as
+        an instrument for economic performance.
+
+---
+
+```r
+library(haven)
+mss_repdata_1_ &lt;- read_dta("https://github.com/jnseawright/PS406/raw/main/data/mss_repdata%20(1).dta")
+```
+
+---
+
+```r
+library(ivreg)
+migueliv &lt;- ivreg(any_prio ~ gdp_g + gdp_g_l + y_0 + polity2l + ethfrac + relfrac + Oil + lpopl1 + lmtnest | GPCP_g + GPCP_g_l+ y_0 + polity2l + ethfrac + relfrac + Oil + lpopl1 + lmtnest, data=mss_repdata_1_)
+summary(migueliv)
+```
+
+```
+## 
+## Call:
+## ivreg(formula = any_prio ~ gdp_g + gdp_g_l + y_0 + polity2l + 
+##     ethfrac + relfrac + Oil + lpopl1 + lmtnest | GPCP_g + GPCP_g_l + 
+##     y_0 + polity2l + ethfrac + relfrac + Oil + lpopl1 + lmtnest, 
+##     data = mss_repdata_1_)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -1.0098 -0.3114 -0.1342  0.3796  2.0431 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -0.438746   0.137120  -3.200  0.00143 ** 
+## gdp_g       -0.528454   1.517953  -0.348  0.72784    
+## gdp_g_l     -2.076062   1.781017  -1.166  0.24413    
+## y_0         -0.042668   0.020714  -2.060  0.03977 *  
+## polity2l     0.002769   0.003220   0.860  0.39005    
+## ethfrac      0.225661   0.090639   2.490  0.01301 *  
+## relfrac     -0.236262   0.103205  -2.289  0.02235 *  
+## Oil          0.043934   0.056533   0.777  0.43733    
+## lpopl1       0.067683   0.017231   3.928 9.38e-05 ***
+## lmtnest      0.077338   0.014966   5.168 3.06e-07 ***
+## 
+## Diagnostic tests:
+##                            df1 df2 statistic  p-value    
+## Weak instruments (gdp_g)     2 733     8.646 0.000194 ***
+## Weak instruments (gdp_g_l)   2 733     5.943 0.002752 ** 
+## Wu-Hausman                   2 731     0.744 0.475485    
+## Sargan                       0  NA        NA       NA    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.4421 on 733 degrees of freedom
+## Multiple R-Squared: 0.01679,	Adjusted R-squared: 0.004723 
+## Wald test: 10.27 on 9 and 733 DF,  p-value: 5.189e-15
+```
+
+---
+
+```r
+library(lmtest)
+```
+
+```
+## Loading required package: zoo
+```
+
+```
+## 
+## Attaching package: 'zoo'
+```
+
+```
+## The following objects are masked from 'package:base':
+## 
+##     as.Date, as.Date.numeric
+```
+
+```r
+library(sandwich)
+```
+
+---
+
+```r
+coeftest(migueliv, vcov = vcovCL(migueliv, cluster = ~country_name))
+```
+
+```
+## 
+## t test of coefficients:
+## 
+##               Estimate Std. Error t value Pr(&gt;|t|)  
+## (Intercept) -0.4387459  0.3532897 -1.2419  0.21468  
+## gdp_g       -0.5284537  1.4250511 -0.3708  0.71087  
+## gdp_g_l     -2.0760619  1.0241329 -2.0271  0.04301 *
+## y_0         -0.0426678  0.0483408 -0.8826  0.37772  
+## polity2l     0.0027692  0.0044092  0.6281  0.53016  
+## ethfrac      0.2256606  0.2757338  0.8184  0.41339  
+## relfrac     -0.2362620  0.2397070 -0.9856  0.32464  
+## Oil          0.0439336  0.2123598  0.2069  0.83616  
+## lpopl1       0.0676828  0.0498531  1.3576  0.17499  
+## lmtnest      0.0773375  0.0385422  2.0066  0.04516 *
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+---
+### What's Wrong with Weak Instruments?
+
+-   For an IV estimate of a regression with only one independent
+    variable and only one instrument, the IV estimator is:
+    `\((\mathbf{z}^{T} \mathbf{x})^{-1} \mathbf{z}^{T} \mathbf{y}\)`, which
+    is the same as
+    `\(cov(\mathbf{z}, \mathbf{y})/cov(\mathbf{z}, \mathbf{x})\)`.
+
+---
+### What's Wrong with Weak Instruments?
+
+-   The `\(cov(\mathbf{z}, \mathbf{y})\)` may be thought of as a combination
+    of three components:
+
+    -   the direct effect of `\(\mathbf{z}\)` on `\(\mathbf{y}\)`,
+
+    -   the indirect effect of `\(\mathbf{z}\)` on `\(\mathbf{y}\)` via
+        `\(\mathbf{x}\)`,
+
+    -   and any correlation between `\(\mathbf{z}\)` and `\(\mathbf{u}\)`.
+
+---
+### What's Wrong with Weak Instruments?
+
+-   If `\(cov(\mathbf{z}, \mathbf{x})\)` is big, then a moderate amount of
+    contamination of `\(cov(\mathbf{z}, \mathbf{y})\)` with undesirable
+    information will have only a small effect on the estimate.
+
+-   If `\(cov(\mathbf{z}, \mathbf{x})\)` is very small, then even a small
+    amount of contamination of `\(cov(\mathbf{z}, \mathbf{y})\)` with
+    undesirable information will lead to serious bias in the estimate.
+
+---
+
+```r
+summary(migueliv)
+```
+
+```
+## 
+## Call:
+## ivreg(formula = any_prio ~ gdp_g + gdp_g_l + y_0 + polity2l + 
+##     ethfrac + relfrac + Oil + lpopl1 + lmtnest | GPCP_g + GPCP_g_l + 
+##     y_0 + polity2l + ethfrac + relfrac + Oil + lpopl1 + lmtnest, 
+##     data = mss_repdata_1_)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -1.0098 -0.3114 -0.1342  0.3796  2.0431 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -0.438746   0.137120  -3.200  0.00143 ** 
+## gdp_g       -0.528454   1.517953  -0.348  0.72784    
+## gdp_g_l     -2.076062   1.781017  -1.166  0.24413    
+## y_0         -0.042668   0.020714  -2.060  0.03977 *  
+## polity2l     0.002769   0.003220   0.860  0.39005    
+## ethfrac      0.225661   0.090639   2.490  0.01301 *  
+## relfrac     -0.236262   0.103205  -2.289  0.02235 *  
+## Oil          0.043934   0.056533   0.777  0.43733    
+## lpopl1       0.067683   0.017231   3.928 9.38e-05 ***
+## lmtnest      0.077338   0.014966   5.168 3.06e-07 ***
+## 
+## Diagnostic tests:
+##                            df1 df2 statistic  p-value    
+## Weak instruments (gdp_g)     2 733     8.646 0.000194 ***
+## Weak instruments (gdp_g_l)   2 733     5.943 0.002752 ** 
+## Wu-Hausman                   2 731     0.744 0.475485    
+## Sargan                       0  NA        NA       NA    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.4421 on 733 degrees of freedom
+## Multiple R-Squared: 0.01679,	Adjusted R-squared: 0.004723 
+## Wald test: 10.27 on 9 and 733 DF,  p-value: 5.189e-15
+```
+
+---
+### What's Wrong with Strong Instruments?
+
+-   We know that `\(\mathbf{x}\)` and `\(\mathbf{u}\)` are related, or we
+    wouldn't bother with the IV procedure.
+
+-   If `\(\mathbf{x}\)` and `\(\mathbf{z}\)` are very strongly related, and
+    `\(\mathbf{x}\)` and `\(\mathbf{u}\)` are also substantially related, then
+    `\(\mathbf{z}\)` and `\(\mathbf{u}\)` are almost certainly substantially
+    related, as well.
+
+-   So a central assumption of IV regression fails.
+
+---
+
+```r
+miguellm2 &lt;- lm(any_prio ~ gdp_g + gdp_g_l +GPCP_g + GPCP_g_l + y_0 + polity2l + ethfrac + relfrac + Oil + lpopl1 + lmtnest + year:country_name, data=mss_repdata_1_)
+
+library(jtools)
+
+summ(miguellm2)
+```
+
+&lt;table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; Observations &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 743 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; Dependent variable &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; any_prio &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; Type &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; OLS linear regression &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt; &lt;table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; F(52,690) &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18.03 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; R² &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.58 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; Adj. R² &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.54 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt; &lt;table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;border-bottom: 0;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Est. &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; S.E. &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; t val. &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; (Intercept) &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -124.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25.51 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -4.86 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; gdp_g &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.41 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.16 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -2.54 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; gdp_g_l &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.09 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.16 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.55 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.59 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; GPCP_g &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.06 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.64 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; GPCP_g_l &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.13 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.06 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -2.20 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.03 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; y_0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 12.16 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.72 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2.58 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; polity2l &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -1.53 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.13 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; ethfrac &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 87.06 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 21.19 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; relfrac &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 71.41 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 27.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2.64 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; Oil &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.13 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.20 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.85 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; lpopl1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.05 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.34 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.15 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.88 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; lmtnest &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2.55 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.51 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.72 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.47 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; year:country_nameAngola &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.07 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.94 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; year:country_nameBenin &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.15 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.25 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; year:country_nameBotswana &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.13 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.26 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; year:country_nameBurkina Faso &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.81 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.42 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; year:country_nameBurundi &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2.92 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; year:country_nameCameroon &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -1.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.32 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; year:country_nameCentral African Republic &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.26 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.79 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; year:country_nameChad &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.24 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.81 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; year:country_nameCongo &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.43 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.67 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; year:country_nameDjibouti &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.02 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.52 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.13 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; year:country_nameEthiopia &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.25 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.80 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; year:country_nameGabon &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -1.20 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.23 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; year:country_nameGambia &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.02 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.63 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.10 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; year:country_nameGhana &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.02 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.98 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; year:country_nameGuinea &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.25 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.21 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; year:country_nameGuinea-Bissau &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.69 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; year:country_nameIvory Coast &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.96 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.34 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; year:country_nameKenya &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.94 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.35 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; year:country_nameLesotho &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2.77 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; year:country_nameLiberia &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.38 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.70 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; year:country_nameMadagascar &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2.63 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; year:country_nameMalawi &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.66 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.51 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; year:country_nameMali &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.02 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.56 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.12 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; year:country_nameMauritania &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.04 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.49 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; year:country_nameMozambique &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.33 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.74 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; year:country_nameNamibia &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.78 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; year:country_nameNiger &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.24 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.22 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; year:country_nameNigeria &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.67 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.50 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; year:country_nameRwanda &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2.69 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; year:country_nameSenegal &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.02 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.63 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.10 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; year:country_nameSierra Leone &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.08 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.94 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; year:country_nameSomalia &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.05 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.12 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; year:country_nameSouth Africa &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.02 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -1.43 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.15 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; year:country_nameSudan &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.65 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.52 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; year:country_nameSwaziland &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.49 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.62 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; year:country_nameTanzania, United Republic of &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.79 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.43 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; year:country_nameTogo &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.99 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.32 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; year:country_nameUganda &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.90 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.37 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; year:country_nameZaire &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.62 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.53 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; year:country_nameZambia &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.38 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.70 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; year:country_nameZimbabwe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.12 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.26 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;tfoot&gt;&lt;tr&gt;&lt;td style="padding: 0; " colspan="100%"&gt;
+&lt;sup&gt;&lt;/sup&gt; Standard errors: OLS&lt;/td&gt;&lt;/tr&gt;&lt;/tfoot&gt;
+&lt;/table&gt;
+
+---
+### Encouragement Designs in Experiments
+
+-   Intent-to-treat analysis
+
+-   Use the treatment assignment as an instrument, the actual treatment
+    received as the treatment variable, and the outcome as normal.
+
+---
+
+```r
+library(readr)
+peruemotions &lt;- read_csv("https://github.com/jnseawright/PS406/raw/main/data/peruemotions.csv")
+```
+
+```
+## New names:
+## Rows: 450 Columns: 76
+## ── Column specification
+## ──────────────────────────────────────────────────────── Delimiter: "," chr
+## (1): treatment dbl (75): ...1, index, Cuzco, angertreat, anxietytreat,
+## calmtreat, outvote1,...
+## ℹ Use `spec()` to retrieve the full column specification for this data. ℹ
+## Specify the column types or set `show_col_types = FALSE` to quiet this message.
+## • `` -&gt; `...1`
+```
+
+---
+
+```r
+summary(lm(outsidervote~simpletreat, data=peruemotions))
+```
+
+```
+## 
+## Call:
+## lm(formula = outsidervote ~ simpletreat, data = peruemotions)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -0.6093 -0.4916  0.3907  0.5084  0.5084 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  0.49164    0.02874  17.104   &lt;2e-16 ***
+## simpletreat  0.11763    0.04962   2.371   0.0182 *  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.497 on 448 degrees of freedom
+## Multiple R-squared:  0.01239,	Adjusted R-squared:  0.01018 
+## F-statistic:  5.62 on 1 and 448 DF,  p-value: 0.01818
+```
+
+---
+
+```r
+summary(lm(outsidervote~enojado, data=peruemotions))
+```
+
+```
+## 
+## Call:
+## lm(formula = outsidervote ~ enojado, data = peruemotions)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -0.6905 -0.5147  0.3095  0.4853  0.4853 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  0.51471    0.02463   20.90   &lt;2e-16 ***
+## enojado      0.17577    0.08062    2.18   0.0298 *  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.4975 on 448 degrees of freedom
+## Multiple R-squared:  0.0105,	Adjusted R-squared:  0.00829 
+## F-statistic: 4.753 on 1 and 448 DF,  p-value: 0.02976
+```
+
+---
+
+```r
+summary(ivreg(outsidervote~enojado|simpletreat,data=peruemotions))
+```
+
+```
+## 
+## Call:
+## ivreg(formula = outsidervote ~ enojado | simpletreat, data = peruemotions)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -2.0804 -0.3716 -0.3716  0.6284  0.6284 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  0.37162    0.09586   3.877 0.000122 ***
+## enojado      1.70882    0.96993   1.762 0.078788 .  
+## 
+## Diagnostic tests:
+##                  df1 df2 statistic p-value  
+## Weak instruments   1 448     5.664  0.0177 *
+## Wu-Hausman         1 447     4.608  0.0324 *
+## Sargan             0  NA        NA      NA  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.6688 on 448 degrees of freedom
+## Multiple R-Squared: -0.7881,	Adjusted R-squared: -0.7921 
+## Wald test: 3.104 on 1 and 448 DF,  p-value: 0.07879
+```
+
+---
+
+```r
+summary(lm(outsidervote~enojado+simpletreat, data=peruemotions))
+```
+
+```
+## 
+## Call:
+## lm(formula = outsidervote ~ enojado + simpletreat, data = peruemotions)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -0.7439 -0.4807  0.3630  0.5193  0.5193 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  0.48066    0.02921  16.453   &lt;2e-16 ***
+## enojado      0.15639    0.08081   1.935   0.0536 .  
+## simpletreat  0.10687    0.04978   2.147   0.0324 *  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.4955 on 447 degrees of freedom
+## Multiple R-squared:  0.0206,	Adjusted R-squared:  0.01621 
+## F-statistic:   4.7 on 2 and 447 DF,  p-value: 0.009551
+```
+
+---
+### LATE
+
+-   Let's divide our population into four categories:
+
+    1.  Compliers: will have high `\(\mathbf{x}\)` whenever `\(\mathbf{z}\)` is
+        high, and low `\(\mathbf{x}\)` whenever `\(\mathbf{z}\)` is low.
+
+    2.  Defiers: will have low `\(\mathbf{x}\)` whenever `\(\mathbf{z}\)` is
+        high, and high `\(\mathbf{x}\)` whenever `\(\mathbf{z}\)` is low.
+
+    3.  Always-takers: will have high `\(\mathbf{x}\)` no matter what.
+
+    4.  Never-takers: will have low `\(\mathbf{x}\)` no matter what.
+
+---
+### LATE
+
+-   The effect of the instrument on the treatment is
+    `\(\%Compliers - \%Defiers\)`.
+
+-   The effect of the instrument on the outcome, given the exclusion
+    restriction, is (ATE for Compliers)$*\%Compliers -$ (ATE for
+    Defiers)$*\%Defiers$.
+
+---
+### Beyond LATE
+
+-   Aronow and Carnegie propose estimating ATE by reweighting on the
+    *compliance score*.
+
+-   The compliance score is the probability that the received treatment
+    is greater, when in the encouragement treatment, than it is in the
+    control.
+
+---
+
+```r
+peruemotionstrim &lt;- na.omit(data.frame(enojado=peruemotions$enojado, 
+       outsidervote=peruemotions$outsidervote, 
+       simpletreat=peruemotions$simpletreat, 
+       Cuzco=peruemotions$Cuzco,
+       age=peruemotions$age))
+
+library(icsw)
+```
+
+---
+
+```r
+exp.reweight &lt;- with(peruemotionstrim, icsw.tsls(D=enojado, Y=outsidervote, 
+       Z=simpletreat, X=cbind(1,Cuzco), W=cbind(Cuzco,age), R=100))
+```
+
+```
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+
+## Warning in clip.small.probs(scores, min.prob): Probabilities &lt;= 0 encountered
+## and min.prob not set. Replacing with smallest value &gt; 0.
+```
+
+---
+
+```r
+exp.reweight$coefficients
+```
+
+```
+##                 Cuzco          D 
+##  0.5810754 -0.1744233 -1.3042105
+```
+
+```r
+exp.reweight$coefs.se.boot
+```
+
+```
+##                   Cuzco           D 
+##   0.1976429   2.6300524 245.7836249
+```
+
+---
+
+```r
+sidelm &lt;- lm(enojado ~ simpletreat+Cuzco+age, data= peruemotionstrim)
+summ(sidelm)
+```
+
+&lt;table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; Observations &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 438 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; Dependent variable &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; enojado &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; Type &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; OLS linear regression &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt; &lt;table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; F(3,434) &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.39 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; R² &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.02 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; Adj. R² &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.02 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt; &lt;table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;border-bottom: 0;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Est. &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; S.E. &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; t val. &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; (Intercept) &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.15 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.04 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.58 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; simpletreat &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.07 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2.33 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.02 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; Cuzco &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.04 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -1.20 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.23 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; age &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -1.75 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.08 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;tfoot&gt;&lt;tr&gt;&lt;td style="padding: 0; " colspan="100%"&gt;
+&lt;sup&gt;&lt;/sup&gt; Standard errors: OLS&lt;/td&gt;&lt;/tr&gt;&lt;/tfoot&gt;
+&lt;/table&gt;
+
+---
+### When Might 2SLS or IV Be a Good Idea?
+
+-   If there's a true randomization in the world that you can take
+    advantage of -- but there still might be down-sides.
+
+-   As a Hausmann test, to see if your most important results hold up
+    under some alternative assumptions.
+
+-   If a reviewer demands it of you.
+
+---
+### RDD
+
+-   Regression-discontinuity designs (Thistlethwaite and Campbell 1960)
+    are a systematic way of finding natural experiments.
+
+    1.  Suppose treatment assignment is based on passing a threshold on
+        a measured, underlying continuous variable.
+
+    2.  Then, cases just above and just below the threshold should be
+        basically identical.
+
+    3.  So comparing borderline cases allows a valid causal inference.
+
+---
+### RDD
+
+-   An RDD can be analyzed by comparing simple average scores just above
+    and just below the threshold.
+
+-   Alternatively, a (simple or complex) statistical model may be used
+    to extrapolate from the data just above and just below the
+    threshold.
+
+---
+
+&lt;img src="images/Lee1.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="images/Lee2.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+
+```
+## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+## ✔ forcats   1.0.0     ✔ stringr   1.5.0
+## ✔ lubridate 1.9.3     ✔ tibble    3.2.1
+## ✔ purrr     1.0.2     ✔ tidyr     1.3.0
+## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## ✖ nlme::collapse() masks dplyr::collapse()
+## ✖ dplyr::filter()  masks stats::filter()
+## ✖ dplyr::lag()     masks stats::lag()
+## ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors
+## Version:  1.39.3
+## Date:     2023-11-09
+## Author:   Philip Leifeld (University of Essex)
+## 
+## Consider submitting praise using the praise or praise_interactive functions.
+## Please cite the JSS article in your publications -- see citation("texreg").
+## 
+## 
+## Attaching package: 'texreg'
+## 
+## 
+## The following object is masked from 'package:tidyr':
+## 
+##     extract
+```
+
+---
+
+```r
+#This coding example due to Yuta Toyama.
+demmeans &lt;- split(lmb_data$democrat, cut(lmb_data$lagdemvoteshare, 100)) %&gt;%
+  lapply(mean) %&gt;%
+  unlist()
+
+agg_lmb_data &lt;- data.frame(democrat = demmeans, lagdemvoteshare = seq(0.01,1, by = 0.01))
+```
+
+---
+
+```r
+lmb_data &lt;- lmb_data %&gt;%
+  mutate(gg_group = if_else(lagdemvoteshare &gt; 0.5, 1,0))
+
+gg_srd = ggplot(data=lmb_data, aes(lagdemvoteshare, democrat)) +
+  geom_point(aes(x = lagdemvoteshare, y = democrat), data = agg_lmb_data) +
+  xlim(0,1) + ylim(-0.1,1.1) +
+  geom_vline(xintercept = 0.5) +
+  xlab("Democrat Vote Share, time t") +
+  ylab("Probability of Democrat Win, time t+1") +
+  scale_y_continuous(breaks=seq(0,1,0.2)) +
+  ggtitle(TeX("Effect of Initial Win on Winning Next Election: $\\P^D_{t+1} - P^R_{t+1}$"))
+```
+
+```
+## Scale for y is already present.
+## Adding another scale for y, which will replace the existing scale.
+```
+
+---
+
+```r
+gg_srd + stat_smooth(aes(lagdemvoteshare, democrat, group = gg_group),
+  method = "lm"
+  , formula = y ~ x + I(x^2))
+```
+
+```
+## Warning: Removed 11 rows containing non-finite values (`stat_smooth()`).
+```
+
+```
+## Warning: Removed 13 rows containing missing values (`geom_point()`).
+```
+
+&lt;img src="5naturalexperiments2_files/figure-html/unnamed-chunk-23-1.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+
+```r
+gg_srd + stat_smooth(data=lmb_data %&gt;% filter(lagdemvoteshare&gt;.45 &amp; lagdemvoteshare&lt;.55),
+  aes(lagdemvoteshare, democrat, group = gg_group),
+  method = "lm", formula = y ~ x + I(x^2))
+```
+
+```
+## Warning: Removed 13 rows containing missing values (`geom_point()`).
+```
+
+&lt;img src="5naturalexperiments2_files/figure-html/unnamed-chunk-24-1.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+
+```r
+lmb_subset &lt;- lmb_data %&gt;%
+     filter(lagdemvoteshare&gt;.48 &amp; lagdemvoteshare&lt;.52)
+
+lm_1 &lt;- lm_robust(score ~ lagdemocrat, data = lmb_subset, se_type = "HC1")
+summary(lm_1)
+```
+
+```
+## 
+## Call:
+## lm_robust(formula = score ~ lagdemocrat, data = lmb_subset, se_type = "HC1")
+## 
+## Standard error type:  HC1 
+## 
+## Coefficients:
+##             Estimate Std. Error t value  Pr(&gt;|t|) CI Lower CI Upper  DF
+## (Intercept)    31.20      1.334   23.39 3.788e-95    28.58    33.81 913
+## lagdemocrat    21.28      1.951   10.91 3.987e-26    17.45    25.11 913
+## 
+## Multiple R-squared:  0.1152 ,	Adjusted R-squared:  0.1142 
+## F-statistic:   119 on 1 and 913 DF,  p-value: &lt; 2.2e-16
+```
+
+---
+### RDD Windows
+
+-   How wide a window above and below the break point?
+
+---
+
+```r
+lmb_subset &lt;- lmb_data %&gt;%
+     filter(lagdemvoteshare&gt;.49 &amp; lagdemvoteshare&lt;.51)
+
+lm_1 &lt;- lm_robust(score ~ lagdemocrat, data = lmb_subset, se_type = "HC1")
+summary(lm_1)
+```
+
+```
+## 
+## Call:
+## lm_robust(formula = score ~ lagdemocrat, data = lmb_subset, se_type = "HC1")
+## 
+## Standard error type:  HC1 
+## 
+## Coefficients:
+##             Estimate Std. Error t value  Pr(&gt;|t|) CI Lower CI Upper  DF
+## (Intercept)    31.71      1.938  16.358 4.539e-47    27.90    35.52 428
+## lagdemocrat    23.97      2.799   8.564 1.985e-16    18.47    29.47 428
+## 
+## Multiple R-squared:  0.1453 ,	Adjusted R-squared:  0.1433 
+## F-statistic: 73.34 on 1 and 428 DF,  p-value: &lt; 2.2e-16
+```
+
+---
+
+```r
+lmb_subset &lt;- lmb_data %&gt;%
+     filter(lagdemvoteshare&gt;.495 &amp; lagdemvoteshare&lt;.505)
+
+lm_1 &lt;- lm_robust(score ~ lagdemocrat, data = lmb_subset, se_type = "HC1")
+summary(lm_1)
+```
+
+```
+## 
+## Call:
+## lm_robust(formula = score ~ lagdemocrat, data = lmb_subset, se_type = "HC1")
+## 
+## Standard error type:  HC1 
+## 
+## Coefficients:
+##             Estimate Std. Error t value  Pr(&gt;|t|) CI Lower CI Upper  DF
+## (Intercept)    29.55      2.547  11.600 3.574e-24    24.52    34.57 202
+## lagdemocrat    29.13      3.845   7.577 1.250e-12    21.55    36.72 202
+## 
+## Multiple R-squared:  0.2177 ,	Adjusted R-squared:  0.2138 
+## F-statistic: 57.41 on 1 and 202 DF,  p-value: 1.25e-12
+```
+
+---
+### RDD
+
+&gt; Irrespective of the manner in which the bandwidth is chosen, one
+&gt; should always investigate the sensitivity of the inferences to this
+&gt; choice, for example, by including results for bandwidths twice (or
+&gt; four times) and half (or a quarter of) the size of the originally
+&gt; chosen bandwidth. Obviously, such bandwidth choices affect both
+&gt; estimates and standard errors, but if the results are critically
+&gt; dependent on a particular bandwidth choice, they are clearly less
+&gt; credible than if they are robust to such variation in bandwidths.
+&gt; (Imbens and Lemieux 2008)
+
+---
+### RDD
+
+-   Green, Leong, Kern, Gerber, and Larimer find that an estimate of the
+    optimal bandwidth proposed by Imbens and Kalyanaraman, in
+    conjunction with local linear regression, helps RDD come very close
+    to replicating experimental results.
+
+---
+
+```r
+library(rdd)
+```
+
+```
+## Loading required package: AER
+```
+
+```
+## Loading required package: car
+```
+
+```
+## Loading required package: carData
+```
+
+```
+## 
+## Attaching package: 'car'
+```
+
+```
+## The following object is masked from 'package:purrr':
+## 
+##     some
+```
+
+```
+## The following object is masked from 'package:dplyr':
+## 
+##     recode
+```
+
+```
+## Loading required package: survival
+```
+
+```
+## Registered S3 methods overwritten by 'AER':
+##   method              from 
+##   print.ivreg         ivreg
+##   print.summary.ivreg ivreg
+##   summary.ivreg       ivreg
+##   vcov.ivreg          ivreg
+##   bread.ivreg         ivreg
+##   estfun.ivreg        ivreg
+##   hatvalues.ivreg     ivreg
+##   predict.ivreg       ivreg
+##   anova.ivreg         ivreg
+##   terms.ivreg         ivreg
+##   model.matrix.ivreg  ivreg
+##   update.ivreg        ivreg
+```
+
+```
+## 
+## Attaching package: 'AER'
+```
+
+```
+## The following objects are masked from 'package:ivreg':
+## 
+##     ivreg, ivreg.fit
+```
+
+```
+## Loading required package: Formula
+```
+
+```r
+rddik &lt;- RDestimate(score ~ lagdemvoteshare, cutpoint=0.5, data=lmb_data)
+summary(rddik)
+```
+
+```
+## 
+## Call:
+## RDestimate(formula = score ~ lagdemvoteshare, data = lmb_data, 
+##     cutpoint = 0.5)
+## 
+## Type:
+## sharp 
+## 
+## Estimates:
+##            Bandwidth  Observations  Estimate  Std. Error  z value  Pr(&gt;|z|) 
+## LATE       0.12883     6072         18.84     1.637       11.511   1.163e-30
+## Half-BW    0.06442     3150         20.48     2.353        8.705   3.190e-18
+## Double-BW  0.25767    10512         22.45     1.162       19.321   3.583e-83
+##               
+## LATE       ***
+## Half-BW    ***
+## Double-BW  ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## F-statistics:
+##            F       Num. DoF  Denom. DoF  p
+## LATE        516.1  3          6068       0
+## Half-BW     167.8  3          3146       0
+## Double-BW  1324.0  3         10508       0
+```
+
+---
+
+```r
+library(rdrobust)
+rdbw2 &lt;- rdbwselect(lmb_data$score, lmb_data$lagdemvoteshare, c=0.5)
+```
+
+```
+## Warning in rdbwselect(lmb_data$score, lmb_data$lagdemvoteshare, c = 0.5): Mass
+## points detected in the running variable.
+```
+
+```r
+summary(rdbw2)
+```
+
+```
+## Call: rdbwselect
+## 
+## Number of Obs.                13577
+## BW type                       mserd
+## Kernel                   Triangular
+## VCE method                       NN
+## 
+## Number of Obs.                 5670         7907
+## Order est. (p)                    1            1
+## Order bias  (q)                   2            2
+## Unique Obs.                    2878         3279
+## 
+## =======================================================
+##                   BW est. (h)    BW bias (b)
+##             Left of c Right of c  Left of c Right of c
+## =======================================================
+##      mserd     0.086      0.086      0.133      0.133
+## =======================================================
+```
+
+---
+
+```r
+lmb_subset &lt;- lmb_data %&gt;%
+     filter(lagdemvoteshare&gt;.41 &amp; lagdemvoteshare&lt;.59)
+
+lm_final &lt;- lm_robust(score ~ lagdemocrat, data = lmb_subset, se_type = "HC1")
+summary(lm_final)
+```
+
+```
+## 
+## Call:
+## lm_robust(formula = score ~ lagdemocrat, data = lmb_subset, se_type = "HC1")
+## 
+## Standard error type:  HC1 
+## 
+## Coefficients:
+##             Estimate Std. Error t value   Pr(&gt;|t|) CI Lower CI Upper   DF
+## (Intercept)    28.35     0.5779   49.06  0.000e+00    27.21    29.48 4304
+## lagdemocrat    28.77     0.8610   33.41 7.265e-218    27.08    30.46 4304
+## 
+## Multiple R-squared:  0.2067 ,	Adjusted R-squared:  0.2066 
+## F-statistic:  1117 on 1 and 4304 DF,  p-value: &lt; 2.2e-16
+```
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create();
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

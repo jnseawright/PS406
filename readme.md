@@ -8,7 +8,7 @@
 * [Tuesday](https://jnseawright.github.io/IPSA2024/Regression%20and%20Case%20Studies%20Slides/IPSA%202024%20Day%202.pdf) 
 * [Wednesday](https://jnseawright.github.io/IPSA2024/Regression%20and%20Case%20Studies%20Slides/IPSA%202024%20Day%203.pdf)
 * [Thursday](https://jnseawright.github.io/IPSA2024/Regression%20and%20Case%20Studies%20Slides/IPSA%202024%20Day%204.pdf)
-* [Friday](https://jnseawright.github.io/IPSA2024/Regression%20and%20Case%20Studies%20Slides/IPSA%202024%20Day%205.pdf) 
+* [Week 5: Natural Experiments Part 2](https://jnseawright.github.io/PS406/5naturalexperiments2.html#1) 
 
 ### Labs
 
