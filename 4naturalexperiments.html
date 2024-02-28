@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>4: Natural Experiments</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="J. Seawright" />
+    <meta name="date" content="2024-04-15" />
+    <script src="4naturalexperiments_files/header-attrs-2.25/header-attrs.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# 4: Natural Experiments
+]
+.subtitle[
+## Quantitative Causal Inference
+]
+.author[
+### <large>J. Seawright</large>
+]
+.institute[
+### <small>Northwestern Political Science</small>
+]
+.date[
+### April 15, 2024
+]
+
+---
+
+class: center, middle
+
+&lt;style type="text/css"&gt;
+pre {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+pre[class] {
+  max-height: 200px;
+}
+&lt;/style&gt;
+
+
+
+
+---
+### Typology of Natural Experiments
+
+-   Classic Natural Experiment
+
+-   Instrumental Variables-Type Natural Experiment
+
+-   Regression-Discontinuity Design
+
+---
+### Key Ideas for Natural Experiments
+
+The cause of the cause, and the cause of the cause of the cause
+
+---
+### Classic Natural Experiment
+
+1.  "Nature" randomizes the treatment.
+
+    -   No discretion is involved in assigning treatments, or the
+        relevant information is unavailable or unused.
+
+2.  Randomized treatment has the same effect as non-randomized treatment
+    would have.
+
+---
+### Snow: the Most Famous Natural Experiment
+&lt;img src="images/jonsnow.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+---
+### Snow: the Most Famous Natural Experiment
+&lt;img src="images/johnsnow.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+---
+### Snow: the Most Famous Natural Experiment
+&lt;img src="images/snowpubandpump.png" width="50%" style="display: block; margin: auto;" /&gt;
+
+---
+### Snow on Cholera
+&lt;img src="images/snowcrossdistrict.jpg" width="40%" style="display: block; margin: auto;" /&gt;
+
+---
+''Although the facts shown in the above table afford very strong evidence
+of the powerful influence which the drinking of water containing the
+sewage of a town exerts over the spread of cholera, when that disease is
+present, yet the question does not end here; for the intermixing of the
+water supply of the Southwark and Vauxhall Company with that of the
+Lambeth Company, over an extensive part of London, admitted of the
+subject being sifted in such a way as to yield the most incontrovertible
+proof on one side or the other.''
+
+---
+''In the sub-districts enumerated in the above table as being supplied by
+both Companies, the mixing of the supply is of the most intimate kind.
+The pipes of each Company go down all the streets, and into nearly all
+the courts and alleys. A few houses are supplied by one Company and a
+few by the other, according to the decision of the owner or occupier at
+that time when the Water Companies were in active competition. In many
+cases a single house has a supply different from that on either side.
+Each company supplies both rich and poor, both large houses and small;
+there is no difference either in the condition or occupation of the
+persons receiving the water of the different Companies.''
+
+---
+
+&lt;img src="images/snowwithindistrict.jpg" width="40%" style="display: block; margin: auto;" /&gt;
+
+---
+
+```r
+snowtable8 &lt;- read_csv("https://github.com/jnseawright/PS406/raw/main/data/snowtable8.csv")
+```
+
+```
+## Rows: 32 Columns: 12
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: ","
+## chr (5): subDistrict, supplier, lambethdegree, last3imputed, district
+## dbl (7): pop1851, deathsOverall, deathsSouthwark, deathsLambeth, deathsPump,...
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+```
+
+```r
+snowlm &lt;- lm(deathsOverall ~ supplier, data=snowtable8)
+```
+---
+
+```r
+summary(snowlm)
+```
+
+```
+## 
+## Call:
+## lm(formula = deathsOverall ~ supplier, data = snowtable8)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -69.333 -16.896  -1.625  16.813  54.667 
+## 
+## Coefficients:
+##                                   Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)                           4.50      14.93   0.302 0.765175    
+## supplierSouthwarkVauxhall            65.83      17.23   3.820 0.000651 ***
+## supplierSouthwarkVauxhall_Lambeth    36.25      16.69   2.172 0.038139 *  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 29.85 on 29 degrees of freedom
+## Multiple R-squared:  0.3575,	Adjusted R-squared:  0.3132 
+## F-statistic:  8.07 on 2 and 29 DF,  p-value: 0.001636
+```
+
+---
+
+```r
+snowlm2 &lt;- lm(I(log(pop1851))~ supplier, data=snowtable8)
+summary(snowlm2)
+```
+
+```
+## 
+## Call:
+## lm(formula = I(log(pop1851)) ~ supplier, data = snowtable8)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.90380 -0.16029 -0.00353  0.28874  0.80617 
+## 
+## Coefficients:
+##                                   Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)                         8.3014     0.1886  44.019  &lt; 2e-16 ***
+## supplierSouthwarkVauxhall           1.1731     0.2178   5.387 8.65e-06 ***
+## supplierSouthwarkVauxhall_Lambeth   1.5134     0.2108   7.178 6.70e-08 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.3772 on 29 degrees of freedom
+## Multiple R-squared:  0.6402,	Adjusted R-squared:  0.6153 
+## F-statistic:  25.8 on 2 and 29 DF,  p-value: 3.661e-07
+```
+
+---
+### Brady and McNulty on Costs of Voting
+
+---
+&lt;img src="images/bradymcnulty.JPG" width="100%" style="display: block; margin: auto;" /&gt;
+
+---
+### Vietnam War Draft Lottery
+
+---
+&lt;img src="images/draftrandom.JPG" width="100%" style="display: block; margin: auto;" /&gt;
+
+---
+
+```r
+draft1970 &lt;- read_csv("https://github.com/jnseawright/PS406/raw/main/data/draft1970.csv")
+```
+
+```
+## Rows: 366 Columns: 3
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: ","
+## dbl (3): day, rank, month
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+```
+---
+
+```r
+boxplot(rank~month, data=draft1970)
+```
+
+&lt;img src="4naturalexperiments_files/figure-html/unnamed-chunk-13-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+```r
+draftlm &lt;- lm(rank ~ day, data=draft1970)
+```
+---
+
+```r
+summ(draftlm)
+```
+
+&lt;table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; Observations &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 366 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; Dependent variable &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; rank &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; Type &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; OLS linear regression &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt; &lt;table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; F(1,364) &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 19.54 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; R² &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.05 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; Adj. R² &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.05 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt; &lt;table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;border-bottom: 0;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Est. &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; S.E. &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; t val. &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; (Intercept) &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 224.91 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10.81 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20.80 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; day &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.23 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.05 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -4.42 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;tfoot&gt;&lt;tr&gt;&lt;td style="padding: 0; " colspan="100%"&gt;
+&lt;sup&gt;&lt;/sup&gt; Standard errors: OLS&lt;/td&gt;&lt;/tr&gt;&lt;/tfoot&gt;
+&lt;/table&gt;
+---
+
+```r
+draft1971 &lt;- read_csv("https://github.com/jnseawright/PS406/raw/main/data/draft1971.csv")
+```
+
+```
+## Rows: 365 Columns: 3
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: ","
+## dbl (3): day, rank, month
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+```
+---
+
+```r
+boxplot(rank~month, data=draft1971)
+```
+
+&lt;img src="4naturalexperiments_files/figure-html/unnamed-chunk-17-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+```r
+draft71lm &lt;- lm(rank ~ day, data=draft1971)
+```
+---
+
+```r
+summ(draft71lm)
+```
+
+&lt;table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; Observations &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 365 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; Dependent variable &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; rank &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; Type &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; OLS linear regression &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt; &lt;table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; F(1,363) &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.07 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; R² &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; Adj. R² &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.00 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt; &lt;table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;border-bottom: 0;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Est. &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; S.E. &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; t val. &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; (Intercept) &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 180.39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11.08 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 16.28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; day &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.05 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.27 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.79 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;tfoot&gt;&lt;tr&gt;&lt;td style="padding: 0; " colspan="100%"&gt;
+&lt;sup&gt;&lt;/sup&gt; Standard errors: OLS&lt;/td&gt;&lt;/tr&gt;&lt;/tfoot&gt;
+&lt;/table&gt;
+
+---
+&lt;img src="images/angrist.JPG" width="85%" style="display: block; margin: auto;" /&gt;
+
+---
+### Lottery Winners and Political Attitudes
+
+---
+&lt;img src="images/Doherty1.png" width="60%" style="display: block; margin: auto;" /&gt;
+
+---
+&lt;img src="images/Doherty2.png" width="80%" style="display: block; margin: auto;" /&gt;
+
+---
+&lt;img src="images/Doherty3.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+---
+### IV Natural Experiment
+
+1.  "Nature" randomizes a cause of the treatment.
+
+    -   Call the treatment `\(X\)`.
+
+    -   Call the randomized cause of the treatment `\(Z\)`.
+
+2.  `\(Z\)` only affects `\(Y\)` through its effects on `\(X\)`.
+
+3.  Treatment caused by the randomized cause has the same effect as
+    treatment with any other cause would have.
+
+---
+### Colonialism and Development
+
+&lt;img src="images/settlers1.png" width="520" height="100%" style="display: block; margin: auto;" /&gt;
+---
+### Colonialism and Development
+
+&lt;img src="images/settlers2.png" width="968" height="100%" style="display: block; margin: auto;" /&gt;
+---
+
+### Colonialism and Development
+
+&lt;img src="images/settlers3.png" width="948" height="100%" style="display: block; margin: auto;" /&gt;
+
+---
+### Colonialism and Development
+
+&lt;img src="images/settlers4.png" width="80%" style="display: block; margin: auto;" /&gt;
+
+---
+### Vietnam Draft Lottery and Returns to Education
+
+&lt;img src="images/Angrist1.png" width="80%" style="display: block; margin: auto;" /&gt;
+
+---
+&lt;img src="images/Angrist2.png" width="50%" style="display: block; margin: auto;" /&gt;
+
+---
+&lt;img src="images/Pierskalla.JPG" height="100%" style="display: block; margin: auto;" /&gt;
+
+---
+&lt;img src="images/PierskallaInstrumentArgument.JPG" height="100%" style="display: block; margin: auto;" /&gt;
+
+---
+&lt;img src="images/PierskallaInstrumentFootnote.JPG" height="100%" style="display: block; margin: auto;" /&gt;
+
+---
+&lt;img src="images/PierskallaInstrumentResults.JPG" height="100%" style="display: block; margin: auto;" /&gt;
+
+---
+### RDD
+
+1.  There is an assignment variable, `\(Z\)`.
+
+2.  Cases are assigned to treatment if and only if `\(Z\)` is greater than a
+    predetermined threshold value, `\(T\)`.
+
+3.  There are enough cases that lots have scores of `\(Z\)` that are just
+    above and just below `\(T\)`.
+
+---
+### Example: Maimonides' Rule
+
+&gt; "The number of pupils assigned to each teacher is twenty-five. If
+&gt; there are fifty, we appoint two teachers. If there are forty, we
+&gt; appoint an assistant, at the expense of the town." (Baba Bathra,
+&gt; Chapter II, page 21a; translated by Epstein 1976: 214)
+
+---
+### Example: Maimonides' Rule
+
+&gt; "Twenty-five children may be put in charge of one teacher. If the
+&gt; number in the class exceeds twenty-five but is not more than forty, he
+&gt; should have an assistant to help with the instruction. If there are
+&gt; more than forty, two teachers must be appointed." (Maimonides, given
+&gt; in Hyamson 1937: 58b)
+
+---
+### Example: Maimonides' Rule
+
+-   Maimonides' Rule is used to determine class sizes in Israel.
+
+-   Angrist and Lavy (1999) use this to carry out an RDD analysis of the
+    effects of class size on educational outcomes.
+
+---
+### Example: Maimonides' Rule
+
+&lt;img src="images/maimonverb.jpeg" width="65%" style="display: block; margin: auto;" /&gt;
+
+---
+### Example: Maimonides' Rule
+
+&lt;img src="images/maimonmath.jpeg" width="65%" style="display: block; margin: auto;" /&gt;
+
+---
+&lt;img src="images/Broockman.JPG" width="65%" style="display: block; margin: auto;" /&gt;
+
+---
+&lt;img src="images/BroockmanRDDVisual.JPG" width="65%" style="display: block; margin: auto;" /&gt;
+
+---
+&lt;img src="images/BroockmanSuccess.JPG" width="65%" style="display: block; margin: auto;" /&gt;
+
+---
+&lt;img src="images/BroockmanFailure.JPG" width="65%" style="display: block; margin: auto;" /&gt;
+
+---
+### RDD
+
+RDD isn't a good idea if:
+
+-   Actors are aware of the discontinuity and adjust their behavior
+    accordingly.
+
+-   The variable which assigns the discontinuity is so coarsely measured
+    or distributed that the cases nearest to the divide are not close to
+    each other.
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create();
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

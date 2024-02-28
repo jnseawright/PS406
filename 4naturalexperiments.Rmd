@@ -142,13 +142,13 @@ snowlm <- lm(deathsOverall ~ supplier, data=snowtable8)
 ```
 ---
 ```{r, echo = TRUE, out.width="40%", fig.retina = 1, fig.align='center'}
-summ(snowlm)
+summary(snowlm)
 ```
 
 ---
 ```{r, echo = TRUE, out.width="40%", fig.retina = 1, fig.align='center'}
 snowlm2 <- lm(I(log(pop1851))~ supplier, data=snowtable8)
-summ(snowlm2)
+summary(snowlm2)
 ```
 
 ---
