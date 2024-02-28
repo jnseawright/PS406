@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>7: Synthetic Controls, Sensitivity Analysis and Bounds</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="J. Seawright" />
+    <meta name="date" content="2024-05-06" />
+    <script src="7synthetic_files/header-attrs-2.25/header-attrs.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# 7: Synthetic Controls, Sensitivity Analysis and Bounds
+]
+.subtitle[
+## Quantitative Causal Inference
+]
+.author[
+### <large>J. Seawright</large>
+]
+.institute[
+### <small>Northwestern Political Science</small>
+]
+.date[
+### May 6, 2024
+]
+
+---
+
+class: center, middle
+
+&lt;style type="text/css"&gt;
+pre {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+pre[class] {
+  max-height: 200px;
+}
+&lt;/style&gt;
+
+
+
+
+---
+### Manufacture Perfect Comparisons
+
+Strictly speaking, for the Method of Difference to work based on a
+comparison between cases 1 and 2, the condition which must be met is:
+
+`$$\begin{aligned}
+Y_{1,t} = Y_{2,t}\\
+Y_{1,c} = Y_{2,c}\end{aligned}$$`
+
+---
+### Manufacture Perfect Comparisons
+
+No observable condition can ever guarantee that this assumption is met,
+but if we were to find two cases that *exactly* match on a suitably rich
+set of background variables `\(\mathbb{Z}\)`, perhaps, we would come close to believing the
+assumption.
+
+---
+### Manufacture Perfect Comparisons
+
+Unfortunately, if `\(\mathbb{Z}\)` is indeed a reasonably deep list of
+variables, we are unlikely to find cases that in fact exactly match (or
+even come particularly close).
+
+---
+### Manufacture Perfect Comparisons
+
+Abadie and collaborators suggest that we create our own "synthetic"
+control cases, by averaging together existing control cases to come as
+close as possible to exactly matching the treatment case on
+`\(\mathbb{Z}\)`.
+
+---
+### Synthetic Control
+
+The setup is one in which there are `\(N\)` cases, each of which is observed
+at multiple time periods labeled from 1 through `\(T\)`.
+
+---
+### Synthetic Control
+
+Each case has a treatment and control potential outcome for each time
+period. The difference between these is:
+
+`\(\alpha_{i,t} = Y^T_{i,t} - Y^C_{i,t}\)`
+
+---
+### Synthetic Control
+
+Suppose that the treatment of interest happens in *one* case at one time
+period. That is, `\(D_{j,t}=0\)` for all `\(j \neq i\)` and for all
+`\(t &lt; t_{treat}\)`.
+
+---
+### Synthetic Control
+
+Let `\(X_{i} = (\mathbb{Z}_{i}, Y_{i})\)`
+
+Minimize `\(X_{i, t} -  \mathbb{X}_{j, t} W\)` for `\(t &lt; t_{treat}\)`.
+
+---
+### Synthetic Control
+
+`\(\sqrt{(X_{i, t} -  \mathbb{X}_{j, t} W)^{T} V (X_{i, t} -  \mathbb{X}_{j, t} W)}\)`
+
+---
+&lt;img src="images/choosingv.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+&lt;img src="images/chavezsynth.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+&lt;img src="images/chavezsynth2.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+&lt;img src="images/chavezsynth3.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+&lt;img src="images/chavezsynth4.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+&lt;img src="images/chavezsynth5.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+&lt;img src="images/chavezsynth6.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+&lt;img src="images/chavezsynth7.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+&lt;img src="images/chavezsynth8.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+&lt;img src="images/chavezsynth9.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+&lt;img src="images/DeKadt1.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+&lt;img src="images/DeKadt2.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+&lt;img src="images/DeKadt3.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+&lt;img src="images/DeKadt4.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+
+```r
+library(Synth)
+```
+
+```
+## ##
+## ## Synth Package: Implements Synthetic Control Methods.
+```
+
+```
+## ## See https://web.stanford.edu/~jhain/synthpage.html for additional information.
+```
+
+---
+
+```r
+afripanel &lt;- read.csv("https://github.com/jnseawright/PS406/raw/main/data/afripanel.csv")
+
+malidata &lt;- afripanel[afripanel$WBCode=="MLI" | afripanel$cont_dem_ind==1,]
+
+malicontrols &lt;- unique(malidata$WBCode[malidata$WBCode!="MLI"&amp;malidata$WBCode!="ETH"&amp;malidata$WBCode!="SDN"])
+```
+
+---
+
+```r
+mali.prep &lt;- dataprep(
+    foo=malidata, 
+    predictors=c(
+      "lngdpmadlag",
+      "lngdpmadlag2",
+      "lngdpmadlag3",
+      "lngdpmadlag4",
+      "lnpop",
+      "ki",
+      "openk",
+      "civwar",
+      "civwarend",
+      "pwt_xrate",
+      "pwt_xrate_lag1",
+      "pwt_xrate_lag2",
+      "pwt_xrate_lag3",
+      "eximdiff",
+      "eximdiff_lag1",
+      "eximdiff_lag2",
+      "wbank",
+      "wbank_lag1",
+      "wbank_lag2",
+      "imfadj",
+      "imfadj_lag1",
+      "imfadj_lag2"
+    ),
+    dependent="lngdpmad",
+    unit.variable="wbcode2",
+    time.variable="year", 
+    treatment.identifier="MLI", 
+    controls.identifier=malicontrols,          
+    time.predictors.prior=c(1975:1990),
+    time.optimize.ssr=c(1975:1991),
+    time.plot=c(1975:2008),
+    unit.names.variable="WBCode"
+)
+```
+
+```
+## 
+##  Missing data- treated unit; predictor: eximdiff ; for period: 1975 
+##  We ignore (na.rm = TRUE) all missing values for predictors.op.
+## 
+##  Missing data- treated unit; predictor: eximdiff ; for period: 1976 
+##  We ignore (na.rm = TRUE) all missing values for predictors.op.
+## 
+##  Missing data- treated unit; predictor: eximdiff ; for period: 1977 
+##  We ignore (na.rm = TRUE) all missing values for predictors.op.
+## 
+##  Missing data- treated unit; predictor: eximdiff ; for period: 1978 
+##  We ignore (na.rm = TRUE) all missing values for predictors.op.
+## 
+##  Missing data- treated unit; predictor: eximdiff ; for period: 1979 
+##  We ignore (na.rm = TRUE) all missing values for predictors.op.
+## 
+##  Missing data- treated unit; predictor: eximdiff_lag1 ; for period: 1975 
+##  We ignore (na.rm = TRUE) all missing values for predictors.op.
+## 
+##  Missing data- treated unit; predictor: eximdiff_lag1 ; for period: 1976 
+##  We ignore (na.rm = TRUE) all missing values for predictors.op.
+## 
+##  Missing data- treated unit; predictor: eximdiff_lag1 ; for period: 1977 
+##  We ignore (na.rm = TRUE) all missing values for predictors.op.
+## 
+##  Missing data- treated unit; predictor: eximdiff_lag1 ; for period: 1978 
+##  We ignore (na.rm = TRUE) all missing values for predictors.op.
+## 
+##  Missing data- treated unit; predictor: eximdiff_lag1 ; for period: 1979 
+##  We ignore (na.rm = TRUE) all missing values for predictors.op.
+## 
+##  Missing data- treated unit; predictor: eximdiff_lag1 ; for period: 1980 
+##  We ignore (na.rm = TRUE) all missing values for predictors.op.
+## 
+##  Missing data- treated unit; predictor: eximdiff_lag2 ; for period: 1975 
+##  We ignore (na.rm = TRUE) all missing values for predictors.op.
+## 
+##  Missing data- treated unit; predictor: eximdiff_lag2 ; for period: 1976 
+##  We ignore (na.rm = TRUE) all missing values for predictors.op.
+## 
+##  Missing data- treated unit; predictor: eximdiff_lag2 ; for period: 1977 
+##  We ignore (na.rm = TRUE) all missing values for predictors.op.
+## 
+##  Missing data- treated unit; predictor: eximdiff_lag2 ; for period: 1978 
+##  We ignore (na.rm = TRUE) all missing values for predictors.op.
+## 
+##  Missing data- treated unit; predictor: eximdiff_lag2 ; for period: 1979 
+##  We ignore (na.rm = TRUE) all missing values for predictors.op.
+## 
+##  Missing data- treated unit; predictor: eximdiff_lag2 ; for period: 1980 
+##  We ignore (na.rm = TRUE) all missing values for predictors.op.
+## 
+##  Missing data- treated unit; predictor: eximdiff_lag2 ; for period: 1981 
+##  We ignore (na.rm = TRUE) all missing values for predictors.op.
+## 
+##  Missing data - control unit: 2 ; predictor: eximdiff ; for period: 1975 
+##  We ignore (na.rm = TRUE) all missing values for predictors.op.
+## 
+##  Missing data - control unit: 2 ; predictor: eximdiff ; for period: 1976 
+##  We ignore (na.rm = TRUE) all missing values for predictors.op.
+## 
+##  Missing data - control unit: 2 ; predictor: eximdiff ; for period: 1977 
+##  We ignore (na.rm = TRUE) all missing values for predictors.op.
+## 
+##  Missing data - control unit: 2 ; predictor: eximdiff ; for period: 1978 
+##  We ignore (na.rm = TRUE) all missing values for predictors.op.
+## 
+##  Missing data - control unit: 2 ; predictor: eximdiff ; for period: 1979 
+##  We ignore (na.rm = TRUE) all missing values for predictors.op.
+## 
+##  Missing data - control unit: 11 ; predictor: eximdiff ; for period: 1975 
+##  We ignore (na.rm = TRUE) all missing values for predictors.op.
+## 
+##  Missing data - control unit: 11 ; predictor: eximdiff ; for period: 1976 
+##  We ignore (na.rm = TRUE) all missing values for predictors.op.
+## 
+##  Missing data - control unit: 11 ; predictor: eximdiff ; for period: 1977 
+##  We ignore (na.rm = TRUE) all missing values for predictors.op.
+## 
+##  Missing data - control unit: 11 ; predictor: eximdiff ; for period: 1978 
+##  We ignore (na.rm = TRUE) all missing values for predictors.op.
+## 
+##  Missing data - control unit: 11 ; predictor: eximdiff ; for period: 1979 
+##  We ignore (na.rm = TRUE) all missing values for predictors.op.
+## 
+##  Missing data - control unit: 2 ; predictor: eximdiff_lag1 ; for period: 1975 
+##  We ignore (na.rm = TRUE) all missing values for predictors.op.
+## 
+##  Missing data - control unit: 2 ; predictor: eximdiff_lag1 ; for period: 1976 
+##  We ignore (na.rm = TRUE) all missing values for predictors.op.
+## 
+##  Missing data - control unit: 2 ; predictor: eximdiff_lag1 ; for period: 1977 
+##  We ignore (na.rm = TRUE) all missing values for predictors.op.
+## 
+##  Missing data - control unit: 2 ; predictor: eximdiff_lag1 ; for period: 1978 
+##  We ignore (na.rm = TRUE) all missing values for predictors.op.
+## 
+##  Missing data - control unit: 2 ; predictor: eximdiff_lag1 ; for period: 1979 
+##  We ignore (na.rm = TRUE) all missing values for predictors.op.
+## 
+##  Missing data - control unit: 2 ; predictor: eximdiff_lag1 ; for period: 1980 
+##  We ignore (na.rm = TRUE) all missing values for predictors.op.
+## 
+##  Missing data - control unit: 11 ; predictor: eximdiff_lag1 ; for period: 1975 
+##  We ignore (na.rm = TRUE) all missing values for predictors.op.
+## 
+##  Missing data - control unit: 11 ; predictor: eximdiff_lag1 ; for period: 1976 
+##  We ignore (na.rm = TRUE) all missing values for predictors.op.
+## 
+##  Missing data - control unit: 11 ; predictor: eximdiff_lag1 ; for period: 1977 
+##  We ignore (na.rm = TRUE) all missing values for predictors.op.
+## 
+##  Missing data - control unit: 11 ; predictor: eximdiff_lag1 ; for period: 1978 
+##  We ignore (na.rm = TRUE) all missing values for predictors.op.
+## 
+##  Missing data - control unit: 11 ; predictor: eximdiff_lag1 ; for period: 1979 
+##  We ignore (na.rm = TRUE) all missing values for predictors.op.
+## 
+##  Missing data - control unit: 11 ; predictor: eximdiff_lag1 ; for period: 1980 
+##  We ignore (na.rm = TRUE) all missing values for predictors.op.
+## 
+##  Missing data - control unit: 2 ; predictor: eximdiff_lag2 ; for period: 1975 
+##  We ignore (na.rm = TRUE) all missing values for predictors.op.
+## 
+##  Missing data - control unit: 2 ; predictor: eximdiff_lag2 ; for period: 1976 
+##  We ignore (na.rm = TRUE) all missing values for predictors.op.
+## 
+##  Missing data - control unit: 2 ; predictor: eximdiff_lag2 ; for period: 1977 
+##  We ignore (na.rm = TRUE) all missing values for predictors.op.
+## 
+##  Missing data - control unit: 2 ; predictor: eximdiff_lag2 ; for period: 1978 
+##  We ignore (na.rm = TRUE) all missing values for predictors.op.
+## 
+##  Missing data - control unit: 2 ; predictor: eximdiff_lag2 ; for period: 1979 
+##  We ignore (na.rm = TRUE) all missing values for predictors.op.
+## 
+##  Missing data - control unit: 2 ; predictor: eximdiff_lag2 ; for period: 1980 
+##  We ignore (na.rm = TRUE) all missing values for predictors.op.
+## 
+##  Missing data - control unit: 2 ; predictor: eximdiff_lag2 ; for period: 1981 
+##  We ignore (na.rm = TRUE) all missing values for predictors.op.
+## 
+##  Missing data - control unit: 11 ; predictor: eximdiff_lag2 ; for period: 1975 
+##  We ignore (na.rm = TRUE) all missing values for predictors.op.
+## 
+##  Missing data - control unit: 11 ; predictor: eximdiff_lag2 ; for period: 1976 
+##  We ignore (na.rm = TRUE) all missing values for predictors.op.
+## 
+##  Missing data - control unit: 11 ; predictor: eximdiff_lag2 ; for period: 1977 
+##  We ignore (na.rm = TRUE) all missing values for predictors.op.
+## 
+##  Missing data - control unit: 11 ; predictor: eximdiff_lag2 ; for period: 1978 
+##  We ignore (na.rm = TRUE) all missing values for predictors.op.
+## 
+##  Missing data - control unit: 11 ; predictor: eximdiff_lag2 ; for period: 1979 
+##  We ignore (na.rm = TRUE) all missing values for predictors.op.
+## 
+##  Missing data - control unit: 11 ; predictor: eximdiff_lag2 ; for period: 1980 
+##  We ignore (na.rm = TRUE) all missing values for predictors.op.
+```
+
+---
+
+```r
+mali.synth &lt;- synth(mali.prep)
+```
+
+```
+## 
+## X1, X0, Z1, Z0 all come directly from dataprep object.
+## 
+## 
+## **************** 
+##  searching for synthetic control unit  
+##  
+## 
+## **************** 
+## **************** 
+## **************** 
+## 
+## MSPE (LOSS V): 0.003197622 
+## 
+## solution.v:
+##  0.06551271 0.06737548 0.06997086 0.07378234 0.0147838 9.20567e-05 6.44798e-05 0.1727371 0.004874032 0.07058757 0.07264543 0.07458472 0.07624927 0.0001034037 0.001844508 0.03313834 0.03153702 0.0498886 0.0186926 0.1015321 2.0569e-06 1.5256e-06 
+## 
+## solution.w:
+##  1.443e-06 0.4289425 0.1957719 6.41e-08 0.0001086331 4.38305e-05 2.826e-07 0.001898058 4.4754e-06 6.0236e-06 0.08095075 0.007983987 1.00913e-05 4.066e-06 0.06042418 0.2238245 2.52606e-05
+```
+
+---
+
+```r
+path.plot(synth.res=mali.synth, dataprep.res=mali.prep,
+           Ylab="Log GDP per capita", Legend=NA, tr.intake=1991,
+           Ylim=c(6,8) , Main="Mali"
+)
+```
+
+&lt;img src="7synthetic_files/figure-html/unnamed-chunk-20-1.png" width="60%" style="display: block; margin: auto;" /&gt;
+
+---
+### Sensitivity Analysis
+
+Informal talk: just run a bunch of models.
+
+Advantage: we can see a family of results!
+
+Disadvantages: How systematic was the collection? Was every result actually reported? How is this different from specification searching/p hacking?
+
+---
+### Sensitivity Analysis
+
+More formal ideas:
+
+1.  Ensemble models
+
+2.  Rosenbaum bounds
+
+---
+### Sensitivity Analysis
+
+One approach to sensitivity analysis is to average all the credible
+models. But why a simple average?
+
+---
+### Ensemble Model
+
+1.  Fit each credible model
+
+2.  Form fitted values for each case from each model
+
+3.  Run an ensemble model that predicts the outcome based on those
+    fitted values, which assigns each model a weight
+
+---
+### Ensemble Model
+
+Does this help for causal inference?
+
+---
+### Ensemble Model
+
+Athey et al. 2019 propose using an ensemble model to construct synthetic
+controls, and show that it can outperform single-model methods.
+
+---
+### Ensemble Model
+
+An alternative approach can be to build two ensemble models, one for the
+cases in the treatment group and one for cases in the control group.
+Then run *all* cases through both models and use differences in fitted
+values to estimate causal effects.
+
+---
+### Rosenbaum Bounds
+
+Consider a single matched pair of cases in a matching study, or a joined
+treatment and control case in a stratified experiment. These individuals
+*should* have the same propensity score. If there is confounding, will
+they?
+
+---
+### Rosenbaum Bounds
+
+Let's use `\(\Gamma\)` to represent the degree to which confounding distorts
+random assignment. So if `\(\Gamma = 2\)`, then confounding is going to lead
+one case to be twice as likely to receive the treatment as the other.
+How much would the causal inference shift if `\(\Gamma\)` could be as big as
+2?
+
+---
+### Rosenbaum Bounds
+
+It turns out that, for most methods, there is an upper and a lower bound
+on the possible causal inference for any given level of `\(\Gamma\)` and the
+existing data, called the Rosenbaum Bounds. Exploring these tells us how
+much confounding there would have to be in order to produce a large
+change in our causal inference.
+
+---
+
+```r
+library(sensemakr)
+```
+
+```
+## See details in:
+```
+
+```
+## Carlos Cinelli and Chad Hazlett (2020). Making Sense of Sensitivity: Extending Omitted Variable Bias. Journal of the Royal Statistical Society, Series B (Statistical Methodology).
+```
+
+---
+
+```r
+perulm &lt;- lm(outsidervote ~ simpletreat, data=peruemotions)
+peru.sens1 &lt;- sensemakr(perulm, "simpletreat")
+```
+
+---
+
+```r
+peru.sens1
+```
+
+```
+## Sensitivity Analysis to Unobserved Confounding
+## 
+## Model Formula: outsidervote ~ simpletreat
+## 
+## Null hypothesis: q = 1 and reduce = TRUE 
+## 
+## Unadjusted Estimates of ' simpletreat ':
+##   Coef. estimate: 0.11763 
+##   Standard Error: 0.04962 
+##   t-value: 2.3706 
+## 
+## Sensitivity Statistics:
+##   Partial R2 of treatment with outcome: 0.01239 
+##   Robustness Value, q = 1 : 0.1059 
+##   Robustness Value, q = 1 alpha = 0.05 : 0.01886 
+## 
+## For more information, check summary.
+```
+
+---
+
+```r
+plot(peru.sens1)
+```
+
+&lt;img src="7synthetic_files/figure-html/unnamed-chunk-24-1.png" width="60%" style="display: block; margin: auto;" /&gt;
+
+---
+
+```r
+perulm2 &lt;- lm(risk ~ simpletreat + edlevel + classid + leftright + age + I(age^2), data=peruemotions)
+peru.sens2 &lt;- sensemakr(perulm2, "simpletreat", benchmark_covariates="age")
+```
+
+---
+
+```r
+plot(peru.sens2)
+```
+
+&lt;img src="7synthetic_files/figure-html/unnamed-chunk-26-1.png" width="60%" style="display: block; margin: auto;" /&gt;
+
+---
+### Manski Bounds
+
+Consider a situation with a dichotomous treatment and a dichotomous
+outcome.
+
+---
+### Manski Bounds
+
+Before we do anything else, the possible average treatment effect in such a
+scenario is known to be somewhere between -1 and 1, inclusive.
+
+---
+### Manski Bounds
+
+Every individual case has one of three specific treatment effects: -1, 0, or 1.
+
+---
+### Manski Bounds
+
+Consider:
+
+`\(Y_{i, t}=0\)`
+
+`\(Y_{i, c}=1\)`
+
+Here, the causal effect is -1. 
+
+(Notice that a case in the treatment group with an outcome of zero either has a causal effect of 0 or -1, but cannot have a causal effect of 1. Likewise, a control case with an outcome of one!)
+
+---
+### Manski Bounds
+
+Alternatively:
+
+`\(Y_{i, t}=1\)`
+
+`\(Y_{i, c}=0\)`
+
+Here, the causal effect is 1.
+
+(Notice that cases with these observed pairs of outcomes could have a causal effect of either 1 or 0, but cannot have -1.)
+
+---
+### Manski Bounds
+
+For every case that we observe, we rule out one of the three possible causal effects. This information, *by itself*, puts some modest limits on what the average treatment effect can be.
+
+---
+### Manski Bounds
+
+Manski and Nagin look at the average treatment effect:
+
+`$$ATE = E(Y_{t}) - E(Y_{c})$$`
+`$$ATE = E(Y_{t} | X=t)P(X=t) + E(Y_{t} | X=c)P(X=c)\\ - E(Y_{c}| X=t)P(X=t) - E(Y_{c}| X=c)P(X=c)$$`
+
+---
+### Lower Bound
+
+`$$ATE = E(Y_{t} | X=t)P(X=t) + 0 \\ - 1 - E(Y_{c}| X=c)P(X=c)$$`
+
+---
+### Upper Bound
+
+`$$ATE = E(Y_{t} | X=t)P(X=t) + 1 \\ - 0 - E(Y_{c}| X=c)P(X=c)$$`
+
+---
+
+```r
+library(ATbounds)
+```
+
+---
+
+```r
+nswre_treated &lt;- read.table("http://users.nber.org/~rdehejia/data/nswre74_treated.txt")
+
+colnames(nswre_treated) &lt;- c("treat","age","edu","black","hispanic", "married","nodegree","RE74","RE75","RE78")
+
+nswre_control &lt;- read.table("http://users.nber.org/~rdehejia/data/nswre74_control.txt") 
+
+colnames(nswre_control) &lt;- c("treat","age","edu","black","hispanic","married","nodegree","RE74","RE75","RE78")
+
+nswre &lt;- rbind(nswre_treated,nswre_control)
+
+D &lt;- nswre$treat
+Y &lt;- (nswre$RE78 &gt; 0)
+X &lt;- with(nswre, cbind(age,edu,black,hispanic,married,nodegree,RE74/1000,RE75/1000))
+
+model &lt;- lm(Y ~ D)
+```
+
+---
+
+```r
+summary(model)
+```
+
+```
+## 
+## Call:
+## lm(formula = Y ~ D)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -0.7568 -0.6462  0.2432  0.3538  0.3538 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  0.64615    0.02849  22.679   &lt;2e-16 ***
+## D            0.11060    0.04419   2.503   0.0127 *  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.4594 on 443 degrees of freedom
+## Multiple R-squared:  0.01394,	Adjusted R-squared:  0.01172 
+## F-statistic: 6.265 on 1 and 443 DF,  p-value: 0.01267
+```
+
+---
+
+```r
+rps &lt;- rep(mean(D),length(D))
+bns_nsw &lt;- atebounds(Y, D, X, rps, Q=1)
+summary(bns_nsw)
+```
+
+```
+## ATbounds: ATE
+## Call: atebounds(Y = Y, D = D, X = X, rps = rps, Q = 1)
+## Confidence Level: 0.95
+##                     Lower_Bound Upper_Bound
+## Bound Estimate         -0.45843     0.50112
+## Confidence Interval    -0.74966     0.77878
+```
+
+---
+
+```r
+bns_nsw2 &lt;- atebounds(Y, D, X, rps, Q=2)
+summary(bns_nsw2)
+```
+
+```
+## ATbounds: ATE
+## Call: atebounds(Y = Y, D = D, X = X, rps = rps, Q = 2)
+## Confidence Level: 0.95
+##                     Lower_Bound Upper_Bound
+## Bound Estimate         0.083059     0.10125
+## Confidence Interval   -0.014176     0.21192
+```
+
+---
+### Manski Bounds
+
+-   Ecological inference
+
+-   Missing data
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create();
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
