@@ -6,7 +6,7 @@
 
 * [Week 1: Experiments](https://jnseawright.github.io/PS406/1experiments.html#1)
 * [Week 2: Regression and Causal Inference](https://jnseawright.github.io/PS406/2regression.html#1) 
-* [Wednesday](https://jnseawright.github.io/IPSA2024/Regression%20and%20Case%20Studies%20Slides/IPSA%202024%20Day%203.pdf)
+* [Week 3: Matching](https://jnseawright.github.io/PS406/3matching.html#1)
 * [Thursday](https://jnseawright.github.io/IPSA2024/Regression%20and%20Case%20Studies%20Slides/IPSA%202024%20Day%204.pdf)
 * [Week 5: Natural Experiments Part 2](https://jnseawright.github.io/PS406/5naturalexperiments2.html#1) 
 
