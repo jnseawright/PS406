@@ -179,19 +179,30 @@ include_graphics("images/harmfulcontrol3.jpg")
 ```
 
 ---
-![image](images/luputitleauthor.JPG){width="4in"}
+```{r, echo = FALSE, out.width="90%", fig.retina = 1}
+include_graphics("images/luputitleauthor.JPG")
+```
 
 ---
-![image](images/lupu1.JPG){width="4in"}
+```{r, echo = FALSE, out.width="90%", fig.retina = 1}
+include_graphics("images/lupu1.JPG")
+```
 
 ---
-![image](images/lupu2.JPG){width="4in"}
+```{r, echo = FALSE, out.width="90%", fig.retina = 1}
+include_graphics("images/lupu2.JPG")
+```
 
 ---
-![image](images/lupu3.JPG){width="4in"}
+```{r, echo = FALSE, out.width="90%", fig.retina = 1}
+include_graphics("images/lupu3.JPG")
+```
 
 ---
-![image](images/lupu4.JPG){width="3in"}
+```{r, echo = FALSE, out.width="70%", fig.retina = 1}
+include_graphics("images/lupu4.JPG")
+```
+
 ---
 ```{r, echo = TRUE, out.width="90%", fig.retina = 1}
 library(tidyverse)
@@ -349,17 +360,17 @@ summary(preslmw.mrifit)
 ```
 
 ---
-```{r, echo = TRUE, out.width="80%", fig.retina = 1}
+```{r, echo = TRUE, out.width="60%", fig.retina = 1}
 plot(preslmw.mri)
 ```
 
 ---
-```{r, echo = TRUE, out.width="80%", fig.retina = 1}
+```{r, echo = TRUE, out.width="60%", fig.retina = 1}
  plot(preslmw.mri, type="extrapolation", variables=~ccp_systyear)
 ```
 
 ---
-```{r, echo = TRUE, out.width="80%", fig.retina = 1}
+```{r, echo = TRUE, out.width="60%", fig.retina = 1}
 plot(preslmw.mri, type="influence", outcome="vdem_libdem")
 ```
 
@@ -385,7 +396,7 @@ with(qog2000demsin2020clean, table(ht_colonial, br_pres))
 
 ---
 ```{r, echo = FALSE, out.width="90%", fig.retina = 1}
-include_graphics("htcolonial.png")
+include_graphics("images/htcolonial.png")
 ```
 
 ---

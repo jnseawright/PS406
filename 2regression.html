@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>2: Regression for Causal Inference</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="J. Seawright" />
+    <meta name="date" content="2024-04-01" />
+    <script src="2regression_files/header-attrs-2.25/header-attrs.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# 2: Regression for Causal Inference
+]
+.subtitle[
+## Quantitative Causal Inference
+]
+.author[
+### <large>J. Seawright</large>
+]
+.institute[
+### <small>Northwestern Political Science</small>
+]
+.date[
+### April 1, 2024
+]
+
+---
+
+class: center, middle
+
+
+
+
+---
+### Unconfounded Assignment
+
+1.  `\(Pr(\mathbb{W} | \mathbb{X}, \mathbb{Y}_{0}, \mathbb{Y}_{1}) = Pr(\mathbb{W} | \mathbb{X}, \mathbb{Y}^{'}_{0}, \mathbb{Y}^{'}_{1})\)`
+
+---
+### Regression for Causal Inference
+
+`$$\begin{aligned}
+Y_{i} &amp; = E(Y_{i,c}) + D_{i} \{E(Y_{i,t}) - E(Y_{i,c})\} + \\
+     &amp; [Y_{i,c} - E(Y_{i,c})] + \\
+     &amp; D_{i} ([Y_{i,t} - E(Y_{i,t})] - [Y_{i,c} - E(Y_{i,c})]) \\
+     &amp; = \mu_{0} + D_{i} (\mu_{1} - \mu_{0}) + \{\nu_{0} + D_{i} (\nu_{1} - \nu_{0})\}\end{aligned}$$`
+
+---
+### Regression for Causal Inference
+
+Imagine that there is a single confounding variable, `\(X\)`, which is
+dichotomous.
+
+---
+### Regression for Causal Inference
+
+What can we say about a bivariate regression of `\(Y\)` on `\(D\)` only for
+cases with `\(X=0\)`?
+
+---
+### Regression for Causal Inference
+
+`$$\begin{aligned}
+Y_{i} = \mu_{0} + D_{i} (\mu_{1} - \mu_{0}) + \{\nu_{0} + D_{i} (\nu_{1} - \nu_{0})\}\end{aligned}$$`
+
+---
+### Regression for Causal Inference
+
+What about this regression?
+
+`$$\begin{aligned}
+Y_{i} &amp; = \beta_{0} + D_{i} \beta_{1} + X_{i} \beta_{2} + X_{i} D_{i} \beta_{3} + \epsilon_{i}\end{aligned}$$`
+
+---
+### Regression for Causal Inference
+
+`$$\begin{aligned}
+        Y_{i: X_{i} = 0} &amp; = \beta_{0} + D_{i: X_{i} = 0} \beta_{1} + \epsilon_{i: X_{i} = 0}
+        \end{aligned}$$`
+
+---
+### Regression for Causal Inference
+
+`$$\begin{aligned}
+        Y_{i: X_{i} = 1} &amp; = \beta_{2} + D_{i: X_{i} = 1} \beta_{3} + \delta_{i: X_{i} = 1}
+        \end{aligned}$$`
+
+---
+### Regression for Causal Inference
+
+`$$\begin{aligned}
+        Y_{i} = &amp; (X_{i}) (\beta_{2} + D_{i} \beta_{3} + \delta_{i}) + \\
+              &amp; (1 - X_{i})(\beta_{0} + D_{i} \beta_{1} + \epsilon_{i})
+        \end{aligned}$$`
+
+---
+### Regression for Causal Inference
+
+`$$\begin{aligned}
+        Y_{i} = &amp; \beta_{0} + D_{i} \beta_{1} + (X_{i} \beta_{2} - X_{i} \beta_{0}) + \\
+                  &amp; X_{i} (D_{i} \beta_{3} - D_{i} \beta_{1}) + \\
+        &amp; \epsilon_{i} + X_{i} (\delta_{i} - \epsilon_{i})
+                \end{aligned}$$`
+
+---
+### Regression for Causal Inference
+
+-   A collection of control variables `\(\mathbb{X}\)` will allow regression
+    to produce an unbiased estimate of `\((\mu_{1} - \mu_{0})\)` when:
+
+    1.  `\(D\)` is uncorrelated with
+        `\(\{\nu_{0} + D_{i} (\nu_{1} - \nu_{0})\}\)` within each group
+        defined by `\(\mathbb{X}\)`, and
+
+    2.  the residual causal effect is not correlated with `\(\mathbb{X}\)`,
+        and
+
+    3.  a fully flexible parameterization of `\(\mathbb{X}\)` and `\(D\)` is used.
+
+---
+### Regression for Causal Inference
+
+-   These conditions imply that:
+
+    1.  No element of `\(\mathbb{X}\)` is on any causal path from
+        `\(\mathbf{D}\)` to `\(\mathbf{y}\)`, and
+
+    2.  no element of `\(\mathbb{X}\)` is caused by `\(\mathbf{D}\)` or any of
+        its unmeasured causes *and* some other unmeasured cause of
+        `\(\mathbf{y}\)`, and
+
+    3.  all causes of `\(\mathbf{D}\)` that are also causes of `\(\mathbf{y}\)`
+        have some element of `\(\mathbb{X}\)` somewhere on the causal path
+        from the unmeasured initial cause to either `\(\mathbf{D}\)` or
+        `\(\mathbf{y}\)`.
+
+---
+&lt;img src="images/goodcontrol.jpg" width="90%" /&gt;
+
+---
+&lt;img src="images/irrelevantcontrol1.jpg" width="90%" /&gt;
+
+---
+&lt;img src="images/harmfulcontrol1.jpg" width="90%" /&gt;
+
+---
+&lt;img src="images/harmfulcontrol2.jpg" width="90%" /&gt;
+
+---
+&lt;img src="images/harmfulcontrol3.jpg" width="90%" /&gt;
+
+---
+&lt;img src="images/luputitleauthor.JPG" width="90%" /&gt;
+
+---
+&lt;img src="images/lupu1.JPG" width="90%" /&gt;
+
+---
+&lt;img src="images/lupu2.JPG" width="90%" /&gt;
+
+---
+&lt;img src="images/lupu3.JPG" width="90%" /&gt;
+
+---
+&lt;img src="images/lupu4.JPG" width="70%" /&gt;
+
+---
+
+```r
+library(tidyverse)
+```
+
+```
+## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+## ✔ forcats   1.0.0     ✔ stringr   1.5.0
+## ✔ lubridate 1.9.3     ✔ tibble    3.2.1
+## ✔ purrr     1.0.2     ✔ tidyr     1.3.0
+## ✔ readr     2.1.4     
+## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## ✖ nlme::collapse() masks dplyr::collapse()
+## ✖ dplyr::filter()  masks stats::filter()
+## ✖ dplyr::lag()     masks stats::lag()
+## ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors
+```
+
+---
+
+```r
+qog_std_ts_jan22 &lt;- read_csv("https://github.com/jnseawright/PS406/raw/main/data/qog_std_ts_jan22.csv")
+```
+
+```
+## Warning: One or more parsing issues, call `problems()` on your data frame for details,
+## e.g.:
+##   dat &lt;- vroom(...)
+##   problems(dat)
+```
+
+```
+## Rows: 15168 Columns: 1915
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: ","
+## chr    (7): cname, cname_qog, ccodealp, version, cname_year, ccodealp_year, ...
+## dbl (1905): ccode, year, ccode_qog, ccodecow, aid_cpnc, aid_cpsc, aid_crnc, ...
+## lgl    (3): psi_cpsi2, psi_edate2, psi_psi2
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+```
+
+```r
+qogdems2000 &lt;- qog_std_ts_jan22 %&gt;% 
+  filter(year==2000 &amp; vdem_libdem &gt; 0.5)
+
+qog2000demsin2020 &lt;- qog_std_ts_jan22 %&gt;% 
+  filter(year==2020 &amp; cname %in% qogdems2000$cname)
+
+preslm &lt;- lm(vdem_libdem ~ br_pres, data=qog2000demsin2020)
+```
+
+---
+
+```r
+summ(preslm)
+```
+
+&lt;table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; Observations &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 61 (1 missing obs. deleted) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; Dependent variable &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; vdem_libdem &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; Type &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; OLS linear regression &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt; &lt;table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; F(1,59) &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2.05 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; R² &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.03 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; Adj. R² &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.02 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt; &lt;table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;border-bottom: 0;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Est. &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; S.E. &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; t val. &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; (Intercept) &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.71 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 27.19 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; br_pres &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.06 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.04 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -1.43 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.16 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;tfoot&gt;&lt;tr&gt;&lt;td style="padding: 0; " colspan="100%"&gt;
+&lt;sup&gt;&lt;/sup&gt; Standard errors: OLS&lt;/td&gt;&lt;/tr&gt;&lt;/tfoot&gt;
+&lt;/table&gt;
+
+---
+
+```r
+preslm2 &lt;- lm(vdem_libdem ~ br_pres + as.factor(ht_colonial) +  ccp_systyear + br_pvote, data=qog2000demsin2020)
+```
+
+---
+
+```r
+summ(preslm2)
+```
+
+&lt;table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; Observations &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 58 (4 missing obs. deleted) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; Dependent variable &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; vdem_libdem &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; Type &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; OLS linear regression &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt; &lt;table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; F(9,48) &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.30 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; R² &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.38 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; Adj. R² &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.27 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt; &lt;table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;border-bottom: 0;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Est. &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; S.E. &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; t val. &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; (Intercept) &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2.50 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.76 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.29 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; br_pres &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.04 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.76 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.45 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; as.factor(ht_colonial)1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.31 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.14 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -2.26 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.03 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; as.factor(ht_colonial)2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.09 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.07 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -1.42 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.16 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; as.factor(ht_colonial)5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.12 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.05 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -2.28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.03 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; as.factor(ht_colonial)6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.24 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -2.26 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.03 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; as.factor(ht_colonial)7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.13 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.08 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -1.59 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.12 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; as.factor(ht_colonial)9 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.07 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.13 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.49 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.63 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; ccp_systyear &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -2.36 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.02 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; br_pvote &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.04 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.05 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.95 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.35 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;tfoot&gt;&lt;tr&gt;&lt;td style="padding: 0; " colspan="100%"&gt;
+&lt;sup&gt;&lt;/sup&gt; Standard errors: OLS&lt;/td&gt;&lt;/tr&gt;&lt;/tfoot&gt;
+&lt;/table&gt;
+
+---
+### How Much Does It Hurt to Be Wrong?
+
+Suppose we know we can get a good causal inference from:
+
+`$$Y_{i}=\beta_{1}+\beta_{2}D_{i}+\beta_{3}X_{i}+\beta_{4}W_{i}+\epsilon_{i}$$`
+---
+
+But instead we estimate:
+
+`$$Y_{i}=\beta^{*}_{1}+\beta^{*}_{2}D_{i}+\beta^{*}_{3}X_{i}+\epsilon^{*}_{i}$$`
+---
+
+`$$E[\hat{\beta^*}_{2}]=\beta_{2}+\beta_{4} b_{4,2}$$`
+`$$b_{4,2} = \frac{(r_{4,2}−r_{3,2}r_{4,3})}{1-r_{3,2}^2}\sqrt{\frac{V_{4}}{V_{2}}}$$`
+
+---
+
+What if we estimate:
+
+`$$Y_{i}=\beta^{+}_{1}+\beta^{+}_{2}D_{i}+\epsilon^{+}_{i}$$`
+---
+
+`$$E[\hat{\beta^+}_{2}]=\beta_{2}+\beta_{3} r_{2,3}\sqrt{\frac{V_{4}}{V_{2}}} + \beta_{4} r_{2,4}\sqrt{\frac{V_{4}}{V_{3}}}$$`
+---
+
+Is `$$E[\hat{\beta^+}_{2}]$$` closer to zero or further away than `$$E[\hat{\beta^*}_{2}]$$`?
+
+---
+&lt;img src="images/Clarke1.png" width="90%" /&gt;
+
+---
+&lt;img src="images/Clarke2.png" width="90%" /&gt;
+
+---
+### Regression for Causal Inference
+
+-   If the causal effect is not constant across all cases, regression
+    will not give a consistent estimate of the average treatment effect.
+
+-   Instead, it estimates a covariance-adjusted weighted average of
+    cases' treatment effects.
+
+---
+### Aronow and Samii 2016
+
+&lt;img src="images/aronowsamii1.JPG" width="90%" /&gt;
+
+---
+### Aronow and Samii 2016
+
+&lt;img src="images/aronowsamii2.JPG" width="90%" /&gt;
+
+---
+### Aronow and Samii 2016
+
+&lt;img src="images/aronowsamii3.JPG" width="90%" /&gt;
+
+---
+### Chattopadhyay and Zubizarreta 2023
+
+&lt;img src="images/Chattopadhyay1.png" width="90%" /&gt;
+
+---
+### Chattopadhyay and Zubizarreta 2023
+
+`$$\hat{\tau}_{OLS} = \sum_{i:D_{i}=1} w_{i} Y_{i} - \sum_{i:D_{i}=0} w_{i} Y_{i}$$`
+
+---
+### Chattopadhyay and Zubizarreta 2023
+
+There is a different set of weights called the ''multi-regression imputation'' or MRI:
+
+`$$\hat{\tau}_{MRI} = \sum_{i:D_{i}=1} w^{MRI}_{i}(\bar{X}) Y_{i} - \sum_{i:D_{i}=0} w^{MRI}_{i}(\bar{X}) Y_{i}$$`
+
+`$$w^{MRI}_{i}(x) = n^{−1}_{T} + (X_{i} − \bar{X}_{T})^{T}S^{−1}_{T}(x − \bar{X}_{T})$$`
+
+---
+### Chattopadhyay and Zubizarreta 2023
+
+If there is causal heterogeneity, the OLS weights are a biased estimator of ATE, but the MRI weights can be an unbiased estimator.
+
+---
+
+```r
+library(lmw)
+
+qog2000demsin2020clean &lt;- qog2000demsin2020 %&gt;% filter(!is.na(br_pres) &amp; !is.na(ccp_systyear) &amp; 
+                                                         !is.na(ht_colonial) &amp; !is.na(br_pvote))
+```
+
+---
+
+```r
+preslmw.uri &lt;- lmw(~ br_pres + as.factor(ht_colonial) +  ccp_systyear + br_pvote, data = qog2000demsin2020clean,
+                estimand = "ATT", method = "URI", treat = "br_pres")
+
+preslmw.urifit &lt;- lmw_est(preslmw.uri, outcome = "vdem_libdem")
+```
+
+```
+## Warning in meatHC(x, type = type, omega = omega): HC3 covariances become
+## numerically unstable if hat values are close to 1 as for observations 29, 44
+```
+
+```r
+summary(preslmw.urifit)
+```
+
+```
+## 
+## Effect estimates:
+##              Estimate Std. Error 95% CI L 95% CI U t value Pr(&gt;|t|)
+## E[Y₁-Y₀|A=1]  0.03085    0.04089 -0.05136  0.11305   0.754    0.454
+## 
+## Residual standard error: 0.1312 on 48 degrees of freedom
+```
+
+---
+
+```r
+preslmw.mri &lt;- lmw(~ br_pres + as.factor(ht_colonial) +  ccp_systyear + br_pvote, data = qog2000demsin2020clean,
+                   estimand = "ATT", method = "MRI", treat = "br_pres")
+
+preslmw.mrifit &lt;- lmw_est(preslmw.mri, outcome = "vdem_libdem")
+```
+
+```
+## Warning in meatHC(x, type = type, omega = omega): HC3 covariances become
+## numerically unstable if hat values are close to 1 as for observations 11, 29,
+## 44
+```
+
+```r
+summary(preslmw.mrifit)
+```
+
+```
+## 
+## Effect estimates:
+##              Estimate Std. Error 95% CI L 95% CI U t value Pr(&gt;|t|)
+## E[Y₁-Y₀|A=1]  0.03866    0.09277 -0.14830  0.22562   0.417    0.679
+## 
+## Residual standard error: 0.134 on 44 degrees of freedom
+## 
+## Potential outcome means:
+##           Estimate Std. Error 95% CI L 95% CI U t value Pr(&gt;|t|)    
+## E[Y₀|A=1]  0.61134    0.09137  0.42719  0.79549   6.691 3.25e-08 ***
+## E[Y₁|A=1]  0.65000    0.03689  0.57566  0.72434  17.622  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+---
+
+```r
+plot(preslmw.mri)
+```
+
+&lt;img src="2regression_files/figure-html/unnamed-chunk-25-1.png" width="60%" /&gt;
+
+---
+
+```r
+ plot(preslmw.mri, type="extrapolation", variables=~ccp_systyear)
+```
+
+&lt;img src="2regression_files/figure-html/unnamed-chunk-26-1.png" width="60%" /&gt;
+
+---
+
+```r
+plot(preslmw.mri, type="influence", outcome="vdem_libdem")
+```
+
+&lt;img src="2regression_files/figure-html/unnamed-chunk-27-1.png" width="60%" /&gt;
+
+---
+
+```r
+qog2000demsin2020clean$cname[11]
+```
+
+```
+## [1] "Cabo Verde"
+```
+
+```r
+qog2000demsin2020clean$br_pres[11]
+```
+
+```
+## [1] 0
+```
+
+```r
+qog2000demsin2020clean$ht_colonial[11]
+```
+
+```
+## [1] 7
+```
+
+```r
+qog2000demsin2020clean$ccp_systyear[11]
+```
+
+```
+## [1] 1980
+```
+
+```r
+qog2000demsin2020clean$br_pvote[11]
+```
+
+```
+## [1] 1
+```
+
+```r
+qog2000demsin2020clean$vdem_libdem[11]
+```
+
+```
+## [1] 0.69
+```
+
+---
+
+```r
+with(qog2000demsin2020clean, table(ht_colonial, br_pres))
+```
+
+```
+##            br_pres
+## ht_colonial  0  1
+##           0 24 11
+##           1  0  1
+##           2  0  6
+##           5  5  5
+##           6  0  2
+##           7  1  2
+##           9  1  0
+```
+
+---
+&lt;img src="images/htcolonial.png" width="90%" /&gt;
+
+---
+
+```r
+qog2000demsin2020nocabo &lt;- qog2000demsin2020clean %&gt;% filter(cname != "Cabo Verde")
+
+preslmw.mrinocabo &lt;- lmw(~ br_pres + as.factor(ht_colonial) +  
+                           ccp_systyear + br_pvote, 
+                         data = qog2000demsin2020nocabo,
+                   estimand = "ATT", method = "MRI", treat = "br_pres")
+
+preslmw.mrifitnocabo &lt;- lmw_est(preslmw.mrinocabo, outcome = "vdem_libdem")
+```
+
+```
+## Warning in meatHC(x, type = type, omega = omega): HC3 covariances become
+## numerically unstable if hat values are close to 1 as for observations 28, 43
+```
+
+```r
+summary(preslmw.mrifitnocabo)
+```
+
+```
+## 
+## Effect estimates:
+##      Estimate Std. Error 95% CI L 95% CI U t value Pr(&gt;|t|)
+## 
+## Residual standard error: 0.134 on 44 degrees of freedom
+## 
+## Potential outcome means:
+##      Estimate Std. Error 95% CI L 95% CI U t value Pr(&gt;|t|)
+```
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create();
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
