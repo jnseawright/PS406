@@ -1,0 +1,592 @@
+---
+title: "6: Missing Data and Selection"
+subtitle: "Quantitative Causal Inference"
+author: "<large>J. Seawright</large>"
+institute: "<small>Northwestern Political Science</small>" 
+date: "April 29, 2024"
+output: 
+  xaringan::moon_reader:
+    css: xaringan-themer.css
+  
+---
+class: center, middle
+
+```{css, echo=FALSE}
+pre {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+pre[class] {
+  max-height: 200px;
+}
+```
+
+```{r, load_refs, include=FALSE, cache=FALSE}
+# Initializes the bibliography
+library(RefManageR)
+
+library(ggplot2)
+library(dplyr)
+library(readr)
+library(nlme)
+library(jtools)
+
+BibOptions(check.entries = FALSE,
+           bib.style = "authoryear", # Bibliography style
+           max.names = 3, # Max author names displayed in bibliography
+           sorting = "nyt", #Name, year, title sorting
+           cite.style = "authoryear", # citation style
+           style = "markdown",
+           hyperlink = FALSE,
+           dashed = FALSE)
+#myBib <- ReadBib("assets/myBib.bib", check = FALSE)
+# Note: don't forget to clear the knitr cache to account for changes in the
+# bibliography.
+
+peruemotions <- read.csv("https://github.com/jnseawright/PS406/raw/main/data/peruemotions.csv")
+```
+```{r xaringan-themer, include=FALSE, warning=FALSE}
+library(xaringanthemer,MnSymbol)
+style_mono_accent(
+  base_color = "#1c5253",
+  header_font_google = google_font("Josefin Sans"),
+  text_font_google   = google_font("Montserrat", "300", "300i"),
+  code_font_google   = google_font("Fira Mono"),
+  text_font_size = "1.6rem"
+)
+```
+
+---
+### Missingness!
+
+1. Sometimes, our data aren't complete!
+
+2. Missing data can have different effects, depending on which variables are missing (treatment, outcome, controls) and *why* they are missing.
+
+
+---
+### Some Notation
+
+$$\mathbb{Y} = \{\mathbb{Y}_{O}, \mathbb{Y}_{M}\}$$
+
+$$R_{i} = \left\{
+     \begin{array}{lr}
+       1 & : Y_{i} \text{ is observed}\\
+       0 & : Y_{i} \text{ is missing}
+     \end{array}
+   \right.$$
+
+---
+### Some Notation
+
+$$Pr(\mathbb{R} | \mathbb{Y}, \mathbb{X})$$
+
+---
+### MCAR
+
+$$Pr(\mathbb{R} | \mathbb{Y}, \mathbb{X}) = Pr(\mathbb{R})$$
+
+---
+### MAR
+
+$$Pr(\mathbb{R} | \mathbb{Y}, \mathbb{X}) = Pr(\mathbb{R} | \mathbb{Y}_{O}, \mathbb{X})$$
+
+---
+### Non-Ignorable
+
+$$Pr(\mathbb{R} | \mathbb{Y}, \mathbb{X}) \neq Pr(\mathbb{R} | \mathbb{Y}_{O}, \mathbb{X})$$
+
+---
+![image](images/lalltitle.JPG)
+
+---
+![image](images/lallmcartable.JPG)
+
+---
+### Completely Random Missing Data
+
+1. Equivalent to a random subsample.
+
+2. MCAR missingness reduces effective sample sizes, and therefore increases standard errors, but is otherwise fairly harmless.
+
+---
+```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
+summary(lm(outsidervote ~ simpletreat,
+  data=peruemotions))
+```
+
+---
+```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
+perueffects <- 1:100
+
+for (i in 1:100){
+  perutemp <- peruemotions[sample(1:nrow(peruemotions),nrow(peruemotions)-100, replace = TRUE),]
+  perueffects[i] <- lm(outsidervote ~ simpletreat, data=perutemp)$coef[2]
+}
+
+summary(perueffects)
+sd(perueffects)
+```
+
+---
+### Missingness at Random
+
+1. Missingness is correlated with observed variables in some way.
+
+2. MAR missingness reduces effective sample sizes, but can also cause bias.
+
+---
+```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
+library(boot)
+library(Rlab)
+```
+
+---
+```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
+perumareffects <- 1:100
+
+missing.prob <- inv.logit(-2.3 + -.5*peruemotions$edlevel + -.2*peruemotions$classid + peruemotions$leftright)
+missing.prob[is.na(missing.prob)] <- .3
+
+for (i in 1:100){
+  perutemp <- peruemotions[rbern(length(missing.prob),missing.prob)==1,]
+  perumareffects[i] <- lm(outsidervote ~ simpletreat, data=perutemp)$coef[2]
+}
+
+summary(perumareffects)
+sd(perumareffects)
+```
+
+---
+### Nonignorable Missingness 
+
+1. Missingness is correlated with the missing values themselves.
+
+2. Nonignorable missingness reduces effective sample sizes, and often causes bias that is hard to solve.
+
+---
+```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
+perunonigeffects <- 1:100
+
+missing.threshold <- -2.3 + -.5*peruemotions$edlevel + -.2*peruemotions$classid + peruemotions$leftright
+perunonigsubset <- peruemotions[missing.threshold>-.1,]
+
+for (i in 1:100){
+  perutemp <- perunonigsubset[sample(1:nrow(perunonigsubset),nrow(perunonigsubset)-50, replace = TRUE),]
+  perunonigeffects[i] <- lm(outsidervote ~ simpletreat, data=perutemp)$coef[2]
+}
+
+summary(perunonigeffects)
+sd(perunonigeffects)
+```
+
+---
+### Fixing Missingness
+
+1. Delete the data and move on.
+
+2. Fill in the data with some kind of best guess.
+
+3. Repair the missingness with a statistical model.
+
+---
+### Listwise Deletion
+
+Deleting the entire case when one or more value is missing is called ''listwise deletion.'' It works for MCAR data, or in general (more or less) in a model when the causes of missingness are included as covariates.
+
+---
+```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+library(knitr)
+include_graphics("images/King1.png")
+```
+
+---
+```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+include_graphics("images/King2.png")
+```
+
+---
+```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+include_graphics("images/King3.png")
+```
+
+---
+```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+include_graphics("images/King4.png")
+```
+
+---
+```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
+perumareffects2 <- 1:100
+
+missing.prob <- inv.logit(-2.3 + -.5*peruemotions$edlevel + -.2*peruemotions$classid + peruemotions$leftright)
+missing.prob[is.na(missing.prob)] <- .3
+
+for (i in 1:100){
+  perutemp <- peruemotions[rbern(length(missing.prob),missing.prob)==1,]
+  perumareffects2[i] <- lm(outsidervote ~ simpletreat + edlevel + classid + leftright, data=perutemp)$coef[2]
+}
+
+summary(perumareffects2)
+sd(perumareffects2)
+```
+
+
+---
+### Imputation
+
+We can use the known values of variables within a case to come up with a best guess for the missing values within that case, given the joint distributions across the rest of the data. The most common family of ways to do this is multiple imputation.
+
+---
+### Multiple Imputation
+
+1. Come up with an initial guess for all the missing values.
+
+2. Choose one variable ($X_{i}$) to work on. Use the initial guesses, as well as the observed values, for all the other variables to run a regression with $X_{i}$ as the outcome and $X_{-i}$ as the predictors. Draw predictions from that regression for the missing values on $X_{i}$.
+
+3. Move on to the next variable with missing values, and repeat step 2. Continue until all the variables have had their turn.
+
+4. Use the predicted values from these regressions as the new initial guesses and repeat steps 2 and 3. Keep this up until repeating the process produces regression distributions that don't change much across iterations.
+
+---
+### Multiple Imputation
+
+The resulting guesses are better than nothing, but they aren't real data --- they are draws from a distribution. To capture the uncertainty, we should take multiple draws from that distribution for each data point. This will create multiple copies of the data set.
+
+We then run our model of interest on each copy of the data set, and combine the results together to get a final answer.
+
+---
+### Multiple Imputation
+
+For $M$ imputations:
+
+$$\hat{\beta} = \frac{1}{m} \displaystyle\sum_{m=1}^{M} \hat{\beta}_{m}$$
+
+---
+### Multiple Imputation
+
+For $M$ imputations:
+
+$$V_{\beta} = W + (1 + \frac{1}{M}) B$$
+
+$$W = \frac{1}{m} \displaystyle\sum_{m=1}^{M} s^{2}_{m}$$
+
+$$B = \frac{1}{m - 1} \displaystyle\sum_{m=1}^{M} (\hat{\beta}_{m} - \hat{\beta})^{2}$$
+
+---
+```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
+library(mice)
+```
+
+---
+```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
+perumieffects <- 1:100
+
+missing.prob <- inv.logit(-2.3 + -.5*peruemotions$edlevel + -.2*peruemotions$classid + peruemotions$leftright)
+missing.prob[is.na(missing.prob)] <- .3
+
+for (i in 1:100){
+  perutemp <- peruemotions[rbern(length(missing.prob),missing.prob)==1,]
+  perumice <- mice(perutemp)
+  perumieffects[i] <- summary(pool(with(perumice, summary(lm(outsidervote ~ simpletreat)))))[2,2]
+}
+```
+
+---
+```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
+summary(perumieffects)
+sd(perumieffects)
+```
+
+---
+### How Many Imputations?
+
+mice defaults to 5, because of the older received wisdom of the literature.
+
+> In many applications, just 3–5 imputations are sufficient to obtain excellent results. ... Many are surprised by the claim that only 3–5 imputations may be needed. Rubin (1987: 114) shows that the efficiency of an estimate based on $m$ imputations is approximately $(1 + \frac{\gamma}{m})^{-1}$...
+
+---
+### How Many Imputations?
+
+>...where $\gamma$ is the fraction of missing information for the quantity being estimated.... gains rapidly diminish after the first few imputations. ... In most situations there is simply little advantage to producing and analyzing more than a few imputed datasets (Schafer and Olsen 1998: 548–549).
+
+---
+```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+include_graphics("images/Graham1.png")
+```
+
+---
+```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+include_graphics("images/Graham2.png")
+```
+
+---
+```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+include_graphics("images/lallross.JPG")
+```
+
+---
+```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+include_graphics("images/arelbundok.jpg")
+```
+
+---
+```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+include_graphics("images/arelbundok2.jpg")
+```
+
+---
+```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+include_graphics("images/pepinsky.jpg")
+```
+
+---
+```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+include_graphics("images/pepinsky2.jpg")
+```
+
+---
+```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+include_graphics("images/LallRobinson1.png")
+```
+
+---
+```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+include_graphics("images/LallRobinson2.png")
+```
+
+---
+```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+include_graphics("images/LallRobinson3.png")
+```
+
+---
+```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+include_graphics("images/LallRobinson4.png")
+```
+
+---
+```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+library(rMIDAS)
+```
+
+---
+```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+adult <- read.csv("https://raw.githubusercontent.com/MIDASverse/MIDASpy/master/Examples/adult_data.csv",
+                  row.names = 1)[1:1000,]
+                  
+set.seed(89)
+
+adult <- add_missingness(adult, prop = 0.1)
+
+adult_cat <- c('workclass','marital_status','relationship','race','education','occupation','native_country')
+adult_bin <- c('sex','class_labels')
+```
+
+---
+```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+# Apply rMIDAS preprocessing steps
+adult_conv <- convert(adult, 
+                      bin_cols = adult_bin, 
+                      cat_cols = adult_cat,
+                      minmax_scale = TRUE)
+                      
+# Train the model for 20 epochs
+adult_train <- train(adult_conv,
+                       training_epochs = 20,
+                       layer_structure = c(128,128),
+                       input_drop = 0.75,
+                       seed = 89)
+```
+                       
+---
+```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+# Generate 10 imputed datasets
+adult_complete <- complete(adult_train, m = 10)
+
+# Inspect first imputed dataset:
+head(adult_complete[[1]])
+```
+
+---
+```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+# Estimate logit model on 10 completed datasets (using Rubin's combination rules)
+adult_model <- combine("class_labels ~ hours_per_week + sex", 
+                    adult_complete,
+                    family = stats::binomial)
+
+adult_model
+```
+
+---
+### Non-Ignorable Missingness
+
+Censoring: data above/below a certain threshold on a variable (or variables) have missing values in the dataset
+
+Truncation: cases data above/below a certain threshold on a variable (or variables) are not included in the dataset
+
+General Selection Problems: other forms of correlation between missingness and values of the data
+
+---
+### Non-Ignorable Missingness
+
+For non-ignorable missingness, the two main solutions are:
+
+1. Statistical models, usually using maximum-likelihood techniques.
+
+2. Nonparametric bounds, an idea to be discussed next week.
+
+---
+### Tobit
+
+$$y^{*} = \mathbf{x} \beta + \epsilon$$
+
+$$\epsilon \sim N(0, \sigma^{2})$$
+
+$$y = \left\{
+     \begin{array}{lr}
+       y^{*} & : y^{*} > 0\\
+       - & : y^{*} \leq 0
+     \end{array}
+   \right.$$
+
+---
+Consider the situation in which we have a measure of academic aptitude
+(scaled 200-800) which we want to model using reading and math test
+scores, as well as, the type of program the student is enrolled in
+(academic, general, or vocational). The problem here is that students
+who answer all questions on the academic aptitude test correctly receive
+a score of 800, even though it is likely that these students are not
+"truly" equal in aptitude.
+
+---
+```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+dat <- read.csv(
+     "https://stats.idre.ucla.edu/stat/data/tobit.csv")
+
+library(VGAM)
+```
+
+---
+```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+summary(lm(apt ~ read + math +
+          prog,  
+          data = dat))
+
+summary(m <- vglm(apt ~ read + math +
+          prog, tobit(Upper = 800), 
+          data = dat))
+```
+
+---
+### Heckman/Type 2 Tobit
+
+$$y_{i}^{S*} = \mathbf{x}_{i}^{S} \beta^{S} + \epsilon_{i}^{S}$$
+
+$$y_{i}^{O*} = \mathbf{x}_{i}^{O} \beta^{O} + \epsilon_{i}^{O}$$
+
+$$y_{i}^{S} = \left\{
+     \begin{array}{lr}
+       0 & : y_{i}^{S*} \leq 0\\
+       1 & : y_{i}^{S*} > 0
+     \end{array}
+   \right.$$
+
+$$y_{i}^{O} = \left\{
+     \begin{array}{lr}
+       0 & : y_{i}^{S} = 0\\
+       y_{i}^{O*} & : y_{i}^{S} = 1
+     \end{array}
+   \right.$$
+
+---
+### Heckman/Type 2 Tobit
+
+$$\text{E}(y_{i}^{O} | x^{O} = x_{i}^{O}, x^{S} = x_{i}^{S}, y^{S} = 1)$$
+
+$$= \text{E}(\mathbf{x}_{i}^{O} \beta^{O} + \epsilon_{i}^{O} | x^{O} = x_{i}^{O}, x^{S} = x_{i}^{S}, y^{S} = 1)$$
+
+$$= \mathbf{x}_{i}^{O} \beta^{O} + \text{E}(\epsilon_{i}^{O} | x^{O} = x_{i}^{O}, x^{S} = x_{i}^{S}, y^{S} = 1)$$
+
+---
+### Heckman/Type 2 Tobit
+
+$$\mathbf{x}_{i}^{O} \beta^{O} + \text{E}(\epsilon_{i}^{O} | x^{O} = x_{i}^{O}, x^{S} = x_{i}^{S}, y^{S} = 1)$$
+
+$$= \mathbf{x}_{i}^{O} \beta^{O} + \text{E}(\epsilon_{i}^{O} | y^{S} = 1)$$
+
+$$= \mathbf{x}_{i}^{O} \beta^{O} + \text{E}(\epsilon_{i}^{O} | \epsilon_{i}^{S} > - \mathbf{x}_{i}^{S} \beta^{S})$$
+
+---
+### Heckman/Type 2 Tobit
+
+$$\left(
+     \begin{array}{lr}
+       \epsilon^{S}\\
+       \epsilon^{O}
+     \end{array}
+   \right) \sim N \left( \left(
+     \begin{array}{lr}
+       0\\
+       0
+     \end{array}\right) ,
+     \left(
+     \begin{array}{lr}
+       1 & \sigma_{S, O}\\
+       \sigma_{S, O} & \sigma^{2}
+     \end{array},
+   \right) \right)$$
+
+---
+### Heckman/Type 2 Tobit
+
+This is a tobit if we use maximum likelihood and the conditional distribution of the error terms to estimate the model.
+
+---
+### Heckman/Type 2 Tobit
+
+Heckman instead substitutes the first regression into the second regression. You still need the two error terms to be normally distributed, because their distributions figure into the resulting formula, and the ratio of the normal probability function to the cumulative density function (inverse Mills ratio) actually appears in the equation.
+
+---
+```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+library(sampleSelection)
+```
+
+---
+```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+data("Mroz87")
+ols1 = lm(log(wage) ~ educ + exper + I( exper^2 ) + city, data=subset(Mroz87, lfp==1))
+summ(ols1)
+```
+
+---
+```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+data("Mroz87")
+ols1 = lm(log(wage) ~ educ + exper + I( exper^2 ) + city, data=subset(Mroz87, lfp==1))
+summ(ols1)
+```
+
+---
+```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+mroz.tobit = selection( lfp ~ age + I( age^2 ) + kids5 + huswage + educ,
+                 log(wage) ~ educ + exper + I( exper^2 ) + city, data=Mroz87 )
+summary(mroz.tobit)
+```
+
+---
+```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+mroz.heckit = heckit( lfp ~ age + I( age^2 ) + kids5 + huswage + educ,
+                 log(wage) ~ educ + exper + I( exper^2 ) + city, data=Mroz87 )
+summary(mroz.heckit)
+```
+
+---
+```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+include_graphics("images/Sartori1.png")
+```
+
+---
+```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+include_graphics("images/Sartori2.png")
+```
