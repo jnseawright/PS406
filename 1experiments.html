@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>1: Potential Outcomes and Experiments</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="J. Seawright" />
+    <meta name="date" content="2024-03-26" />
+    <script src="1experiments_files/header-attrs-2.25/header-attrs.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# 1: Potential Outcomes and Experiments
+]
+.subtitle[
+## Quantitative Causal Inference
+]
+.author[
+### <large>J. Seawright</large>
+]
+.institute[
+### <small>Northwestern Political Science</small>
+]
+.date[
+### March 26, 2024
+]
+
+---
+
+class: center, middle
+
+&lt;style type="text/css"&gt;
+pre {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+pre[class] {
+  max-height: 200px;
+}
+&lt;/style&gt;
+
+
+
+---
+### Business
+
+-   Weekly lab assignments
+
+-   Final research design
+
+---
+### Online Experiment
+
+---
+### Potential Outcomes
+
+-   Let's build a model of one person participating in the experiment.
+
+---
+### Potential Outcomes
+
+-   Suppose we name that person `\(i\)`.
+
+-   The person we're interested in says 1 when in the control group, and
+    0 when in the treatment group.
+
+---
+### Potential Outcomes
+
+-   `\(y_{i,c} = 0\)`
+
+-   `\(y_{i,t} = 1\)`
+
+---
+### The Potential Outcomes Framework
+
+-   We are interested in the effects of a dichotomous treatment (i.e.,
+    independent variable): whether person got the treatment (t) or the
+    control (c).
+
+-   This variable can be written as `\(W_{i} = (t,c)\)`.
+
+---
+### The Potential Outcomes Framework
+
+-   For a given case, `\(i\)`, we either observe `\(W_{i} = t\)` or `\(W_{i} = c\)`.
+    If `\(W_{i} = t\)`, let us denote the value of the dependent variable as
+    `\(y_{i,t}\)`. If `\(W_{i} = c\)`, let us denote the value of the dependent
+    variable as `\(y_{i,c}\)`
+
+---
+### The Potential Outcomes Framework
+
+-   The causal effect of `\(W\)` on `\(y\)` is:
+
+    -   `\(y_{i,t} - y_{i,c}\)`
+
+---
+### The Average Treatment Effect
+
+-   Sometimes, we are interested in developing an estimate of the effect
+    of `\(W\)` on `\(y\)` in some population `\(\Pi\)`, from which we have a random
+    sample (or even the whole population) split randomly into treatment
+    and control cases.
+
+-   Here, interest focuses on the "average treatment effect":
+
+    -   `\(E(y_{i,t}) - E(y_{i,c})\)`
+
+---
+### Assignment Mechanisms
+
+-   `\(\mathbb{W}\)` has a probability distribution.
+
+&lt;!-- --&gt;
+
+-   `\(Pr(\mathbb{W} | \mathbb{X}, \mathbb{Y}_{0}, \mathbb{Y}_{1})\)`
+
+`$$p_{i}(\mathbb{X}, \mathbb{Y}_{0}, \mathbb{Y}_{1}) = \sum_{\mathbb{W}: W_{i} = 1} Pr(\mathbb{W} | \mathbb{X}, \mathbb{Y}_{0}, \mathbb{Y}_{1})$$`
+
+`\(\mathbb{W}\)`, `\(\mathbb{X}\)`, `\(\mathbb{Y}_{0}\)`, and `\(\mathbb{Y}_{1}\)` take
+on joint values that are drawn from some describable set of
+possibilities.
+
+---
+### Individualistic Assignment
+
+1.  There exists a function `\(q()\)` that is bounded between 0 and 1, such
+    that
+    `\(p_{i}(\mathbb{X}, \mathbb{Y}_{0}, \mathbb{Y}_{1}) = q(X_{i}, Y_{0,i}, Y_{1,i})\)`
+
+2.  `\(Pr(\mathbb{W} | \mathbb{X}, \mathbb{Y}_{0}, \mathbb{Y}_{1})\)` is the
+    product of those individual probabilities.
+
+---
+### Probabilistic Assignment
+
+1.  For all permissible values of `\(\mathbb{X}\)`, `\(\mathbb{Y}_{0}\)`, and
+    `\(\mathbb{Y}_{1}\)`,
+    `\(0 &lt; p_{i}(\mathbb{X}, \mathbb{Y}_{0}, \mathbb{Y}_{1}) &lt; 1\)`.
+
+---
+### Unconfounded Assignment
+
+1.  `\(Pr(\mathbb{W} | \mathbb{X}, \mathbb{Y}_{0}, \mathbb{Y}_{1}) = Pr(\mathbb{W} | \mathbb{X}, \mathbb{Y}^{'}_{0}, \mathbb{Y}^{'}_{1})\)`
+
+---
+### Experiments and Causal Inference
+
+-   Under probabilistic and unconfounded assignment, the set of cases
+    where `\(W_{i} = t\)` produces a random sample from the population of
+    `\(y_{t}\)`. Likewise, the set of cases where `\(W_{i} = c\)` produces a
+    random sample from the population of `\(y_{c}\)`. Thus:
+
+    -   `\(E_{t}(y_{i,t}) = E(y_{i,t})\)`
+
+    -   `\(E_{c}(y_{i,c}) = E(y_{i,c})\)`
+
+    -   `\(E(y_{i,t}) - E(y_{i,c}) = E_{t}(y_{i,t}) - E_{c}(y_{i,c})\)`
+
+---
+
+
+```r
+mean(peruemotions$outsidervote[peruemotions$simpletreat==1])
+```
+
+```
+## [1] 0.6092715
+```
+
+```r
+mean(peruemotions$outsidervote[peruemotions$simpletreat==0])
+```
+
+```
+## [1] 0.4916388
+```
+
+```r
+mean(peruemotions$outsidervote[peruemotions$simpletreat==1]) - mean(peruemotions$outsidervote[peruemotions$simpletreat==0])
+```
+
+```
+## [1] 0.1176327
+```
+
+---
+
+```r
+summ(lm(outsidervote ~ simpletreat, data=peruemotions))
+```
+
+&lt;table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; Observations &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 450 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; Dependent variable &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; outsidervote &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; Type &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; OLS linear regression &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt; &lt;table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; F(1,448) &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.62 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; R² &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; Adj. R² &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt; &lt;table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;border-bottom: 0;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Est. &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; S.E. &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; t val. &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; (Intercept) &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.49 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 17.10 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; simpletreat &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.12 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.05 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2.37 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.02 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;tfoot&gt;&lt;tr&gt;&lt;td style="padding: 0; " colspan="100%"&gt;
+&lt;sup&gt;&lt;/sup&gt; Standard errors: OLS&lt;/td&gt;&lt;/tr&gt;&lt;/tfoot&gt;
+&lt;/table&gt;
+
+---
+### Randomization Inference
+
+-   It is clearly important to test the null hypothesis that
+    `\(E(y_{i,t}) = E(y_{i,c})\)` for all `\(i\)`.
+
+-   If this hypothesis is true, then every case's treatment assignment
+    is unrelated to its outcome.
+
+-   Thus, under the null hypothesis, it is fine for us to reassign
+    treatment at random --- the outcome won't change.
+
+---
+### Randomization Inference
+
+-   Randomization inference involves:
+
+    1.  Randomly reordering the treatment condition vector
+
+    2.  Calculating the difference between the treatment and control
+        group for the new (artificial) treatment condition vector
+
+    3.  Storing the result somewhere
+
+    4.  Repeating the whole process hundreds or thousands of times.
+
+---
+### Randomization Inference
+
+-   If the null hypothesis is true, then the distribution of simulated
+    differences in means is the sampling distribution from which the
+    real difference in means was drawn.
+
+-   Therefore, a good `\(P\)` value for our observed difference in means is
+    the proportion of simulated differences in means that are at least
+    as far from 0 as the real number.
+
+---
+### Assumptions
+
+When analyzing an experiment using randomization inference, we do *not*
+need to assume that:
+
+-   we know and can measure all (or even any!) of the confounding
+    variables for the relationship of interest.
+
+-   causal effects are additive or linear.
+
+-   causal effects are constant across cases.
+
+-   errors are normally distributed or heteroskedastic.
+
+---
+### Assumptions
+
+When analyzing an experiment using randomization inference, we *do* need
+to assume that:
+
+-   SUTVA (stable unit treatment value assumption) holds.
+
+-   Experimental/psychological realism holds.
+
+---
+
+```r
+library(ri2)
+```
+
+```
+## Loading required package: randomizr
+```
+
+```
+## Loading required package: estimatr
+```
+
+```r
+emotions_declaration &lt;- declare_ra(N = 450, m = 151)
+
+emotions_table &lt;- data_frame(Z = peruemotions$simpletreat,
+                             Y = peruemotions$outsidervote)
+```
+
+```
+## Warning: `data_frame()` was deprecated in tibble 1.1.0.
+## ℹ Please use `tibble()` instead.
+## This warning is displayed once every 8 hours.
+## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+## generated.
+```
+
+```r
+ri2_emotionsresult &lt;- conduct_ri(
+  formula = Y ~ Z,
+  declaration = emotions_declaration,
+  sharp_hypothesis = 0,
+  data = emotions_table
+)
+```
+
+---
+
+```r
+ri2_emotionsresult
+```
+
+```
+##   term  estimate two_tailed_p_value
+## 1    Z 0.1176327              0.019
+```
+
+---
+### Balance Testing
+
+---
+
+```r
+library(cobalt)
+```
+
+```
+##  cobalt (Version 4.5.3, Build Date: 2024-01-09)
+```
+
+```r
+peruemotionscovs &lt;- subset(peruemotions, select = c(Cuzco, age))
+bal.tab(peruemotionscovs, treat=peruemotions$simpletreat, 
+        thresholds = c(m = .1, v = 2))
+```
+
+```
+## Note: `s.d.denom` not specified; assuming pooled.
+```
+
+```
+## Warning: Missing values exist in the covariates. Displayed values omit these
+## observations.
+```
+
+```
+## Balance Measures
+##             Type Diff.Un M.Threshold.Un V.Ratio.Un V.Threshold.Un
+## Cuzco     Binary  0.0598 Balanced, &lt;0.1          .               
+## age      Contin.  0.0476 Balanced, &lt;0.1     1.0738   Balanced, &lt;2
+## age:&lt;NA&gt;  Binary  0.0097 Balanced, &lt;0.1          .               
+## 
+## Balance tally for mean differences
+##                    count
+## Balanced, &lt;0.1         3
+## Not Balanced, &gt;0.1     0
+## 
+## Variable with the greatest mean difference
+##  Variable Diff.Un M.Threshold.Un
+##     Cuzco  0.0598 Balanced, &lt;0.1
+## 
+## Balance tally for variance ratios
+##                  count
+## Balanced, &lt;2         1
+## Not Balanced, &gt;2     0
+## 
+## Variable with the greatest variance ratio
+##  Variable V.Ratio.Un V.Threshold.Un
+##       age     1.0738   Balanced, &lt;2
+## 
+## Sample sizes
+##     Control Treated
+## All     299     151
+```
+---
+### Encouragement Designs
+
+---
+### Regression in Experiments
+
+Recall that `\(W_{i}\)` as an indicator of treatment assignment in an
+experiment. Let's change the coding, such that `\(W_{i}\)` equals 1 for
+treatment cases and 0 for control cases. Then we can write:
+
+`$$Y_{i} = W_{i} Y_{i,t} + (1 - W_{i}) Y_{i,c}$$`
+
+`$$Y_{i} = Y_{i,c} + W_{i} (Y_{i,t} - Y_{i,c})$$`
+
+---
+### Regression in Experiments
+
+`$$Y_{i} = \bar{Y}_{i,c} + W_{i} (\bar{Y}_{i,t} - \bar{Y}_{i,c}) +$$` 
+`$$[Y_{i,c} - \bar{Y}_{i,c} + W_{i} (Y_{i,t} - \bar{Y}_{i,t} - Y_{i,c} + \bar{Y}_{i,c})]$$`
+
+---
+### Regression in Experiments
+
+Suppose we use OLS to estimate:
+
+`$$Y_{i} = \beta_{0} + \beta_{1} W_{i} + \epsilon_{i}$$`
+
+Will this work?
+
+---
+### Regression in Experiments
+
+`$$\hat{\beta}_{1} = \frac{cov(W, Y)}{var(W)} = \frac{\sum(W - \bar{W})(Y - \bar{Y})}{\sum(W - \bar{W})^2}$$`
+
+Let `\(\pi\)` equal the proportion of cases assigned to the treatment group.
+
+`$$\hat{\beta}_{1} = \frac{\sum(W - \pi)(Y - \bar{Y})}{N \pi (1 - \pi)}$$`
+
+---
+### Regression in Experiments
+
+`$$\hat{\beta}_{1} = \frac{\sum_{W: W_{i} = 1}(1 - \pi)(Y - \bar{Y}) - \sum_{W: W_{i} = 0}\pi (Y - \bar{Y})}{N \pi (1 - \pi)}$$`
+
+`$$\hat{\beta}_{1} = \frac{\Sigma_{W: W_{i} = 1} (Y_{i} - E(Y_{i}))}{N \pi} - \frac{\Sigma_{W: W_{i} = 0}(Y_{i} - E(Y_{i}))}{N (1 - \pi)}$$`
+
+---
+### Regression in Experiments
+
+`\(N \pi\)` is just the number of cases where `\(W_{i} = 1\)`, and `\(N (1 - \pi)\)`
+is the number of cases where `\(W_{i} = 0\)`. So the last expression
+simplifies to:
+
+`$$\hat{\beta}_{1} = \frac{\Sigma_{W: W_{i} = 1} Y_{i}}{N \pi} - \frac{\Sigma_{W: W_{i} = 0}Y_{i}}{N (1 - \pi)}$$`
+
+`$$\hat{\beta}_{1} = \bar{Y}_{i, W_{i} = 1} - \bar{Y}_{i, W_{i} = 0}$$`
+
+---
+### Regression in Experiments
+
+Multivariate regression for experiments is *not* guaranteed to be
+unbiased in the way that bivariate regression is. Multivariate
+regression can be (even very badly) biased if:
+
+1.  Some control variable included in the model is caused by the
+    treatment, or
+
+2.  The causal effect of interest is very heterogeneous across cases and
+    the total number of cases is small
+    
+---
+
+```r
+summary(lm(outsidervote ~ simpletreat, data=peruemotions))
+```
+
+```
+## 
+## Call:
+## lm(formula = outsidervote ~ simpletreat, data = peruemotions)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -0.6093 -0.4916  0.3907  0.5084  0.5084 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  0.49164    0.02874  17.104   &lt;2e-16 ***
+## simpletreat  0.11763    0.04962   2.371   0.0182 *  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.497 on 448 degrees of freedom
+## Multiple R-squared:  0.01239,	Adjusted R-squared:  0.01018 
+## F-statistic:  5.62 on 1 and 448 DF,  p-value: 0.01818
+```
+
+---
+
+```r
+summary(lm(outsidervote ~ simpletreat + risk, data=peruemotions))
+```
+
+```
+## 
+## Call:
+## lm(formula = outsidervote ~ simpletreat + risk, data = peruemotions)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -1.04217 -0.34282  0.07292  0.34842  1.03717 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  1.0224427  0.0511549  19.987   &lt;2e-16 ***
+## simpletreat  0.0197234  0.0456917   0.432    0.666    
+## risk        -0.0105961  0.0009036 -11.726   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.4294 on 402 degrees of freedom
+##   (45 observations deleted due to missingness)
+## Multiple R-squared:  0.2624,	Adjusted R-squared:  0.2587 
+## F-statistic: 71.49 on 2 and 402 DF,  p-value: &lt; 2.2e-16
+```
+---
+### Causal Mediation
+
+Suppose we want to know the causal steps by which treatment affects `\(Y\)`.
+
+Let `\(M\)` be a hypothesized mediator, i.e., a variable caused by treatment
+that causes `\(Y\)`. Because `\(M\)` is affected by `\(W\)`, `\(M\)` is a sort of
+dependent variable. Let us denote two potential outcomes: `\(M_{i,t}\)` and
+`\(M_{i,c}\)`.
+
+`\(Y\)` depends on `\(W\)` and `\(M\)`, so there are now four potential outcomes on
+`\(Y\)`: `\(Y_{i}(t,M_{i,t})\)`, `\(Y_{i}(t,M_{i,c})\)`, `\(Y_{i}(c,M_{i,t})\)`, and
+`\(Y_{i}(c,M_{i,c})\)`
+
+---
+### Causal Mediation
+
+The two causal mediation effects for each case are:
+
+`$$\begin{aligned}
+\delta_{i,t} = Y_{i}(t,M_{i,t}) - Y_{i}(t,M_{i,c})\end{aligned}$$`
+
+`$$\begin{aligned}
+\delta_{i,c} = Y_{i}(c,M_{i,t}) - Y_{i}(c,M_{i,c})\end{aligned}$$`
+
+---
+### Causal Mediation
+
+To make inferences, we need the assumptions:
+
+`$$\begin{aligned}
+Y_{i}(t,M_{i,t}) \perp\!\!\!\perp W_{i} | X_{i} = x\end{aligned}$$`
+
+`$$\begin{aligned}
+M_{i,t} \perp\!\!\!\perp W_{i} | X_{i} = x\end{aligned}$$`
+
+`$$\begin{aligned}
+Y_{i}(t^{'},m) \perp\!\!\!\perp M_{i,t} | (W_{i} = t, X_{i} = x) \end{aligned}$$`
+
+---
+
+```r
+library(mediation)
+```
+
+```
+## Loading required package: MASS
+```
+
+```
+## 
+## Attaching package: 'MASS'
+```
+
+```
+## The following object is masked from 'package:dplyr':
+## 
+##     select
+```
+
+```
+## Loading required package: Matrix
+```
+
+```
+## Loading required package: mvtnorm
+```
+
+```
+## 
+## Attaching package: 'mvtnorm'
+```
+
+```
+## The following object is masked from 'package:jtools':
+## 
+##     standardize
+```
+
+```
+## Loading required package: sandwich
+```
+
+```
+## mediation: Causal Mediation Analysis
+## Version: 4.5.0
+```
+
+---
+
+```r
+peruemotionsmed &lt;- with(peruemotions, na.omit(data.frame(risk=risk,
+                                                       outsidervote = outsidervote,
+                                                       simpletreat=simpletreat,
+                                                       Cuzco=Cuzco,
+                                                       age=age)))
+
+perumed.lm1 &lt;- lm(risk ~ simpletreat, data=peruemotionsmed)
+perumed.lm2 &lt;- lm(outsidervote ~ risk + simpletreat + Cuzco + age, data=peruemotionsmed)
+perumed.out &lt;- mediate(perumed.lm1, perumed.lm2, treat="simpletreat", mediator = "risk")
+```
+
+---
+
+```r
+summary(perumed.out)
+```
+
+```
+## 
+## Causal Mediation Analysis 
+## 
+## Quasi-Bayesian Confidence Intervals
+## 
+##                Estimate 95% CI Lower 95% CI Upper p-value   
+## ACME            0.08162      0.02773         0.13   0.006 **
+## ADE             0.02244     -0.06955         0.11   0.616   
+## Total Effect    0.10406     -0.00188         0.21   0.056 . 
+## Prop. Mediated  0.75518     -0.38233         4.81   0.054 . 
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Sample Size Used: 398 
+## 
+## 
+## Simulations: 1000
+```
+---
+
+```r
+plot(perumed.out)
+```
+
+&lt;img src="1experiments_files/figure-html/unnamed-chunk-12-1.png" width="70%" /&gt;
+
+---
+
+```r
+perumedsens.out &lt;- medsens(perumed.out, rho.by = 0.1, effect.type = "indirect", sims = 100)
+
+plot(perumedsens.out)
+```
+
+&lt;img src="1experiments_files/figure-html/unnamed-chunk-13-1.png" width="65%" /&gt;
+
+---
+### Heterogeneity
+
+---
+
+```r
+summary(lm(outsidervote ~ simpletreat + Cuzco + simpletreat:Cuzco + age + simpletreat:age, data=peruemotions))
+```
+
+```
+## 
+## Call:
+## lm(formula = outsidervote ~ simpletreat + Cuzco + simpletreat:Cuzco + 
+##     age + simpletreat:age, data = peruemotions)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -0.6325 -0.5234  0.3705  0.4750  0.5903 
+## 
+## Coefficients:
+##                     Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)        0.5045928  0.0875077   5.766 1.55e-08 ***
+## simpletreat        0.1957848  0.1525120   1.284   0.1999    
+## Cuzco             -0.1121455  0.0639902  -1.753   0.0804 .  
+## age                0.0007842  0.0027246   0.288   0.7736    
+## simpletreat:Cuzco  0.0924688  0.1065091   0.868   0.3858    
+## simpletreat:age   -0.0038673  0.0045507  -0.850   0.3959    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.4981 on 432 degrees of freedom
+##   (12 observations deleted due to missingness)
+## Multiple R-squared:  0.01819,	Adjusted R-squared:  0.006829 
+## F-statistic: 1.601 on 5 and 432 DF,  p-value: 0.1585
+```
+
+---
+### Population Inference
+
+-   Unrepresentative samples
+
+-   Let `\(Z_{i}\)` be a dichotomous variable that represents whether a case
+    is in the experimental sample
+
+---
+### Population Inference
+
+Assume:
+
+`$$\begin{aligned}
+f(Y_{i,1} - Y_{i,0} | Z_{i}, X_{i}) = f(Y_{i,1} - Y_{i,0} | X_{i})\end{aligned}$$`
+
+---
+### Population Inference
+
+Assume, for all possible `\(X^{*}\)`:
+
+`$$\begin{aligned}
+P(Z_{i} = 1 | X_{i} = X^{*}) &gt; 0\end{aligned}$$`
+
+---
+### Population Inference
+
+O'Muircheartaigh and Hedges propose:
+
+1.  Let `\(\mathbf{x}\)` be the collection of all observed combination of
+    values `\(X^{*}\)`.
+
+2.  Let `\(T(x)\)` be the sample average of `\(Y_{i,1} - Y_{i,0}\)` across all
+    `\(i\)` such that `\(X_{i} = x\)`.
+
+3.  Let `\(p(x)\)` be the proportion of the population with `\(X_{i} = x\)`.
+
+---
+### Population Inference
+
+O'Muircheartaigh and Hedges propose:
+
+4.  `\(PATE \approx \sum_{x \in \mathbf{x}}(p(x) T(x))\)`
+
+---
+
+```r
+library(devtools)
+```
+
+```
+## Loading required package: usethis
+```
+
+```r
+#devtools::install_github('benjamin-ackerman/generalize')
+library(generalize)
+?assess
+```
+
+---
+
+```r
+?generalize
+```
+
+---
+&lt;img src="images/Bush1.png" width="90%" /&gt;
+
+---
+&lt;img src="images/Bush2.png" width="100%" /&gt;
+
+---
+&lt;img src="images/Bush3.png" width="100%" /&gt;
+
+---
+&lt;img src="images/Cheema1.png" width="100%" /&gt;
+
+---
+&lt;img src="images/Cheema2.png" width="100%" /&gt;
+
+---
+&lt;img src="images/Cheema3.png" width="100%" /&gt;
+
+---
+&lt;img src="images/Cheema4.png" width="100%" /&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create();
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
