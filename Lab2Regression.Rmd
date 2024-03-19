@@ -1,0 +1,77 @@
+---
+title: "Political Science 406 Lab 2: Regression"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    highlight: tango
+  pdf_document: default
+urlcolor: blue
+---
+
+```{r include = FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,                 # don't show code
+  warning = FALSE,              # don't show warnings
+  message = FALSE,              # don't show messages (less serious warnings)
+  cache = FALSE,                # set to TRUE to save results from last compilation
+  fig.align = "center",         # center figures
+  attr.source = '.numberLines'  # add line numbers to code
+)
+
+library(tidyverse)       # load libraries you always use here
+
+set.seed(27)             # make random results reproducible
+```
+
+# Due Date: April 12, 2024
+
+[Submit your lab here.](https://canvas.northwestern.edu/courses/211656/assignments/1391316)
+
+### Problem 1: Bivariate Regression in R
+
+We will be analyzing a data set on inequality for a collection of 118 countries during the mid-1990s.
+
+Begin by loading the data set into R, using the following command:
+
+```{r, echo=TRUE}
+inequality <- read.csv("https://raw.githubusercontent.com/jnseawright/PS406/main/data/Inequality.csv")
+```
+
+Look at the names of the variables in the data set, to make sure your copy downloaded correctly:
+
+```{r, echo=TRUE}
+names(inequality)
+```
+
+Now carry out a bivariate regression, using the Gini coefficient (a measure of inequality) as the dependent variable and the Polity variable (a measure of democracy) as the independent variable. Suppose that the results are causal; what do they mean? What assumption is needed to claim that the findings are causal? (State the assumption as formally as you can and explain what it means substantively.)
+
+### Problem 2: Multivariate Regression in R
+
+You should now expand the model by incorporating logged GDP as a second independent variable. The R commands generalize straightforwardly:
+
+```{r, echo=TRUE, eval=FALSE}
+ineqlm2 <- lm(Gini ~ Polity + log(GDP), data=inequality)
+
+summary(ineqlm2)
+```
+
+(Note that we are able to incorporate functions like log directly into the regression command.)
+
+As in the last problem, interpret the results of this regression in causal terms and explain as carefully as
+possible what is assumed in the process.
+
+### Problem 3: Interaction Terms in R
+
+You should now expand the model by including an interaction between the Polity variable and logged GDP:
+
+```{r, echo=TRUE, eval=FALSE}
+ineqlm3 <- lm(Gini ~ Polity + log(GDP) + Polity:log(GDP), data=inequality)
+```
+
+Analyze and explain the results. Discuss the assumptions that would be involved in treating these results as causal.
+
+### Problem 4: Weights
+
+Calculate the multivariate regression from problem 2 using URI to determine the implied weights for each case. Are they relatively even, or are some cases far more important than others?
+
+To calculate an average treatment effect that weights every case equally, calcuate the effect using MRI. (It may be necessary to dichotomize the treatment; play this by ear.) Are the results substantively similar, or do the weights make a difference?

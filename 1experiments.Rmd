@@ -3,7 +3,7 @@ title: "1: Potential Outcomes and Experiments"
 subtitle: "Quantitative Causal Inference"
 author: "<large>J. Seawright</large>"
 institute: "<small>Northwestern Political Science</small>" 
-date: "March 26, 2024"
+date: "March 26 and 27, 2024"
 output: 
   xaringan::moon_reader:
     css: xaringan-themer.css

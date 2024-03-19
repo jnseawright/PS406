@@ -1,0 +1,46 @@
+---
+title: "Political Science 406 Lab 1: Experiments"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    highlight: tango
+  pdf_document: default
+urlcolor: blue
+---
+
+```{r include = FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,                 # don't show code
+  warning = FALSE,              # don't show warnings
+  message = FALSE,              # don't show messages (less serious warnings)
+  cache = FALSE,                # set to TRUE to save results from last compilation
+  fig.align = "center",         # center figures
+  attr.source = '.numberLines'  # add line numbers to code
+)
+
+library(tidyverse)       # load libraries you always use here
+
+set.seed(27)             # make random results reproducible
+```
+
+# Due Date: April 5, 2024
+
+[Submit your lab here.](https://canvas.northwestern.edu/courses/211656/assignments/1391316)
+
+### Problem 1: Analyzing Experimental Data: Difference in Means
+
+In this lab, you will reanalyze the results of the experiment reported in Dunning and Harrison’s 2010 APSR article. The [article and replication data are available.](http://isps.yale.edu/research/data/d015#.VwKCmuIrKUk)
+
+First, use the difference in means to estimate one of the main treatment effects discussed in the paper (disregard compliance, i.e., subjects’ perception of the ethnicity of the politician and of whether a joking cousin relationship exists). Use randomization inference to find a P value for that difference. Discuss the results and any causal implications.
+
+### Problem 2: Analyzing Experimental Data: Multivariate Regression
+
+Now, fit a multivariate model. Choose the control variables that make sense to you; explain why, potentially using a DAG or other formal causal reasoning. Is your estimate of the main treatment effect consistent with the result from the difference in means? What does the regression teach us about the causal relationships, relative to the difference in means?
+
+### Problem 3: Analyzing Experimental Data: Mediation
+
+Estimate a mediation effect that helps clarify a hypothesis in the article, using what seems to you to be a reasonable set of control variables. Again, explain your model and assumptions using whatever form of reasoning makes sense for you. Are your results consistent with the arguments of the article?
+
+### Problem 4: Analyzing Experimental Data: Compliance
+
+A final major issue in experimentation involves compliance -- the proportion of people who actually end up in the treatment group they are assigned to. What is the compliance rate in this experiment? Would it be a good idea to estimate the treatment effect using the treatment group that people thought they were in, instead of the treatment group people were assigned to, as the independent variable? Why or why not? Discuss this choice in terms of the potential outcomes framework or some other way that makes sense to you, and explain whether you think the experiment is a direct experiment or an encouragement design.
