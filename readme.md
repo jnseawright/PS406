@@ -18,8 +18,8 @@
 
 ### Lab Assignments
 
-* [Week 1: Experiments](https://jnseawright.github.io/PS406/Lab1Experiments.pdf)
-* [Week 2: Regression and Causal Inference](https://jnseawright.github.io/PS406/Lab2Regression.pdf) 
+* [Week 1: Experiments](https://jnseawright.github.io/PS406/Lab1Experiments.html)
+* [Week 2: Regression and Causal Inference](https://jnseawright.github.io/PS406/Lab2Regression.html) 
 * [Week 3: Matching](https://jnseawright.github.io/PS406/Lab3Matching.pdf)
 * [Week 4: Natural Experiments Part 1](https://jnseawright.github.io/PS406/Lab4NaturalExperiments.pdf)
 * [Week 5: Natural Experiments Part 2 ](https://jnseawright.github.io/PS406/Lab5NaturalExperimentsPart2.pdf) 
