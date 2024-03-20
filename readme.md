@@ -20,11 +20,11 @@
 
 * [Week 1: Experiments](https://jnseawright.github.io/PS406/Lab1Experiments.html)
 * [Week 2: Regression and Causal Inference](https://jnseawright.github.io/PS406/Lab2Regression.html) 
-* [Week 3: Matching](https://jnseawright.github.io/PS406/Lab3Matching.pdf)
-* [Week 4: Natural Experiments Part 1](https://jnseawright.github.io/PS406/Lab4NaturalExperiments.pdf)
-* [Week 5: Natural Experiments Part 2 ](https://jnseawright.github.io/PS406/Lab5NaturalExperimentsPart2.pdf) 
-* [Week 6: Missing Data](https://jnseawright.github.io/PS406/Lab6MissingData.pdf)
-* [Week 7: Synthetic Control, Sensitivity, and Bounds](https://jnseawright.github.io/PS406/Lab7BoundsandSyntheticControl.pdf)
-* [Week 8: Difference-in-Differences Designs](https://jnseawright.github.io/PS406/Lab8DiffinDiff.pdf)
-* [Week 9: Machine Learning and Causal Inference](https://jnseawright.github.io/PS406/Lab9MachineLearning.pdf)
+* [Week 3: Matching](https://jnseawright.github.io/PS406/Lab3Matching.html)
+* [Week 4: Natural Experiments Part 1](https://jnseawright.github.io/PS406/Lab4NaturalExperiments1.html)
+* [Week 5: Natural Experiments Part 2 ](https://jnseawright.github.io/PS406/Lab5NaturalExperiments2.html) 
+* [Week 6: Missing Data](https://jnseawright.github.io/PS406/Lab6MissingData.html)
+* [Week 7: Synthetic Control, Sensitivity, and Bounds](https://jnseawright.github.io/PS406/Lab7BoundsandSyntheticControl.html)
+* [Week 8: Difference-in-Differences Designs](https://jnseawright.github.io/PS406/Lab8DiffinDiff.html)
+* [Week 9: Machine Learning and Causal Inference](https://jnseawright.github.io/PS406/Lab9MachineLearning.html)
 
