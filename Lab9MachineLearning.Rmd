@@ -1,0 +1,40 @@
+---
+title: "Political Science 406 Lab 9: Machine Learning"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    highlight: tango
+  pdf_document: default
+urlcolor: blue
+---
+
+```{r include = FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,                 # don't show code
+  warning = FALSE,              # don't show warnings
+  message = FALSE,              # don't show messages (less serious warnings)
+  cache = FALSE,                # set to TRUE to save results from last compilation
+  fig.align = "center",         # center figures
+  attr.source = '.numberLines'  # add line numbers to code
+)
+
+library(tidyverse)       # load libraries you always use here
+
+set.seed(27)             # make random results reproducible
+```
+
+# Due Date: May 31, 2024
+
+[Submit your lab here.](https://canvas.northwestern.edu/courses/211656/assignments/1392661)
+
+### Problem 1: Machine Learning Causal Inference
+
+Load King and Zeng’s massive dataset on possible predictors of state collapse, kingzeng.csv. The [website for these data](https://dataverse.harvard.edu/dataset.xhtml?persistentId=hdl:
+1902.1/RPQIODIANR) contains full files and a codebook.
+
+We will use the data to analyze a cause of homicide rates across countries and over time.
+
+Select one possible cause of homicide rates. (If you don’t have other ideas, you can use whether a country
+is democratic or not as a default cause.) Use one or more machine learning algorithms to estimate the effect
+of that cause on homicide controlling for as many potential confounders as possible. Explain your analysis
+(as well as your choice of estimator) and interpret your results. How is this estimator different from those used in previous weeks?

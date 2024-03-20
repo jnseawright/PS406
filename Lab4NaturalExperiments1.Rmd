@@ -1,0 +1,40 @@
+---
+title: "Political Science 406 Lab 4: Natural Experiments, Part 1"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    highlight: tango
+  pdf_document: default
+urlcolor: blue
+---
+
+```{r include = FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,                 # don't show code
+  warning = FALSE,              # don't show warnings
+  message = FALSE,              # don't show messages (less serious warnings)
+  cache = FALSE,                # set to TRUE to save results from last compilation
+  fig.align = "center",         # center figures
+  attr.source = '.numberLines'  # add line numbers to code
+)
+
+library(tidyverse)       # load libraries you always use here
+
+set.seed(27)             # make random results reproducible
+```
+
+# Due Date: April 26, 2024
+
+[Submit your lab here.](https://canvas.northwestern.edu/courses/211656/assignments/1392648)
+
+### Problem 1: Evaluate a Natural Experiment
+
+Consider the following published natural experiment: 
+
+Golovchenko, Yevgeniy. "Fighting propaganda with censorship: A study of the Ukrainian ban on Russian social media." The Journal of Politics 84.2 (2022): 639-654.
+
+What kind of natural experiment is it? What are the key assumptions for a causal inference in a natural experiment of this kind? (State them in terms of the potential outcomes framework, possibly with a DAG if that would be helpful.) What evidence is provided in the article for those assumptions, and how good is it? On the basis of your answers to these questions, how credible do you think the natural experiment is as a whole?
+
+
+
+

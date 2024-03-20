@@ -10,9 +10,9 @@
 
 
 
-<meta name="date" content="2024-03-19" />
+<meta name="date" content="2024-03-20" />
 
-<title>Political Science 406 Lab 2: Regression</title>
+<title>Political Science 406 Lab 5: Natural Experiments, Part 2</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -220,106 +220,6 @@ ul.task-list{list-style: none;}
 
 
 
-<style type="text/css">
-code {
-white-space: pre;
-}
-.sourceCode {
-overflow: visible;
-}
-</style>
-<style type="text/css" data-origin="pandoc">
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-{ counter-reset: source-line 0; }
-pre.numberSource code > span
-{ position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-{ content: counter(source-line);
-position: relative; left: -1em; text-align: right; vertical-align: baseline;
-border: none; display: inline-block;
--webkit-touch-callout: none; -webkit-user-select: none;
--khtml-user-select: none; -moz-user-select: none;
--ms-user-select: none; user-select: none;
-padding: 0 4px; width: 4em;
-color: #aaaaaa;
-}
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
-div.sourceCode
-{ background-color: #f8f8f8; }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
-code span.al { color: #ef2929; } 
-code span.an { color: #8f5902; font-weight: bold; font-style: italic; } 
-code span.at { color: #204a87; } 
-code span.bn { color: #0000cf; } 
-code span.cf { color: #204a87; font-weight: bold; } 
-code span.ch { color: #4e9a06; } 
-code span.cn { color: #8f5902; } 
-code span.co { color: #8f5902; font-style: italic; } 
-code span.cv { color: #8f5902; font-weight: bold; font-style: italic; } 
-code span.do { color: #8f5902; font-weight: bold; font-style: italic; } 
-code span.dt { color: #204a87; } 
-code span.dv { color: #0000cf; } 
-code span.er { color: #a40000; font-weight: bold; } 
-code span.ex { } 
-code span.fl { color: #0000cf; } 
-code span.fu { color: #204a87; font-weight: bold; } 
-code span.im { } 
-code span.in { color: #8f5902; font-weight: bold; font-style: italic; } 
-code span.kw { color: #204a87; font-weight: bold; } 
-code span.op { color: #ce5c00; font-weight: bold; } 
-code span.ot { color: #8f5902; } 
-code span.pp { color: #8f5902; font-style: italic; } 
-code span.sc { color: #ce5c00; font-weight: bold; } 
-code span.ss { color: #4e9a06; } 
-code span.st { color: #4e9a06; } 
-code span.va { color: #000000; } 
-code span.vs { color: #4e9a06; } 
-code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } 
-</style>
-<script>
-// apply pandoc div.sourceCode style to pre.sourceCode instead
-(function() {
-  var sheets = document.styleSheets;
-  for (var i = 0; i < sheets.length; i++) {
-    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
-    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
-    var j = 0;
-    while (j < rules.length) {
-      var rule = rules[j];
-      // check if there is a div.sourceCode rule
-      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
-        j++;
-        continue;
-      }
-      var style = rule.style.cssText;
-      // check if color or background-color is set
-      if (rule.style.color === '' && rule.style.backgroundColor === '') {
-        j++;
-        continue;
-      }
-      // replace div.sourceCode by a pre.sourceCode rule
-      sheets[i].deleteRule(j);
-      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
-    }
-  }
-})();
-</script>
 
 
 
@@ -420,74 +320,56 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">Political Science 406 Lab 2:
-Regression</h1>
-<h4 class="date">2024-03-19</h4>
+<h1 class="title toc-ignore">Political Science 406 Lab 5: Natural
+Experiments, Part 2</h1>
+<h4 class="date">2024-03-20</h4>
 
 </div>
 
 
-<div id="due-date-april-12-2024" class="section level1">
-<h1>Due Date: April 12, 2024</h1>
-<p><a href="https://canvas.northwestern.edu/courses/211656/assignments/1391318">Submit
+<div id="due-date-may-3-2024" class="section level1">
+<h1>Due Date: May 3, 2024</h1>
+<p><a href="https://canvas.northwestern.edu/courses/211656/assignments/1392656">Submit
 your lab here.</a></p>
-<div id="problem-1-bivariate-regression-in-r" class="section level3">
-<h3>Problem 1: Bivariate Regression in R</h3>
-<p>We will be analyzing a data set on inequality for a collection of 118
-countries during the mid-1990s.</p>
-<p>Begin by loading the data set into R, using the following
-command:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>inequality <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;https://raw.githubusercontent.com/jnseawright/PS406/main/data/Inequality.csv&quot;</span>)</span></code></pre></div>
-<p>Look at the names of the variables in the data set, to make sure your
-copy downloaded correctly:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">names</span>(inequality)</span></code></pre></div>
-<pre><code>##  [1] &quot;Code&quot;            &quot;Country&quot;         &quot;Year&quot;            &quot;Gini&quot;           
-##  [5] &quot;Polity&quot;          &quot;GDP&quot;             &quot;Industry&quot;        &quot;FuelExports&quot;    
-##  [9] &quot;CommunistLegacy&quot; &quot;Region&quot;          &quot;X&quot;               &quot;X.1&quot;            
-## [13] &quot;X.2&quot;             &quot;X.3&quot;             &quot;X.4&quot;             &quot;X.5&quot;            
-## [17] &quot;X.6&quot;             &quot;X.7&quot;             &quot;X.8&quot;             &quot;X.9&quot;            
-## [21] &quot;X.10&quot;            &quot;X.11&quot;            &quot;X.12&quot;            &quot;X.13&quot;           
-## [25] &quot;X.14&quot;            &quot;X.15&quot;            &quot;X.16&quot;            &quot;X.17&quot;           
-## [29] &quot;X.18&quot;            &quot;X.19&quot;            &quot;X.20&quot;            &quot;X.21&quot;           
-## [33] &quot;X.22&quot;            &quot;X.23&quot;</code></pre>
-<p>Now carry out a bivariate regression, using the Gini coefficient (a
-measure of inequality) as the dependent variable and the Polity variable
-(a measure of democracy) as the independent variable. Suppose that the
-results are causal; what do they mean? What assumption is needed to
-claim that the findings are causal? (State the assumption as formally as
-you can and explain what it means substantively.)</p>
+<div id="problem-1-rainfall-economic-shocks-and-civil-conflict" class="section level3">
+<h3>Problem 1: Rainfall, Economic Shocks, and Civil Conflict</h3>
+<p>We are going to replicate an instrumental variables analysis of civil
+conflict in Africa, using rainfall as an instrument for economic growth.
+Consider skimming <a href="https://doi.org/10.1086/421174">the
+article</a>, by Edward Miguel, Shanker Satyanath, and Ernest Sergenti.
+Download <a href="https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/27324">replication
+data, which comes with variable definitions</a>.</p>
+<p>Please replicate model 5 of table 4. Do you get the same coefficient
+estimates? How about standard errors? If there is a difference, can you
+explain why?</p>
+<p>How strong is the instrument? Are there any obvious difficulties with
+the estimate?</p>
+<p>Assume that the instrument is unproblematic. What is the causal
+meaning of the estimate?</p>
 </div>
-<div id="problem-2-multivariate-regression-in-r" class="section level3">
-<h3>Problem 2: Multivariate Regression in R</h3>
-<p>You should now expand the model by incorporating logged GDP as a
-second independent variable. The R commands generalize
-straightforwardly:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>ineqlm2 <span class="ot">&lt;-</span> <span class="fu">lm</span>(Gini <span class="sc">~</span> Polity <span class="sc">+</span> <span class="fu">log</span>(GDP), <span class="at">data=</span>inequality)</span>
-<span id="cb4-2"><a href="#cb4-2"></a></span>
-<span id="cb4-3"><a href="#cb4-3"></a><span class="fu">summary</span>(ineqlm2)</span></code></pre></div>
-<p>(Note that we are able to incorporate functions like log directly
-into the regression command.)</p>
-<p>As in the last problem, interpret the results of this regression in
-causal terms and explain as carefully as possible what is assumed in the
-process.</p>
+<div id="problem-2-making-a-change" class="section level3">
+<h3>Problem 2: Making a Change</h3>
+<p>Change the instrument in the Miguel et al. data by adding the 0.2
+times the outcome variable to the instrument. How do the coefficient
+estimates change, and what does this mean?</p>
 </div>
-<div id="problem-3-interaction-terms-in-r" class="section level3">
-<h3>Problem 3: Interaction Terms in R</h3>
-<p>You should now expand the model by including an interaction between
-the Polity variable and logged GDP:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>ineqlm3 <span class="ot">&lt;-</span> <span class="fu">lm</span>(Gini <span class="sc">~</span> Polity <span class="sc">+</span> <span class="fu">log</span>(GDP) <span class="sc">+</span> Polity<span class="sc">:</span><span class="fu">log</span>(GDP), <span class="at">data=</span>inequality)</span></code></pre></div>
-<p>Analyze and explain the results. Discuss the assumptions that would
-be involved in treating these results as causal.</p>
+<div id="problem-3-late-to-pate" class="section level3">
+<h3>Problem 3: LATE to PATE</h3>
+<p>Reestimate the Miguel et al. model, reweighting to get the PATE
+instead of the LATE. Describe your steps, and explain whether we learn
+anything new from this procedure.</p>
 </div>
-<div id="problem-4-weights" class="section level3">
-<h3>Problem 4: Weights</h3>
-<p>Calculate the multivariate regression from problem 2 using URI to
-determine the implied weights for each case. Are they relatively even,
-or are some cases far more important than others?</p>
-<p>To calculate an average treatment effect that weights every case
-equally, calcuate the effect using MRI. (It may be necessary to
-dichotomize the treatment; play this by ear.) Are the results
-substantively similar, or do the weights make a difference?</p>
+<div id="problem-4-regression-discontinuity-and-partisan-sheriffs" class="section level3">
+<h3>Problem 4: Regression Discontinuity and Partisan Sheriffs</h3>
+<p>Our <a href="https://doi.org/10.1017/S0003055419000613">original
+article</a> here is by Thompson.</p>
+<p>Replicate one of the key RDD analyses from the article as closely as
+you can, using the <a href="https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/CFASH6">replication
+data</a>.</p>
+<p>Taking advantage of the things you learned in class about RDD, are
+there ways you would have changed or improved the statistical analysis?
+Make those changes, and report the result, emphasizing any effects this
+would have on the substantive conclusions to be drawn.</p>
 </div>
 </div>
 

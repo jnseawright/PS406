@@ -1,0 +1,84 @@
+---
+title: "Political Science 406 Lab 3: Matching"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    highlight: tango
+  pdf_document: default
+urlcolor: blue
+---
+
+```{r include = FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,                 # don't show code
+  warning = FALSE,              # don't show warnings
+  message = FALSE,              # don't show messages (less serious warnings)
+  cache = FALSE,                # set to TRUE to save results from last compilation
+  fig.align = "center",         # center figures
+  attr.source = '.numberLines'  # add line numbers to code
+)
+
+library(tidyverse)       # load libraries you always use here
+
+set.seed(27)             # make random results reproducible
+```
+
+# Due Date: April 19, 2024
+
+[Submit your lab here.](https://canvas.northwestern.edu/courses/211656/assignments/1392641)
+
+### Problem 1: Estimating a Propensity Score
+
+In this exercise, we will explore the proposition that partisans acquire political information and form
+evaluations differently from nonpartisans, even given a shared political context. To test this hypothesis,
+we will compare self-identified Republicans with self-identified Independents and those who report no par-
+tisan preference in the [2016 American National Election Study data](https://electionstudies.org/
+data-center/2016-time-series-study/).
+
+Begin by recoding variable V161155 such that Republicans get a score of 1, independents/no preference
+respondents get a score of 0, and all others are missing.
+
+Potential confounding variables include education (V161270), social class (V083250X), race (V161310x),
+region of residence (V163003), and degree of attention to politics (V161003). Recode these variables in a
+suitable way.
+
+First, estimate a propensity score for Republican identification conditional on these variables:
+
+```{r, echo=TRUE, eval=FALSE}
+temp1 <- lm(repvind ~ ed + class + race + region + attention, data=anes2008)
+pscore1 <- fitted(temp1)
+```
+
+Briefly discuss the adequacy of the model, as well as the substantive patterns that you find. Make any
+corrections or adjustments that seem relevant.
+
+### Problem 2: Media Usage
+
+Let’s check whether Republican partisans use social media to learn about politics (V161495) more often
+than non-partisans — a variable called repvind below. First, set up a clean data set for the matching exercise:
+
+```{r, echo=TRUE, eval=FALSE}
+mediadata <- na.omit(data.frame(repvind=anes2016$repvind, ed=anes2016$ed,
+class=anes2016$class, race=anes2016$race, region=anes2016$region,
+attention=anes2016$attention, internetnews=anes2016$internetnews))
+```
+
+Using this cleaned data set, re-estimate your propensity score model and store fitted values from that
+model in a new variable. With this propensity score, run a pairwise matching estimate of the effect of
+Republicanness on internet usage. What are your results? Check the quality of balance after matching.
+
+Experiment with the caliper, CommonSupport, BiasAdjust, and Exact parameters to the matching function.
+Do any of these alternative estimators change your results?
+
+What if you change the specification of your propensity score? Do your results change meaningfully, or
+not? What does this finding mean?
+
+### Problem 3: Sensitivity Analysis
+
+Carry out a sensitivity analysis of your favorite matching result from the previous problem. How bad
+would uncontrolled confounding have to be in order to substantially change your conclusions?
+
+### Problem 4: Other Matching Estimators
+
+Try reanalyzing the data above using coarsened exact matching and optimal full matching. Compare
+your conclusions and discuss how you would select an estimator from among this set.

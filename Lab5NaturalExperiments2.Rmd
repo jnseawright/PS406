@@ -1,0 +1,61 @@
+---
+title: "Political Science 406 Lab 5: Natural Experiments, Part 2"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    highlight: tango
+  pdf_document: default
+urlcolor: blue
+---
+
+```{r include = FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,                 # don't show code
+  warning = FALSE,              # don't show warnings
+  message = FALSE,              # don't show messages (less serious warnings)
+  cache = FALSE,                # set to TRUE to save results from last compilation
+  fig.align = "center",         # center figures
+  attr.source = '.numberLines'  # add line numbers to code
+)
+
+library(tidyverse)       # load libraries you always use here
+
+set.seed(27)             # make random results reproducible
+```
+
+# Due Date: May 3, 2024
+
+[Submit your lab here.](https://canvas.northwestern.edu/courses/211656/assignments/1392656)
+
+### Problem 1: Rainfall, Economic Shocks, and Civil Conflict
+
+We are going to replicate an instrumental variables analysis of civil conflict in Africa, using rainfall as
+an instrument for economic growth. Consider skimming [the article](https://doi.org/10.1086/421174), by Edward Miguel, Shanker Satyanath, and Ernest Sergenti. Download [replication data, which comes with variable definitions](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/27324).
+
+Please replicate model 5 of table 4. Do you get the same coefficient estimates? How about standard
+errors? If there is a difference, can you explain why?
+
+How strong is the instrument? Are there any obvious difficulties with the estimate?
+
+Assume that the instrument is unproblematic. What is the causal meaning of the estimate?
+
+
+### Problem 2: Making a Change
+
+Change the instrument in the Miguel et al. data by adding the 0.2 times the outcome variable to the
+instrument. How do the coefficient estimates change, and what does this mean?
+
+### Problem 3: LATE to PATE
+
+Reestimate the Miguel et al. model, reweighting to get the PATE instead of the LATE. Describe your
+steps, and explain whether we learn anything new from this procedure.
+
+### Problem 4: Regression Discontinuity and Partisan Sheriffs
+
+Our [original article](https://doi.org/10.1017/S0003055419000613) here is by Thompson. 
+
+Replicate one of the key RDD analyses from the article as closely as you can, using the [replication data](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/CFASH6).
+
+Taking advantage of the things you learned in class about RDD, are there ways you would have changed
+or improved the statistical analysis? Make those changes, and report the result, emphasizing any effects this
+would have on the substantive conclusions to be drawn.
