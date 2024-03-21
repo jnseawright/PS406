@@ -3,7 +3,7 @@ title: "9: Machine Learning and Causal Inference"
 subtitle: "Quantitative Causal Inference"
 author: "<large>J. Seawright</large>"
 institute: "<small>Northwestern Political Science</small>" 
-date: "May 27, 2024"
+date: "May 20 and 22, 2024"
 output: 
   xaringan::moon_reader:
     css: xaringan-themer.css

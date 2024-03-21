@@ -1,0 +1,44 @@
+---
+title: "Political Science 406 Final Paper: Research Design"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    highlight: tango
+  pdf_document: default
+urlcolor: blue
+---
+
+```{r include = FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,                 # don't show code
+  warning = FALSE,              # don't show warnings
+  message = FALSE,              # don't show messages (less serious warnings)
+  cache = FALSE,                # set to TRUE to save results from last compilation
+  fig.align = "center",         # center figures
+  attr.source = '.numberLines'  # add line numbers to code
+)
+
+library(tidyverse)       # load libraries you always use here
+
+set.seed(27)             # make random results reproducible
+```
+
+# Due Date: June 7, 2024
+
+[Submit your research design here.](https://canvas.northwestern.edu/courses/211656/assignments/1392770)
+
+### Research Design
+
+For this paper, you will write and submit a complete research design for a quantitative causal inference using one or more of the methods from this course. The topic is your choice, and should be briefly introduced, although you should not spend more than 2.5 pages on discussing the topic and theory.
+
+Instead, most of the page length should be devoted to discussing your research design, assumptions, data sources, and limitations. A successful paper will describe a feasible and creative strategy for causal inference (4-5 pages), identify the necessary data including and new collection strategies necessary to complete the project in the future (about 1 page), and thoughtfully discuss strengths and weaknesses (2-3 pages).  
+
+While regression may be a part of the design, it is required that the paper also include at least one technique discussed in week 3 or later of the course. The entire paper should not exceed *10 pages* --- a hard limit.
+
+Grading will focus on:
+
+* whether the method from the course was applied correctly
+* whether data issues were thought through carefully
+* how careful connections are between the methods used and the social science that motivates the research
+* creativity and originality
+* care and thoroughness in discussion of strengths and weaknesses

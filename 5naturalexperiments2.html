@@ -4,7 +4,6 @@
     <title>5: Instrumental Variables and RDD</title>
     <meta charset="utf-8" />
     <meta name="author" content="J. Seawright" />
-    <meta name="date" content="2024-04-22" />
     <script src="5naturalexperiments2_files/header-attrs-2.25/header-attrs.js"></script>
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
   </head>
@@ -25,7 +24,7 @@ class: center, middle, inverse, title-slide
 ### <small>Northwestern Political Science</small>
 ]
 .date[
-### April 22, 2024
+### April 22 and 24, 2024
 ]
 
 ---
@@ -1350,8 +1349,8 @@ exp.reweight$coefficients
 ```
 
 ```
-##                 Cuzco          D 
-##  0.5810754 -0.1744233 -1.3042105
+##                   Cuzco           D 
+##  0.47292590 -0.09057756 -0.03875700
 ```
 
 ```r
@@ -1359,8 +1358,8 @@ exp.reweight$coefs.se.boot
 ```
 
 ```
-##                   Cuzco           D 
-##   0.1976429   2.6300524 245.7836249
+##                 Cuzco          D 
+##  0.1966564  0.9976565 47.5845773
 ```
 
 ---
@@ -1555,11 +1554,13 @@ gg_srd + stat_smooth(aes(lagdemvoteshare, democrat, group = gg_group),
 ```
 
 ```
-## Warning: Removed 11 rows containing non-finite values (`stat_smooth()`).
+## Warning: Removed 11 rows containing non-finite outside the scale range
+## (`stat_smooth()`).
 ```
 
 ```
-## Warning: Removed 13 rows containing missing values (`geom_point()`).
+## Warning: Removed 13 rows containing missing values or values outside the scale range
+## (`geom_point()`).
 ```
 
 &lt;img src="5naturalexperiments2_files/figure-html/unnamed-chunk-23-1.png" width="90%" style="display: block; margin: auto;" /&gt;
@@ -1573,7 +1574,8 @@ gg_srd + stat_smooth(data=lmb_data %&gt;% filter(lagdemvoteshare&gt;.45 &amp; la
 ```
 
 ```
-## Warning: Removed 13 rows containing missing values (`geom_point()`).
+## Warning: Removed 13 rows containing missing values or values outside the scale range
+## (`geom_point()`).
 ```
 
 &lt;img src="5naturalexperiments2_files/figure-html/unnamed-chunk-24-1.png" width="90%" style="display: block; margin: auto;" /&gt;

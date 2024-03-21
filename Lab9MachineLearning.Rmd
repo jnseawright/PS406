@@ -25,11 +25,11 @@ set.seed(27)             # make random results reproducible
 
 # Due Date: May 31, 2024
 
-[Submit your lab here.](https://canvas.northwestern.edu/courses/211656/assignments/1392661)
+[Submit your lab here.](https://canvas.northwestern.edu/courses/211656/assignments/1392772)
 
 ### Problem 1: Machine Learning Causal Inference
 
-Load King and Zeng’s massive dataset on possible predictors of state collapse, kingzeng.csv. The [website for these data](https://dataverse.harvard.edu/dataset.xhtml?persistentId=hdl:
+Load King and Zeng’s dataset on possible predictors of state collapse, kingzeng.csv. The [website for these data](https://dataverse.harvard.edu/dataset.xhtml?persistentId=hdl:
 1902.1/RPQIODIANR) contains full files and a codebook.
 
 We will use the data to analyze a cause of homicide rates across countries and over time.

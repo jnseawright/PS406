@@ -28,3 +28,6 @@
 * [Week 8: Difference-in-Differences Designs](https://jnseawright.github.io/PS406/Lab8DiffinDiff.html)
 * [Week 9: Machine Learning and Causal Inference](https://jnseawright.github.io/PS406/Lab9MachineLearning.html)
 
+### Final Paper
+
+* [Research Design](https://jnseawright.github.io/PS406/FinalPaper.html)

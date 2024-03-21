@@ -4,7 +4,6 @@
     <title>8: Difference-in-Differences Designs</title>
     <meta charset="utf-8" />
     <meta name="author" content="J. Seawright" />
-    <meta name="date" content="2024-05-13" />
     <script src="8diffindiff_files/header-attrs-2.25/header-attrs.js"></script>
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
   </head>
@@ -25,7 +24,7 @@ class: center, middle, inverse, title-slide
 ### <small>Northwestern Political Science</small>
 ]
 .date[
-### May 13, 2024
+### May 13 and 15, 2024
 ]
 
 ---
@@ -309,7 +308,7 @@ calfect &lt;- fect(Rate ~ numerictreat, index = c("State", "Quarter_Num"), force
 ```
 
 ```
-## 68 runs
+## 63 runs
 ```
 
 ```
@@ -327,8 +326,8 @@ calfect
 ## 
 ## ATT:
 ##                                ATT     S.E. CI.lower CI.upper   p.value
-## Tr obs equally weighted   -0.02246 0.006184 -0.03458 -0.01034 0.0002813
-## Tr units equally weighted -0.02246 0.006184 -0.03458 -0.01034 0.0002813
+## Tr obs equally weighted   -0.02246 0.004955 -0.03217 -0.01275 5.821e-06
+## Tr units equally weighted -0.02246 0.004955 -0.03217 -0.01275 5.821e-06
 ```
 
 ---
@@ -347,7 +346,7 @@ calife &lt;- fect(Rate ~ numerictreat, index = c("State", "Quarter_Num"), force 
 ```
 
 ```
-## 75 runs
+## 73 runs
 ```
 
 ```
@@ -365,9 +364,9 @@ calife
 ##     min.T0 = 1)
 ## 
 ## ATT:
-##                                ATT     S.E. CI.lower CI.upper   p.value
-## Tr obs equally weighted   -0.02246 0.005181 -0.03261  -0.0123 1.461e-05
-## Tr units equally weighted -0.02246 0.005181 -0.03261  -0.0123 1.461e-05
+##                                ATT     S.E. CI.lower  CI.upper  p.value
+## Tr obs equally weighted   -0.02246 0.007015 -0.03621 -0.008709 0.001367
+## Tr units equally weighted -0.02246 0.007015 -0.03621 -0.008709 0.001367
 ```
 
     </textarea>

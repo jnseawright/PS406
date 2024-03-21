@@ -4,7 +4,6 @@
     <title>3: Matching</title>
     <meta charset="utf-8" />
     <meta name="author" content="J. Seawright" />
-    <meta name="date" content="2024-04-08" />
     <script src="3matching_files/header-attrs-2.25/header-attrs.js"></script>
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
   </head>
@@ -25,7 +24,7 @@ class: center, middle, inverse, title-slide
 ### <small>Northwestern Political Science</small>
 ]
 .date[
-### April 8, 2024
+### April 8 and 10, 2024
 ]
 
 ---
@@ -673,7 +672,7 @@ firstmatch.mb &lt;- MatchBalance(maj~prop65 +
 ## 
 ## var ratio (Tr/Co).....    0.83882 	 	     1.3321 
 ## T-test p-value........ 0.00038984 	 	    0.25273 
-## KS Bootstrap p-value..      0.002 	 	      0.076 
+## KS Bootstrap p-value.. &lt; 2.22e-16 	 	       0.04 
 ## KS Naive p-value......  0.0026349 	 	   0.047003 
 ## KS Statistic..........    0.46429 	 	       0.36 
 ## 
@@ -694,7 +693,7 @@ firstmatch.mb &lt;- MatchBalance(maj~prop65 +
 ## 
 ## var ratio (Tr/Co).....     2.2316 	 	     15.733 
 ## T-test p-value........      0.123 	 	    0.18286 
-## KS Bootstrap p-value..      0.158 	 	      0.008 
+## KS Bootstrap p-value..      0.146 	 	       0.01 
 ## KS Naive p-value......    0.18069 	 	  0.0055155 
 ## KS Statistic..........    0.27619 	 	       0.44 
 ## 
@@ -715,7 +714,7 @@ firstmatch.mb &lt;- MatchBalance(maj~prop65 +
 ## 
 ## var ratio (Tr/Co).....     1.6859 	 	     1.9046 
 ## T-test p-value........     0.1635 	 	   0.058258 
-## KS Bootstrap p-value..      0.196 	 	      0.016 
+## KS Bootstrap p-value..      0.162 	 	      0.008 
 ## KS Naive p-value......     0.1935 	 	  0.0081118 
 ## KS Statistic..........     0.2631 	 	       0.44 
 ## 
@@ -754,7 +753,7 @@ firstmatch.mb &lt;- MatchBalance(maj~prop65 +
 ## 
 ## var ratio (Tr/Co).....      1.067 	 	    0.98596 
 ## T-test p-value........   2.33e-07 	 	   0.057417 
-## KS Bootstrap p-value.. &lt; 2.22e-16 	 	      0.002 
+## KS Bootstrap p-value.. &lt; 2.22e-16 	 	      0.004 
 ## KS Naive p-value......  3.223e-06 	 	   0.002344 
 ## KS Statistic..........    0.63333 	 	       0.48 
 ## 
@@ -778,9 +777,9 @@ firstmatch.mb &lt;- MatchBalance(maj~prop65 +
 ## 
 ## 
 ## Before Matching Minimum p.value: &lt; 2.22e-16 
-## Variable Name(s): col_uka  Number(s): 5 
+## Variable Name(s): prop65 col_uka  Number(s): 1 5 
 ## 
-## After Matching Minimum p.value: 0.002 
+## After Matching Minimum p.value: 0.004 
 ## Variable Name(s): col_uka  Number(s): 5
 ```
 

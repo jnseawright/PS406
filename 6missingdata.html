@@ -4,7 +4,6 @@
     <title>6: Missing Data and Selection</title>
     <meta charset="utf-8" />
     <meta name="author" content="J. Seawright" />
-    <meta name="date" content="2024-04-29" />
     <script src="6missingdata_files/header-attrs-2.25/header-attrs.js"></script>
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
   </head>
@@ -25,7 +24,7 @@ class: center, middle, inverse, title-slide
 ### <small>Northwestern Political Science</small>
 ]
 .date[
-### April 29, 2024
+### April 29 and May 1, 2024
 ]
 
 ---
@@ -141,8 +140,8 @@ summary(perueffects)
 ```
 
 ```
-##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
-## -0.06867  0.08223  0.11678  0.11591  0.15554  0.25227
+##      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
+## -0.004504  0.071624  0.103322  0.110932  0.148843  0.269845
 ```
 
 ```r
@@ -150,7 +149,7 @@ sd(perueffects)
 ```
 
 ```
-## [1] 0.05411724
+## [1] 0.05385583
 ```
 
 ---
@@ -213,7 +212,7 @@ summary(perumareffects)
 
 ```
 ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-## 0.07351 0.18617 0.23148 0.22807 0.27234 0.34650
+## 0.09266 0.18026 0.23441 0.23145 0.27561 0.39981
 ```
 
 ```r
@@ -221,7 +220,7 @@ sd(perumareffects)
 ```
 
 ```
-## [1] 0.06190259
+## [1] 0.06573794
 ```
 
 ---
@@ -249,7 +248,7 @@ summary(perunonigeffects)
 
 ```
 ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-## -0.0665  0.2109  0.2843  0.2893  0.3946  0.6667
+## 0.08841 0.22955 0.32430 0.31931 0.39329 0.52632
 ```
 
 ```r
@@ -257,7 +256,7 @@ sd(perunonigeffects)
 ```
 
 ```
-## [1] 0.1356711
+## [1] 0.1078096
 ```
 
 ---
@@ -303,8 +302,8 @@ summary(perumareffects2)
 ```
 
 ```
-##      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
-## 0.0002199 0.1760662 0.2229999 0.2232153 0.2657387 0.3777038
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+## 0.03615 0.19334 0.23039 0.22578 0.27139 0.34632
 ```
 
 ```r
@@ -312,7 +311,7 @@ sd(perumareffects2)
 ```
 
 ```
-## [1] 0.06838909
+## [1] 0.06373765
 ```
 
 
@@ -405,35 +404,35 @@ for (i in 1:100){
 ```
 ## 
 ##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
+##   1   1  preocupado  risk
+##   1   2  preocupado  risk
+##   1   3  preocupado  risk
+##   1   4  preocupado  risk
+##   1   5  preocupado  risk
+##   2   1  preocupado  risk
+##   2   2  preocupado  risk
+##   2   3  preocupado  risk
+##   2   4  preocupado  risk
+##   2   5  preocupado  risk
+##   3   1  preocupado  risk
+##   3   2  preocupado  risk
+##   3   3  preocupado  risk
+##   3   4  preocupado  risk
+##   3   5  preocupado  risk
+##   4   1  preocupado  risk
+##   4   2  preocupado  risk
+##   4   3  preocupado  risk
+##   4   4  preocupado  risk
+##   4   5  preocupado  risk
+##   5   1  preocupado  risk
+##   5   2  preocupado  risk
+##   5   3  preocupado  risk
+##   5   4  preocupado  risk
+##   5   5  preocupado  risk
 ```
 
 ```
-## Warning: Number of logged events: 45
+## Warning: Number of logged events: 70
 ```
 
 ```
@@ -467,7 +466,313 @@ for (i in 1:100){
 ```
 
 ```
-## Warning: Number of logged events: 98
+## Warning: Number of logged events: 72
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 68
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 94
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 96
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 94
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 91
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 93
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  preocupado  risk
+##   1   2  preocupado  risk
+##   1   3  preocupado  risk
+##   1   4  preocupado  risk
+##   1   5  preocupado  risk
+##   2   1  preocupado  risk
+##   2   2  preocupado  risk
+##   2   3  preocupado  risk
+##   2   4  preocupado  risk
+##   2   5  preocupado  risk
+##   3   1  preocupado  risk
+##   3   2  preocupado  risk
+##   3   3  preocupado  risk
+##   3   4  preocupado  risk
+##   3   5  preocupado  risk
+##   4   1  preocupado  risk
+##   4   2  preocupado  risk
+##   4   3  preocupado  risk
+##   4   4  preocupado  risk
+##   4   5  preocupado  risk
+##   5   1  preocupado  risk
+##   5   2  preocupado  risk
+##   5   3  preocupado  risk
+##   5   4  preocupado  risk
+##   5   5  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 70
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  preocupado  risk
+##   1   2  preocupado  risk
+##   1   3  preocupado  risk
+##   1   4  preocupado  risk
+##   1   5  preocupado  risk
+##   2   1  preocupado  risk
+##   2   2  preocupado  risk
+##   2   3  preocupado  risk
+##   2   4  preocupado  risk
+##   2   5  preocupado  risk
+##   3   1  preocupado  risk
+##   3   2  preocupado  risk
+##   3   3  preocupado  risk
+##   3   4  preocupado  risk
+##   3   5  preocupado  risk
+##   4   1  preocupado  risk
+##   4   2  preocupado  risk
+##   4   3  preocupado  risk
+##   4   4  preocupado  risk
+##   4   5  preocupado  risk
+##   5   1  preocupado  risk
+##   5   2  preocupado  risk
+##   5   3  preocupado  risk
+##   5   4  preocupado  risk
+##   5   5  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 72
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 86
 ```
 
 ```
@@ -535,41 +840,7 @@ for (i in 1:100){
 ```
 
 ```
-## Warning: Number of logged events: 92
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  risk
-##   1   2  age  risk
-##   1   3  age  risk
-##   1   4  age  risk
-##   1   5  age  risk
-##   2   1  age  risk
-##   2   2  age  risk
-##   2   3  age  risk
-##   2   4  age  risk
-##   2   5  age  risk
-##   3   1  age  risk
-##   3   2  age  risk
-##   3   3  age  risk
-##   3   4  age  risk
-##   3   5  age  risk
-##   4   1  age  risk
-##   4   2  age  risk
-##   4   3  age  risk
-##   4   4  age  risk
-##   4   5  age  risk
-##   5   1  age  risk
-##   5   2  age  risk
-##   5   3  age  risk
-##   5   4  age  risk
-##   5   5  age  risk
-```
-
-```
-## Warning: Number of logged events: 64
+## Warning: Number of logged events: 94
 ```
 
 ```
@@ -603,7 +874,7 @@ for (i in 1:100){
 ```
 
 ```
-## Warning: Number of logged events: 46
+## Warning: Number of logged events: 95
 ```
 
 ```
@@ -637,7 +908,41 @@ for (i in 1:100){
 ```
 
 ```
-## Warning: Number of logged events: 66
+## Warning: Number of logged events: 97
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 70
 ```
 
 ```
@@ -739,6 +1044,550 @@ for (i in 1:100){
 ```
 
 ```
+## Warning: Number of logged events: 93
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 94
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 94
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 89
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 49
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 96
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 92
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 91
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 94
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 93
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 93
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 94
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 94
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 94
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 96
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 91
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
 ## Warning: Number of logged events: 92
 ```
 
@@ -779,31 +1628,779 @@ for (i in 1:100){
 ```
 ## 
 ##  iter imp variable
-##   1   1  age  risk
-##   1   2  age  risk
-##   1   3  age  risk
-##   1   4  age  risk
-##   1   5  age  risk
-##   2   1  age  risk
-##   2   2  age  risk
-##   2   3  age  risk
-##   2   4  age  risk
-##   2   5  age  risk
-##   3   1  age  risk
-##   3   2  age  risk
-##   3   3  age  risk
-##   3   4  age  risk
-##   3   5  age  risk
-##   4   1  age  risk
-##   4   2  age  risk
-##   4   3  age  risk
-##   4   4  age  risk
-##   4   5  age  risk
-##   5   1  age  risk
-##   5   2  age  risk
-##   5   3  age  risk
-##   5   4  age  risk
-##   5   5  age  risk
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 96
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 92
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 93
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 97
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 92
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 94
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 93
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 93
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 96
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 94
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 93
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 47
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 20
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 93
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 90
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 96
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 95
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 93
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  preocupado  risk
+##   1   2  preocupado  risk
+##   1   3  preocupado  risk
+##   1   4  preocupado  risk
+##   1   5  preocupado  risk
+##   2   1  preocupado  risk
+##   2   2  preocupado  risk
+##   2   3  preocupado  risk
+##   2   4  preocupado  risk
+##   2   5  preocupado  risk
+##   3   1  preocupado  risk
+##   3   2  preocupado  risk
+##   3   3  preocupado  risk
+##   3   4  preocupado  risk
+##   3   5  preocupado  risk
+##   4   1  preocupado  risk
+##   4   2  preocupado  risk
+##   4   3  preocupado  risk
+##   4   4  preocupado  risk
+##   4   5  preocupado  risk
+##   5   1  preocupado  risk
+##   5   2  preocupado  risk
+##   5   3  preocupado  risk
+##   5   4  preocupado  risk
+##   5   5  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 20
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 95
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 96
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  preocupado  risk
+##   1   2  preocupado  risk
+##   1   3  preocupado  risk
+##   1   4  preocupado  risk
+##   1   5  preocupado  risk
+##   2   1  preocupado  risk
+##   2   2  preocupado  risk
+##   2   3  preocupado  risk
+##   2   4  preocupado  risk
+##   2   5  preocupado  risk
+##   3   1  preocupado  risk
+##   3   2  preocupado  risk
+##   3   3  preocupado  risk
+##   3   4  preocupado  risk
+##   3   5  preocupado  risk
+##   4   1  preocupado  risk
+##   4   2  preocupado  risk
+##   4   3  preocupado  risk
+##   4   4  preocupado  risk
+##   4   5  preocupado  risk
+##   5   1  preocupado  risk
+##   5   2  preocupado  risk
+##   5   3  preocupado  risk
+##   5   4  preocupado  risk
+##   5   5  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 70
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  preocupado  risk
+##   1   2  preocupado  risk
+##   1   3  preocupado  risk
+##   1   4  preocupado  risk
+##   1   5  preocupado  risk
+##   2   1  preocupado  risk
+##   2   2  preocupado  risk
+##   2   3  preocupado  risk
+##   2   4  preocupado  risk
+##   2   5  preocupado  risk
+##   3   1  preocupado  risk
+##   3   2  preocupado  risk
+##   3   3  preocupado  risk
+##   3   4  preocupado  risk
+##   3   5  preocupado  risk
+##   4   1  preocupado  risk
+##   4   2  preocupado  risk
+##   4   3  preocupado  risk
+##   4   4  preocupado  risk
+##   4   5  preocupado  risk
+##   5   1  preocupado  risk
+##   5   2  preocupado  risk
+##   5   3  preocupado  risk
+##   5   4  preocupado  risk
+##   5   5  preocupado  risk
 ```
 
 ```
@@ -875,1027 +2472,7 @@ for (i in 1:100){
 ```
 
 ```
-## Warning: Number of logged events: 91
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 96
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 96
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 97
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
 ## Warning: Number of logged events: 93
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 95
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 94
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 91
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 98
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 81
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 95
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 93
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 43
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 50
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 90
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 94
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 100
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  preocupado  risk
-##   1   2  preocupado  risk
-##   1   3  preocupado  risk
-##   1   4  preocupado  risk
-##   1   5  preocupado  risk
-##   2   1  preocupado  risk
-##   2   2  preocupado  risk
-##   2   3  preocupado  risk
-##   2   4  preocupado  risk
-##   2   5  preocupado  risk
-##   3   1  preocupado  risk
-##   3   2  preocupado  risk
-##   3   3  preocupado  risk
-##   3   4  preocupado  risk
-##   3   5  preocupado  risk
-##   4   1  preocupado  risk
-##   4   2  preocupado  risk
-##   4   3  preocupado  risk
-##   4   4  preocupado  risk
-##   4   5  preocupado  risk
-##   5   1  preocupado  risk
-##   5   2  preocupado  risk
-##   5   3  preocupado  risk
-##   5   4  preocupado  risk
-##   5   5  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 71
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 72
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 94
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 95
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 92
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 93
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 94
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  preocupado  risk
-##   1   2  preocupado  risk
-##   1   3  preocupado  risk
-##   1   4  preocupado  risk
-##   1   5  preocupado  risk
-##   2   1  preocupado  risk
-##   2   2  preocupado  risk
-##   2   3  preocupado  risk
-##   2   4  preocupado  risk
-##   2   5  preocupado  risk
-##   3   1  preocupado  risk
-##   3   2  preocupado  risk
-##   3   3  preocupado  risk
-##   3   4  preocupado  risk
-##   3   5  preocupado  risk
-##   4   1  preocupado  risk
-##   4   2  preocupado  risk
-##   4   3  preocupado  risk
-##   4   4  preocupado  risk
-##   4   5  preocupado  risk
-##   5   1  preocupado  risk
-##   5   2  preocupado  risk
-##   5   3  preocupado  risk
-##   5   4  preocupado  risk
-##   5   5  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 71
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 95
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 95
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  preocupado  risk
-##   1   2  preocupado  risk
-##   1   3  preocupado  risk
-##   1   4  preocupado  risk
-##   1   5  preocupado  risk
-##   2   1  preocupado  risk
-##   2   2  preocupado  risk
-##   2   3  preocupado  risk
-##   2   4  preocupado  risk
-##   2   5  preocupado  risk
-##   3   1  preocupado  risk
-##   3   2  preocupado  risk
-##   3   3  preocupado  risk
-##   3   4  preocupado  risk
-##   3   5  preocupado  risk
-##   4   1  preocupado  risk
-##   4   2  preocupado  risk
-##   4   3  preocupado  risk
-##   4   4  preocupado  risk
-##   4   5  preocupado  risk
-##   5   1  preocupado  risk
-##   5   2  preocupado  risk
-##   5   3  preocupado  risk
-##   5   4  preocupado  risk
-##   5   5  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 45
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 94
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 97
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 94
 ```
 
 ```
@@ -1997,6 +2574,108 @@ for (i in 1:100){
 ```
 
 ```
+## Warning: Number of logged events: 96
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 93
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 95
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
 ## Warning: Number of logged events: 94
 ```
 
@@ -2031,7 +2710,143 @@ for (i in 1:100){
 ```
 
 ```
-## Warning: Number of logged events: 92
+## Warning: Number of logged events: 70
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 91
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 91
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  preocupado  risk
+##   1   2  preocupado  risk
+##   1   3  preocupado  risk
+##   1   4  preocupado  risk
+##   1   5  preocupado  risk
+##   2   1  preocupado  risk
+##   2   2  preocupado  risk
+##   2   3  preocupado  risk
+##   2   4  preocupado  risk
+##   2   5  preocupado  risk
+##   3   1  preocupado  risk
+##   3   2  preocupado  risk
+##   3   3  preocupado  risk
+##   3   4  preocupado  risk
+##   3   5  preocupado  risk
+##   4   1  preocupado  risk
+##   4   2  preocupado  risk
+##   4   3  preocupado  risk
+##   4   4  preocupado  risk
+##   4   5  preocupado  risk
+##   5   1  preocupado  risk
+##   5   2  preocupado  risk
+##   5   3  preocupado  risk
+##   5   4  preocupado  risk
+##   5   5  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 74
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 94
 ```
 
 ```
@@ -2071,40 +2886,6 @@ for (i in 1:100){
 ```
 ## 
 ##  iter imp variable
-##   1   1  age  risk
-##   1   2  age  risk
-##   1   3  age  risk
-##   1   4  age  risk
-##   1   5  age  risk
-##   2   1  age  risk
-##   2   2  age  risk
-##   2   3  age  risk
-##   2   4  age  risk
-##   2   5  age  risk
-##   3   1  age  risk
-##   3   2  age  risk
-##   3   3  age  risk
-##   3   4  age  risk
-##   3   5  age  risk
-##   4   1  age  risk
-##   4   2  age  risk
-##   4   3  age  risk
-##   4   4  age  risk
-##   4   5  age  risk
-##   5   1  age  risk
-##   5   2  age  risk
-##   5   3  age  risk
-##   5   4  age  risk
-##   5   5  age  risk
-```
-
-```
-## Warning: Number of logged events: 63
-```
-
-```
-## 
-##  iter imp variable
 ##   1   1  age  preocupado  risk
 ##   1   2  age  preocupado  risk
 ##   1   3  age  preocupado  risk
@@ -2133,415 +2914,7 @@ for (i in 1:100){
 ```
 
 ```
-## Warning: Number of logged events: 44
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 97
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 96
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 93
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 93
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 94
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 97
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 64
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  preocupado  risk
-##   1   2  preocupado  risk
-##   1   3  preocupado  risk
-##   1   4  preocupado  risk
-##   1   5  preocupado  risk
-##   2   1  preocupado  risk
-##   2   2  preocupado  risk
-##   2   3  preocupado  risk
-##   2   4  preocupado  risk
-##   2   5  preocupado  risk
-##   3   1  preocupado  risk
-##   3   2  preocupado  risk
-##   3   3  preocupado  risk
-##   3   4  preocupado  risk
-##   3   5  preocupado  risk
-##   4   1  preocupado  risk
-##   4   2  preocupado  risk
-##   4   3  preocupado  risk
-##   4   4  preocupado  risk
-##   4   5  preocupado  risk
-##   5   1  preocupado  risk
-##   5   2  preocupado  risk
-##   5   3  preocupado  risk
-##   5   4  preocupado  risk
-##   5   5  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 68
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 95
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 96
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 96
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 98
+## Warning: Number of logged events: 45
 ```
 
 ```
@@ -2609,7 +2982,143 @@ for (i in 1:100){
 ```
 
 ```
-## Warning: Number of logged events: 97
+## Warning: Number of logged events: 94
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 92
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 95
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 44
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 92
 ```
 
 ```
@@ -2677,7 +3186,41 @@ for (i in 1:100){
 ```
 
 ```
-## Warning: Number of logged events: 48
+## Warning: Number of logged events: 95
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 92
 ```
 
 ```
@@ -2717,201 +3260,31 @@ for (i in 1:100){
 ```
 ## 
 ##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 88
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 93
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 46
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 98
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 69
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
+##   1   1  preocupado  risk
+##   1   2  preocupado  risk
+##   1   3  preocupado  risk
+##   1   4  preocupado  risk
+##   1   5  preocupado  risk
+##   2   1  preocupado  risk
+##   2   2  preocupado  risk
+##   2   3  preocupado  risk
+##   2   4  preocupado  risk
+##   2   5  preocupado  risk
+##   3   1  preocupado  risk
+##   3   2  preocupado  risk
+##   3   3  preocupado  risk
+##   3   4  preocupado  risk
+##   3   5  preocupado  risk
+##   4   1  preocupado  risk
+##   4   2  preocupado  risk
+##   4   3  preocupado  risk
+##   4   4  preocupado  risk
+##   4   5  preocupado  risk
+##   5   1  preocupado  risk
+##   5   2  preocupado  risk
+##   5   3  preocupado  risk
+##   5   4  preocupado  risk
+##   5   5  preocupado  risk
 ```
 
 ```
@@ -2949,7 +3322,7 @@ for (i in 1:100){
 ```
 
 ```
-## Warning: Number of logged events: 92
+## Warning: Number of logged events: 43
 ```
 
 ```
@@ -2983,449 +3356,7 @@ for (i in 1:100){
 ```
 
 ```
-## Warning: Number of logged events: 93
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 96
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 94
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 92
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 91
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 96
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 93
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 97
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 93
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 95
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 97
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  risk
-##   1   2  age  risk
-##   1   3  age  risk
-##   1   4  age  risk
-##   1   5  age  risk
-##   2   1  age  risk
-##   2   2  age  risk
-##   2   3  age  risk
-##   2   4  age  risk
-##   2   5  age  risk
-##   3   1  age  risk
-##   3   2  age  risk
-##   3   3  age  risk
-##   3   4  age  risk
-##   3   5  age  risk
-##   4   1  age  risk
-##   4   2  age  risk
-##   4   3  age  risk
-##   4   4  age  risk
-##   4   5  age  risk
-##   5   1  age  risk
-##   5   2  age  risk
-##   5   3  age  risk
-##   5   4  age  risk
-##   5   5  age  risk
-```
-
-```
-## Warning: Number of logged events: 65
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 94
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 95
+## Warning: Number of logged events: 70
 ```
 
 ```
@@ -3527,6 +3458,142 @@ for (i in 1:100){
 ```
 
 ```
+## Warning: Number of logged events: 98
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 97
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  risk
+##   1   2  age  risk
+##   1   3  age  risk
+##   1   4  age  risk
+##   1   5  age  risk
+##   2   1  age  risk
+##   2   2  age  risk
+##   2   3  age  risk
+##   2   4  age  risk
+##   2   5  age  risk
+##   3   1  age  risk
+##   3   2  age  risk
+##   3   3  age  risk
+##   3   4  age  risk
+##   3   5  age  risk
+##   4   1  age  risk
+##   4   2  age  risk
+##   4   3  age  risk
+##   4   4  age  risk
+##   4   5  age  risk
+##   5   1  age  risk
+##   5   2  age  risk
+##   5   3  age  risk
+##   5   4  age  risk
+##   5   5  age  risk
+```
+
+```
+## Warning: Number of logged events: 66
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
+## Warning: Number of logged events: 49
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk
+##   1   2  age  preocupado  risk
+##   1   3  age  preocupado  risk
+##   1   4  age  preocupado  risk
+##   1   5  age  preocupado  risk
+##   2   1  age  preocupado  risk
+##   2   2  age  preocupado  risk
+##   2   3  age  preocupado  risk
+##   2   4  age  preocupado  risk
+##   2   5  age  preocupado  risk
+##   3   1  age  preocupado  risk
+##   3   2  age  preocupado  risk
+##   3   3  age  preocupado  risk
+##   3   4  age  preocupado  risk
+##   3   5  age  preocupado  risk
+##   4   1  age  preocupado  risk
+##   4   2  age  preocupado  risk
+##   4   3  age  preocupado  risk
+##   4   4  age  preocupado  risk
+##   4   5  age  preocupado  risk
+##   5   1  age  preocupado  risk
+##   5   2  age  preocupado  risk
+##   5   3  age  preocupado  risk
+##   5   4  age  preocupado  risk
+##   5   5  age  preocupado  risk
+```
+
+```
 ## Warning: Number of logged events: 93
 ```
 
@@ -3561,41 +3628,41 @@ for (i in 1:100){
 ```
 
 ```
-## Warning: Number of logged events: 95
+## Warning: Number of logged events: 46
 ```
 
 ```
 ## 
 ##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
+##   1   1  preocupado  risk
+##   1   2  preocupado  risk
+##   1   3  preocupado  risk
+##   1   4  preocupado  risk
+##   1   5  preocupado  risk
+##   2   1  preocupado  risk
+##   2   2  preocupado  risk
+##   2   3  preocupado  risk
+##   2   4  preocupado  risk
+##   2   5  preocupado  risk
+##   3   1  preocupado  risk
+##   3   2  preocupado  risk
+##   3   3  preocupado  risk
+##   3   4  preocupado  risk
+##   3   5  preocupado  risk
+##   4   1  preocupado  risk
+##   4   2  preocupado  risk
+##   4   3  preocupado  risk
+##   4   4  preocupado  risk
+##   4   5  preocupado  risk
+##   5   1  preocupado  risk
+##   5   2  preocupado  risk
+##   5   3  preocupado  risk
+##   5   4  preocupado  risk
+##   5   5  preocupado  risk
 ```
 
 ```
-## Warning: Number of logged events: 92
+## Warning: Number of logged events: 20
 ```
 
 ```
@@ -3663,7 +3730,7 @@ for (i in 1:100){
 ```
 
 ```
-## Warning: Number of logged events: 92
+## Warning: Number of logged events: 48
 ```
 
 ```
@@ -3697,7 +3764,7 @@ for (i in 1:100){
 ```
 
 ```
-## Warning: Number of logged events: 97
+## Warning: Number of logged events: 94
 ```
 
 ```
@@ -3731,75 +3798,7 @@ for (i in 1:100){
 ```
 
 ```
-## Warning: Number of logged events: 91
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 92
-```
-
-```
-## 
-##  iter imp variable
-##   1   1  age  preocupado  risk
-##   1   2  age  preocupado  risk
-##   1   3  age  preocupado  risk
-##   1   4  age  preocupado  risk
-##   1   5  age  preocupado  risk
-##   2   1  age  preocupado  risk
-##   2   2  age  preocupado  risk
-##   2   3  age  preocupado  risk
-##   2   4  age  preocupado  risk
-##   2   5  age  preocupado  risk
-##   3   1  age  preocupado  risk
-##   3   2  age  preocupado  risk
-##   3   3  age  preocupado  risk
-##   3   4  age  preocupado  risk
-##   3   5  age  preocupado  risk
-##   4   1  age  preocupado  risk
-##   4   2  age  preocupado  risk
-##   4   3  age  preocupado  risk
-##   4   4  age  preocupado  risk
-##   4   5  age  preocupado  risk
-##   5   1  age  preocupado  risk
-##   5   2  age  preocupado  risk
-##   5   3  age  preocupado  risk
-##   5   4  age  preocupado  risk
-##   5   5  age  preocupado  risk
-```
-
-```
-## Warning: Number of logged events: 93
+## Warning: Number of logged events: 95
 ```
 
 ---
@@ -3810,7 +3809,7 @@ summary(perumieffects)
 
 ```
 ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-##  0.0771  0.1861  0.2281  0.2269  0.2668  0.3832
+##  0.0881  0.1867  0.2219  0.2258  0.2711  0.3889
 ```
 
 ```r
@@ -3818,7 +3817,7 @@ sd(perumieffects)
 ```
 
 ```
-## [1] 0.06726681
+## [1] 0.05817075
 ```
 
 ---
@@ -3988,7 +3987,7 @@ adult_train &lt;- train(adult_conv,
 ## Epoch: 18 , loss: 7.851328249900572
 ## Epoch: 19 , loss: 7.870914905301986
 ## Training complete. Saving file...
-## Model saved in file: /tmp/RtmpFUZyhN
+## Model saved in file: /tmp/RtmpBGEALZ
 ```
                        
 ---

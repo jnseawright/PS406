@@ -3,7 +3,7 @@ title: "2: Regression for Causal Inference"
 subtitle: "Quantitative Causal Inference"
 author: "<large>J. Seawright</large>"
 institute: "<small>Northwestern Political Science</small>" 
-date: "April 1, 2024"
+date: "April 1 and 3, 2024"
 output: 
   xaringan::moon_reader:
     css: xaringan-themer.css

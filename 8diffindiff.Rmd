@@ -3,7 +3,7 @@ title: "8: Difference-in-Differences Designs"
 subtitle: "Quantitative Causal Inference"
 author: "<large>J. Seawright</large>"
 institute: "<small>Northwestern Political Science</small>" 
-date: "May 13, 2024"
+date: "May 13 and 15, 2024"
 output: 
   xaringan::moon_reader:
     css: xaringan-themer.css
