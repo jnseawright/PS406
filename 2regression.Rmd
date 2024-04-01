@@ -204,6 +204,32 @@ include_graphics("images/lupu4.JPG")
 ```
 
 ---
+```{r, echo = TRUE, out.width="70%", fig.retina = 1}
+library(dagitty)
+```
+
+---
+```{r, echo = TRUE, out.width="70%", fig.retina = 1}
+LupuPeisahkinDAG1 <- dagitty( "dag {Dekulakized -> Victimization PreSovietWealth -> Victimization SovietOpposition -> Victimization PreSovietReligiosity -> Victimization PriorRegion -> Victimization DeportationRegion -> Victimization DeportationRegion -> Religiosity PriorRegion -> Religiosity PreSovietReligiosity -> Religiosity SovietOpposition -> Religiosity PreSovietWealth -> Religiosity Victimization -> Religiosity Dekulakized -> Religiosity}" )
+```
+
+---
+```{r, echo = TRUE, out.width="50%", fig.retina = 1}
+plot( LupuPeisahkinDAG1 )
+```
+
+---
+```{r, echo = TRUE, out.width="70%", fig.retina = 1}
+LupuPeisahkinDAG2 <- dagitty( "dag {Dekulakized <- Victimization PreSovietWealth -> Victimization SovietOpposition -> Victimization PreSovietReligiosity -> Victimization PriorRegion -> Victimization DeportationRegion <- Victimization DeportationRegion -> Religiosity PriorRegion -> Religiosity PreSovietReligiosity -> Religiosity SovietOpposition <- Religiosity PreSovietWealth -> Religiosity Victimization -> Religiosity Dekulakized -> Religiosity}" )
+```
+
+---
+```{r, echo = TRUE, out.width="50%", fig.retina = 1}
+plot( LupuPeisahkinDAG2 )
+```
+
+
+---
 ```{r, echo = TRUE, out.width="90%", fig.retina = 1}
 library(tidyverse)
 ```
