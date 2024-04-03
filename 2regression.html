@@ -194,7 +194,7 @@ plot( LupuPeisahkinDAG1 )
 ---
 
 ```r
-LupuPeisahkinDAG2 &lt;- dagitty( "dag {Dekulakized &lt;- Victimization PreSovietWealth -&gt; Victimization SovietOpposition -&gt; Victimization PreSovietReligiosity -&gt; Victimization PriorRegion -&gt; Victimization DeportationRegion &lt;- Victimization DeportationRegion -&gt; Religiosity PriorRegion -&gt; Religiosity PreSovietReligiosity -&gt; Religiosity SovietOpposition &lt;- Religiosity PreSovietWealth -&gt; Religiosity Victimization -&gt; Religiosity Dekulakized -&gt; Religiosity}" )
+LupuPeisahkinDAG2 &lt;- dagitty( "dag {Dekulakized &lt;- Victimization PreSovietWealth -&gt; Victimization SovietOpposition -&gt; Victimization PreSovietReligiosity -&gt; Victimization PriorRegion -&gt; Victimization DeportationRegion &lt;- Victimization DeportationRegion -&gt; Religiosity PriorRegion -&gt; Religiosity PreSovietReligiosity -&gt; Religiosity SovietOpposition -&gt; Religiosity PreSovietWealth -&gt; Religiosity Victimization -&gt; Religiosity Dekulakized -&gt; Religiosity}" )
 ```
 
 ---
@@ -209,6 +209,57 @@ plot( LupuPeisahkinDAG2 )
 
 &lt;img src="2regression_files/figure-html/unnamed-chunk-15-1.png" width="50%" /&gt;
 
+---
+
+```r
+adjustmentSets(LupuPeisahkinDAG1, exposure = "Victimization", outcome = "Religiosity")
+```
+
+```
+## { Dekulakized, DeportationRegion, PreSovietReligiosity,
+##   PreSovietWealth, PriorRegion, SovietOpposition }
+```
+
+```r
+adjustmentSets(LupuPeisahkinDAG2, exposure = "Victimization", outcome = "Religiosity")
+```
+
+```
+## { PreSovietReligiosity, PreSovietWealth, PriorRegion, SovietOpposition
+##   }
+```
+
+---
+
+```r
+instrumentalVariables(LupuPeisahkinDAG1, exposure = "Victimization", outcome = "Religiosity")
+
+instrumentalVariables(LupuPeisahkinDAG2, exposure = "Victimization", outcome = "Religiosity")
+```
+
+---
+
+```r
+impliedConditionalIndependencies(LupuPeisahkinDAG1)
+```
+
+```
+## Dklk _||_ DprR
+## Dklk _||_ PrSR
+## Dklk _||_ PrSW
+## Dklk _||_ PrrR
+## Dklk _||_ SvtO
+## DprR _||_ PrSR
+## DprR _||_ PrSW
+## DprR _||_ PrrR
+## DprR _||_ SvtO
+## PrSR _||_ PrSW
+## PrSR _||_ PrrR
+## PrSR _||_ SvtO
+## PrSW _||_ PrrR
+## PrSW _||_ SvtO
+## PrrR _||_ SvtO
+```
 
 ---
 
@@ -218,7 +269,7 @@ library(tidyverse)
 
 ```
 ## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-## ✔ forcats   1.0.0     ✔ stringr   1.5.1
+## ✔ forcats   1.0.0     ✔ stringr   1.5.0
 ## ✔ lubridate 1.9.3     ✔ tibble    3.2.1
 ## ✔ purrr     1.0.2     ✔ tidyr     1.3.0
 ## ✔ readr     2.1.4     
@@ -270,25 +321,65 @@ preslm &lt;- lm(vdem_libdem ~ br_pres, data=qog2000demsin2020)
 summ(preslm)
 ```
 
-```
-## MODEL INFO:
-## Observations: 61 (1 missing obs. deleted)
-## Dependent Variable: vdem_libdem
-## Type: OLS linear regression 
-## 
-## MODEL FIT:
-## F(1,59) = 2.05, p = 0.16
-## R² = 0.03
-## Adj. R² = 0.02 
-## 
-## Standard errors: OLS
-## ------------------------------------------------
-##                      Est.   S.E.   t val.      p
-## ----------------- ------- ------ -------- ------
-## (Intercept)          0.71   0.03    27.19   0.00
-## br_pres             -0.06   0.04    -1.43   0.16
-## ------------------------------------------------
-```
+&lt;table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; Observations &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 61 (1 missing obs. deleted) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; Dependent variable &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; vdem_libdem &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; Type &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; OLS linear regression &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt; &lt;table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; F(1,59) &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2.05 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; R² &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.03 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; Adj. R² &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.02 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt; &lt;table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;border-bottom: 0;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Est. &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; S.E. &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; t val. &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; (Intercept) &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.71 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 27.19 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; br_pres &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.06 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.04 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -1.43 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.16 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;tfoot&gt;&lt;tr&gt;&lt;td style="padding: 0; " colspan="100%"&gt;
+&lt;sup&gt;&lt;/sup&gt; Standard errors: OLS&lt;/td&gt;&lt;/tr&gt;&lt;/tfoot&gt;
+&lt;/table&gt;
 
 ---
 
@@ -302,33 +393,121 @@ preslm2 &lt;- lm(vdem_libdem ~ br_pres + as.factor(ht_colonial) +  ccp_systyear 
 summ(preslm2)
 ```
 
-```
-## MODEL INFO:
-## Observations: 58 (4 missing obs. deleted)
-## Dependent Variable: vdem_libdem
-## Type: OLS linear regression 
-## 
-## MODEL FIT:
-## F(9,48) = 3.30, p = 0.00
-## R² = 0.38
-## Adj. R² = 0.27 
-## 
-## Standard errors: OLS
-## ------------------------------------------------------------
-##                                  Est.   S.E.   t val.      p
-## ----------------------------- ------- ------ -------- ------
-## (Intercept)                      2.50   0.76     3.29   0.00
-## br_pres                          0.03   0.04     0.76   0.45
-## as.factor(ht_colonial)1         -0.31   0.14    -2.26   0.03
-## as.factor(ht_colonial)2         -0.09   0.07    -1.42   0.16
-## as.factor(ht_colonial)5         -0.12   0.05    -2.28   0.03
-## as.factor(ht_colonial)6         -0.24   0.11    -2.26   0.03
-## as.factor(ht_colonial)7         -0.13   0.08    -1.59   0.12
-## as.factor(ht_colonial)9         -0.07   0.13    -0.49   0.63
-## ccp_systyear                    -0.00   0.00    -2.36   0.02
-## br_pvote                         0.04   0.05     0.95   0.35
-## ------------------------------------------------------------
-```
+&lt;table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; Observations &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 58 (4 missing obs. deleted) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; Dependent variable &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; vdem_libdem &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; Type &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; OLS linear regression &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt; &lt;table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; F(9,48) &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.30 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; R² &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.38 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; Adj. R² &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.27 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt; &lt;table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;border-bottom: 0;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Est. &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; S.E. &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; t val. &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; (Intercept) &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2.50 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.76 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.29 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; br_pres &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.04 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.76 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.45 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; as.factor(ht_colonial)1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.31 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.14 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -2.26 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.03 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; as.factor(ht_colonial)2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.09 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.07 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -1.42 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.16 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; as.factor(ht_colonial)5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.12 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.05 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -2.28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.03 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; as.factor(ht_colonial)6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.24 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -2.26 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.03 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; as.factor(ht_colonial)7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.13 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.08 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -1.59 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.12 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; as.factor(ht_colonial)9 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.07 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.13 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.49 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.63 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; ccp_systyear &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -2.36 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.02 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; br_pvote &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.04 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.05 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.95 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.35 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;tfoot&gt;&lt;tr&gt;&lt;td style="padding: 0; " colspan="100%"&gt;
+&lt;sup&gt;&lt;/sup&gt; Standard errors: OLS&lt;/td&gt;&lt;/tr&gt;&lt;/tfoot&gt;
+&lt;/table&gt;
 
 ---
 ### How Much Does It Hurt to Be Wrong?
@@ -470,12 +649,17 @@ summary(preslmw.mrifit)
 ```
 ## 
 ## Effect estimates:
-##      Estimate Std. Error 95% CI L 95% CI U t value Pr(&gt;|t|)
+##              Estimate Std. Error 95% CI L 95% CI U t value Pr(&gt;|t|)
+## E[Y₁-Y₀|A=1]  0.03866    0.09277 -0.14830  0.22562   0.417    0.679
 ## 
 ## Residual standard error: 0.134 on 44 degrees of freedom
 ## 
 ## Potential outcome means:
-##      Estimate Std. Error 95% CI L 95% CI U t value Pr(&gt;|t|)
+##           Estimate Std. Error 95% CI L 95% CI U t value Pr(&gt;|t|)    
+## E[Y₀|A=1]  0.61134    0.09137  0.42719  0.79549   6.691 3.25e-08 ***
+## E[Y₁|A=1]  0.65000    0.03689  0.57566  0.72434  17.622  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
 ---
@@ -484,7 +668,7 @@ summary(preslmw.mrifit)
 plot(preslmw.mri)
 ```
 
-&lt;img src="2regression_files/figure-html/unnamed-chunk-30-1.png" width="60%" /&gt;
+&lt;img src="2regression_files/figure-html/unnamed-chunk-33-1.png" width="60%" /&gt;
 
 ---
 
@@ -492,7 +676,7 @@ plot(preslmw.mri)
  plot(preslmw.mri, type="extrapolation", variables=~ccp_systyear)
 ```
 
-&lt;img src="2regression_files/figure-html/unnamed-chunk-31-1.png" width="60%" /&gt;
+&lt;img src="2regression_files/figure-html/unnamed-chunk-34-1.png" width="60%" /&gt;
 
 ---
 
@@ -500,7 +684,7 @@ plot(preslmw.mri)
 plot(preslmw.mri, type="influence", outcome="vdem_libdem")
 ```
 
-&lt;img src="2regression_files/figure-html/unnamed-chunk-32-1.png" width="60%" /&gt;
+&lt;img src="2regression_files/figure-html/unnamed-chunk-35-1.png" width="60%" /&gt;
 
 ---
 
@@ -598,17 +782,12 @@ summary(preslmw.mrifitnocabo)
 ```
 ## 
 ## Effect estimates:
-##              Estimate Std. Error 95% CI L 95% CI U t value Pr(&gt;|t|)
-## E[Y₁-Y₀|A=1]  0.05419    0.04791 -0.04236  0.15075   1.131    0.264
+##      Estimate Std. Error 95% CI L 95% CI U t value Pr(&gt;|t|)
 ## 
 ## Residual standard error: 0.134 on 44 degrees of freedom
 ## 
 ## Potential outcome means:
-##           Estimate Std. Error 95% CI L 95% CI U t value Pr(&gt;|t|)    
-## E[Y₀|A=1]  0.59581    0.04447  0.50619  0.68543   13.40   &lt;2e-16 ***
-## E[Y₁|A=1]  0.65000    0.03688  0.57567  0.72433   17.62   &lt;2e-16 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+##      Estimate Std. Error 95% CI L 95% CI U t value Pr(&gt;|t|)
 ```
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>

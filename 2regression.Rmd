@@ -220,7 +220,7 @@ plot( LupuPeisahkinDAG1 )
 
 ---
 ```{r, echo = TRUE, out.width="70%", fig.retina = 1}
-LupuPeisahkinDAG2 <- dagitty( "dag {Dekulakized <- Victimization PreSovietWealth -> Victimization SovietOpposition -> Victimization PreSovietReligiosity -> Victimization PriorRegion -> Victimization DeportationRegion <- Victimization DeportationRegion -> Religiosity PriorRegion -> Religiosity PreSovietReligiosity -> Religiosity SovietOpposition <- Religiosity PreSovietWealth -> Religiosity Victimization -> Religiosity Dekulakized -> Religiosity}" )
+LupuPeisahkinDAG2 <- dagitty( "dag {Dekulakized <- Victimization PreSovietWealth -> Victimization SovietOpposition -> Victimization PreSovietReligiosity -> Victimization PriorRegion -> Victimization DeportationRegion <- Victimization DeportationRegion -> Religiosity PriorRegion -> Religiosity PreSovietReligiosity -> Religiosity SovietOpposition -> Religiosity PreSovietWealth -> Religiosity Victimization -> Religiosity Dekulakized -> Religiosity}" )
 ```
 
 ---
@@ -228,6 +228,24 @@ LupuPeisahkinDAG2 <- dagitty( "dag {Dekulakized <- Victimization PreSovietWealth
 plot( LupuPeisahkinDAG2 )
 ```
 
+---
+```{r, echo = TRUE, out.width="50%", fig.retina = 1}
+adjustmentSets(LupuPeisahkinDAG1, exposure = "Victimization", outcome = "Religiosity")
+
+adjustmentSets(LupuPeisahkinDAG2, exposure = "Victimization", outcome = "Religiosity")
+```
+
+---
+```{r, echo = TRUE, out.width="50%", fig.retina = 1}
+instrumentalVariables(LupuPeisahkinDAG1, exposure = "Victimization", outcome = "Religiosity")
+
+instrumentalVariables(LupuPeisahkinDAG2, exposure = "Victimization", outcome = "Religiosity")
+```
+
+---
+```{r, echo = TRUE, out.width="50%", fig.retina = 1}
+impliedConditionalIndependencies(LupuPeisahkinDAG1)
+```
 
 ---
 ```{r, echo = TRUE, out.width="90%", fig.retina = 1}
