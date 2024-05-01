@@ -224,7 +224,8 @@ missing.prob <- inv.logit(-2.3 + -.5*peruemotions$edlevel + -.2*peruemotions$cla
 missing.prob[is.na(missing.prob)] <- .3
 
 for (i in 1:100){
-  perutemp <- peruemotions[rbern(length(missing.prob),missing.prob)==1,]
+  perutemp <- peruemotions
+  perutemp$risk[rbern(length(missing.prob),missing.prob)==1] <- NA
   perumareffects2[i] <- lm(outsidervote ~ simpletreat + edlevel + classid + leftright, data=perutemp)$coef[2]
 }
 
@@ -243,7 +244,10 @@ We can use the known values of variables within a case to come up with a best gu
 
 1. Come up with an initial guess for all the missing values.
 
-2. Choose one variable ($X_{i}$) to work on. Use the initial guesses, as well as the observed values, for all the other variables to run a regression with $X_{i}$ as the outcome and $X_{-i}$ as the predictors. Draw predictions from that regression for the missing values on $X_{i}$.
+2. Choose one variable ($Y_{i}$) to work on. Use the initial guesses, as well as the observed values, for all the other variables to run a regression with $YX_{i}$ as the outcome and $Y_{-i}$ as well as $X$ as the predictors. Draw fitted values from that regression for the missing values on $Y_{i}$.
+
+---
+### Multiple Imputation
 
 3. Move on to the next variable with missing values, and repeat step 2. Continue until all the variables have had their turn.
 
@@ -287,7 +291,8 @@ missing.prob <- inv.logit(-2.3 + -.5*peruemotions$edlevel + -.2*peruemotions$cla
 missing.prob[is.na(missing.prob)] <- .3
 
 for (i in 1:100){
-  perutemp <- peruemotions[rbern(length(missing.prob),missing.prob)==1,]
+  perutemp <- peruemotions
+  perutemp$risk[rbern(length(missing.prob),missing.prob)==1] <- NA
   perumice <- mice(perutemp)
   perumieffects[i] <- summary(pool(with(perumice, summary(lm(outsidervote ~ simpletreat)))))[2,2]
 }
@@ -444,12 +449,12 @@ $$y^{*} = \mathbf{x} \beta + \epsilon$$
 
 $$\epsilon \sim N(0, \sigma^{2})$$
 
-$$y = \left\{
-     \begin{array}{lr}
+$$y = 
+     \begin{cases}
        y^{*} & : y^{*} > 0\\
        - & : y^{*} \leq 0
-     \end{array}
-   \right.$$
+     \end{cases}
+   $$
 
 ---
 Consider the situation in which we have a measure of academic aptitude
