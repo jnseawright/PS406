@@ -225,7 +225,7 @@ missing.prob[is.na(missing.prob)] <- .3
 
 for (i in 1:100){
   perutemp <- peruemotions
-  perutemp$risk[rbern(length(missing.prob),missing.prob)==1] <- NA
+  perutemp$simpletreat[rbern(length(missing.prob),missing.prob)==1] <- NA
   perumareffects2[i] <- lm(outsidervote ~ simpletreat + edlevel + classid + leftright, data=perutemp)$coef[2]
 }
 
@@ -292,7 +292,7 @@ missing.prob[is.na(missing.prob)] <- .3
 
 for (i in 1:100){
   perutemp <- peruemotions
-  perutemp$risk[rbern(length(missing.prob),missing.prob)==1] <- NA
+  perutemp$simpletreat[rbern(length(missing.prob),missing.prob)==1] <- NA
   perumice <- mice(perutemp)
   perumieffects[i] <- summary(pool(with(perumice, summary(lm(outsidervote ~ simpletreat)))))[2,2]
 }
