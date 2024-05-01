@@ -150,7 +150,8 @@ missing.prob <- inv.logit(-2.3 + -.5*peruemotions$edlevel + -.2*peruemotions$cla
 missing.prob[is.na(missing.prob)] <- .3
 
 for (i in 1:100){
-  perutemp <- peruemotions[rbern(length(missing.prob),missing.prob)==1,]
+  perutemp <- peruemotions
+  perutemp$outsidervote[rbern(length(missing.prob),missing.prob)==1] <- NA
   perumareffects[i] <- lm(outsidervote ~ simpletreat, data=perutemp)$coef[2]
 }
 
@@ -225,7 +226,7 @@ missing.prob[is.na(missing.prob)] <- .3
 
 for (i in 1:100){
   perutemp <- peruemotions
-  perutemp$simpletreat[rbern(length(missing.prob),missing.prob)==1] <- NA
+  perutemp$outsidervote[rbern(length(missing.prob),missing.prob)==1] <- NA
   perumareffects2[i] <- lm(outsidervote ~ simpletreat + edlevel + classid + leftright, data=perutemp)$coef[2]
 }
 
@@ -292,7 +293,7 @@ missing.prob[is.na(missing.prob)] <- .3
 
 for (i in 1:100){
   perutemp <- peruemotions
-  perutemp$simpletreat[rbern(length(missing.prob),missing.prob)==1] <- NA
+  perutemp$outsidervote[rbern(length(missing.prob),missing.prob)==1] <- NA
   perumice <- mice(perutemp)
   perumieffects[i] <- summary(pool(with(perumice, summary(lm(outsidervote ~ simpletreat)))))[2,2]
 }
@@ -448,15 +449,18 @@ For non-ignorable missingness, the two main solutions are:
 $$y^{*} = \mathbf{x} \beta + \epsilon$$
 
 $$\epsilon \sim N(0, \sigma^{2})$$
+---
+### Tobit
 
-$$y = 
-     \begin{cases}
-       y^{*} & : y^{*} > 0\\
+$$y = \left\{
+     \begin{array}{lr}
+        y^{*} & : y^{*} > 0\\
        - & : y^{*} \leq 0
-     \end{cases}
-   $$
+     \end{array}
+   \right.$$
 
 ---
+
 Consider the situation in which we have a measure of academic aptitude
 (scaled 200-800) which we want to model using reading and math test
 scores, as well as, the type of program the student is enrolled in
@@ -478,7 +482,10 @@ library(VGAM)
 summary(lm(apt ~ read + math +
           prog,  
           data = dat))
+```
 
+---
+```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
 summary(m <- vglm(apt ~ read + math +
           prog, tobit(Upper = 800), 
           data = dat))
