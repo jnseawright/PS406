@@ -22,6 +22,10 @@ pre[class] {
 }
 ```
 
+```{r setup, include=FALSE} 
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+```
+
 ```{r, load_refs, include=FALSE, cache=FALSE}
 # Initializes the bibliography
 library(RefManageR)
@@ -119,9 +123,20 @@ then $\mathbf{z}$ meets the mathematical definition of an *instrument*.
 ---
 ### Instrumental Variables
 
-```{r, echo = FALSE, out.width="100%", fig.retina = 1, fig.align='center'}
-library(knitr)
-include_graphics("images/endog5.jpg")
+---
+```{r, echo = TRUE, out.width="70%", fig.retina = 1}
+library(dagitty)
+hypotheticalinstruments.dag <- dagitty( "dag { Polarization -> DemocraticErosion ElitePower -> DemocraticErosion Corruption -> Polarization Corruption -> DemocraticErosion SocialMedia -> Polarization PrimaryElections -> Polarization PrimaryElections -> ElitePower EconomicInequality -> ElitePower EconomicInequality -> Polarization Polarization [exposure]
+DemocraticErosion [outcome]}" )
+```
+
+---
+```{r, echo = TRUE, out.width="50%", fig.retina = 1}
+plot( hypotheticalinstruments.dag )
+```
+---
+```{r, echo = TRUE, out.width="50%", fig.retina = 1}
+instrumentalVariables(hypotheticalinstruments.dag)
 ```
 
 ---
@@ -193,10 +208,17 @@ include_graphics("images/endog5.jpg")
 ---
 ### Another Way of Thinking About Instrumental Variables
 
-$\hat{\mathbf{\beta}}_{IV} = (\mathbf{X}^{T}\mathbf{Z} (\mathbf{Z}^{T} \mathbf{Z})^{-1} \mathbf{Z}^{T} \mathbf{Z} (\mathbf{Z}^{T} \mathbf{Z})^{-1} \mathbf{Z}^{T} \mathbf{X})^{-1} \mathbf{X}^{T}\mathbf{Z} (\mathbf{Z}^{T} \mathbf{Z})^{-1} \mathbf{Z}^{T} \mathbf{y} = (\mathbf{X}^{T}\mathbf{Z} (\mathbf{Z}^{T} \mathbf{Z})^{-1} \mathbf{Z}^{T} \mathbf{X})^{-1} \mathbf{X}^{T}\mathbf{Z} (\mathbf{Z}^{T} \mathbf{Z})^{-1} \mathbf{Z}^{T} \mathbf{y} = (\mathbf{Z}^{T}\mathbf{X})^{-1} \mathbf{Z}^{T}\mathbf{y}$
+$$
+\begin{split}
+\hat{\mathbf{\beta}}_{IV} = & (\mathbf{X}^{T}\mathbf{Z} (\mathbf{Z}^{T} \mathbf{Z})^{-1} \mathbf{Z}^{T} \mathbf{Z} (\mathbf{Z}^{T} \mathbf{Z})^{-1} \mathbf{Z}^{T} \mathbf{X})^{-1} \\
+& \mathbf{X}^{T}\mathbf{Z} (\mathbf{Z}^{T} \mathbf{Z})^{-1} \mathbf{Z}^{T} \mathbf{y} = \\
+& (\mathbf{X}^{T}\mathbf{Z} (\mathbf{Z}^{T} \mathbf{Z})^{-1} \mathbf{Z}^{T} \mathbf{X})^{-1} \\ & \mathbf{X}^{T}\mathbf{Z} (\mathbf{Z}^{T} \mathbf{Z})^{-1} \mathbf{Z}^{T} \mathbf{y} = \\
+& (\mathbf{Z}^{T}\mathbf{X})^{-1} \mathbf{Z}^{T}\mathbf{y}
+\end{split}
+$$
 
--   So the instrumental variables estimator gives the same coefficient
-    estimates as running an OLS regression using $\hat{\mathbf{X}}$ in
+-   The instrumental variables estimator gives the same coefficient
+    estimates as running an OLS regression using $\hat{\mathbf{X}}$ as predicted by $\mathbf{Z}$ in
     the place of $\mathbf{X}$.
 
 ---
@@ -313,9 +335,7 @@ summary(migueliv)
 ```{r, echo = TRUE, fig.retina = 1, fig.align='center'}
 miguellm2 <- lm(any_prio ~ gdp_g + gdp_g_l +GPCP_g + GPCP_g_l + y_0 + polity2l + ethfrac + relfrac + Oil + lpopl1 + lmtnest + year:country_name, data=mss_repdata_1_)
 
-library(jtools)
-
-summ(miguellm2)
+summary(miguellm2)
 ```
 
 ---
@@ -374,8 +394,8 @@ summary(lm(outsidervote~enojado+simpletreat, data=peruemotions))
     $\%Compliers - \%Defiers$.
 
 -   The effect of the instrument on the outcome, given the exclusion
-    restriction, is (ATE for Compliers)$*\%Compliers -$ (ATE for
-    Defiers)$*\%Defiers$.
+    restriction, is (ATE for Compliers) times $\%Compliers -$ (ATE for
+    Defiers) times $\%Defiers$.
 
 ---
 ### Beyond LATE
@@ -414,7 +434,7 @@ exp.reweight$coefs.se.boot
 ---
 ```{r, echo = TRUE, fig.retina = 1, fig.align='center'}
 sidelm <- lm(enojado ~ simpletreat+Cuzco+age, data= peruemotionstrim)
-summ(sidelm)
+summary(sidelm)
 ```
 
 ---
@@ -455,6 +475,7 @@ summ(sidelm)
 ---
 
 ```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+library(knitr)
 include_graphics("images/Lee1.png")
 ```
 
@@ -507,7 +528,21 @@ gg_srd + stat_smooth(aes(lagdemvoteshare, democrat, group = gg_group),
 ```
 
 ---
+```{r, echo = FALSE, out.width="70%", fig.retina = 1, fig.align='center'}
+gg_srd + stat_smooth(aes(lagdemvoteshare, democrat, group = gg_group),
+  method = "lm"
+  , formula = y ~ x + I(x^2))
+```
+
+---
 ```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
+gg_srd + stat_smooth(data=lmb_data %>% filter(lagdemvoteshare>.45 & lagdemvoteshare<.55),
+  aes(lagdemvoteshare, democrat, group = gg_group),
+  method = "lm", formula = y ~ x + I(x^2))
+```
+
+---
+```{r, echo = FALSE, out.width="70%", fig.retina = 1, fig.align='center'}
 gg_srd + stat_smooth(data=lmb_data %>% filter(lagdemvoteshare>.45 & lagdemvoteshare<.55),
   aes(lagdemvoteshare, democrat, group = gg_group),
   method = "lm", formula = y ~ x + I(x^2))
@@ -521,6 +556,16 @@ lmb_subset <- lmb_data %>%
 lm_1 <- lm_robust(score ~ lagdemocrat, data = lmb_subset, se_type = "HC1")
 summary(lm_1)
 ```
+
+---
+```{r, echo = FALSE, out.width="50%", fig.retina = 1, fig.align='center'}
+lmb_subset <- lmb_data %>%
+     filter(lagdemvoteshare>.48 & lagdemvoteshare<.52)
+
+lm_1 <- lm_robust(score ~ lagdemocrat, data = lmb_subset, se_type = "HC1")
+summary(lm_1)
+```
+
 
 ---
 ### RDD Windows
