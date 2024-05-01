@@ -45,7 +45,7 @@ suitable way.
 First, estimate a propensity score for Republican identification conditional on these variables:
 
 ```{r, echo=TRUE, eval=FALSE}
-temp1 <- lm(repvind ~ ed + class + race + region + attention, data=anes2008)
+temp1 <- lm(repvind ~ ed + class + race + region + attention, data=anes2016)
 pscore1 <- fitted(temp1)
 ```
 
