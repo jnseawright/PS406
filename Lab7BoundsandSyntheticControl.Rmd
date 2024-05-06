@@ -2,9 +2,9 @@
 title: "Political Science 406 Lab 7: Bounds and Synthetic Control"
 date: "`r Sys.Date()`"
 output:
+  pdf_document: default
   html_document:
     highlight: tango
-  pdf_document: default
 urlcolor: blue
 ---
 
@@ -35,19 +35,15 @@ The treatment variable, treat is randomly assigned and reflects whether a resear
 uncivil debate between a Democrat and a Republican. Outcome variables include mfvcanth for the feeling
 thermometer score for your own candidate; lfvcanth, for the feeling thermometer score for the other candidate;
 own, for the perceived legitimacy of policy arguments for the participant’s own issue stance; and other, for
-the perceived legitimacy of policy arguments for the opposite issue stance. Carry out a significance test for
-the hypothesis that the treatment affects this set of outcome variables.
-
-### Problem 2: Is In-Your-Face Television Right?
+the perceived legitimacy of policy arguments for the opposite issue stance. 
 
 Look only at the bivariate relationship between treat and lfvcanth. How strong would omitted variables
 need to be in order to substantially affect the estimated relationship? Answer using both sensitivity analysis
-and extreme bounds analysis. (For the extreme bounds analysis, you may choose to dichotomize the outcome
-variable at the value 50 if that is helpful.)
+and extreme bounds analysis. (For the extreme bounds analysis, you may choose to dichotomize variables as helpful. This is artificial and probably shouldn't be done in real research, but can be useful in exercises.)
 
-### Problem 3: Trump and Immigration
+### Problem 2: Trump and Immigration
 
 Can we use a synthetic controls strategy to come up with a statistical test of the effect of Trump’s
 election in 2016 on (legal and/or illegal) immigration to the U.S.? Provide a proposed research design complete with
 necessary data and estimator, explain the required assumptions, and discuss the strengths and weaknesses
-of your proposal. Then show your results.
+of your proposal. Then show your results if possible.
