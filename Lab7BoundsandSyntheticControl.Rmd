@@ -2,9 +2,9 @@
 title: "Political Science 406 Lab 7: Bounds and Synthetic Control"
 date: "`r Sys.Date()`"
 output:
-  pdf_document: default
   html_document:
     highlight: tango
+  pdf_document: default
 urlcolor: blue
 ---
 
