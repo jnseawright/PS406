@@ -4,7 +4,7 @@
     <title>8: Difference-in-Differences Designs</title>
     <meta charset="utf-8" />
     <meta name="author" content="J. Seawright" />
-    <script src="8diffindiff_files/header-attrs-2.25/header-attrs.js"></script>
+    <script src="8diffindiff_files/header-attrs-2.26/header-attrs.js"></script>
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
   </head>
   <body>
@@ -66,7 +66,7 @@ Suppose we have a set of confounders that:
 ---
 ### Difference-In-Differences
 
-`\([Y_{1,i,t+k} - Y_{0,i,t+k}] - [Y_{0,j,t} - Y_{0,j,t}]\)`
+`\([Y_{1,i,t+k} - Y_{0,j,t+k}] - [Y_{0,i,t} - Y_{0,j,t}]\)`
 
 ---
 &lt;img src="images/miamiboatlift.JPG" width="90%" style="display: block; margin: auto;" /&gt;
@@ -121,7 +121,7 @@ summary(clfe)
 
 ```
 ## OLS estimation, Dep. Var.: Rate
-## Observations: 162 
+## Observations: 162
 ## Fixed-effects: State: 27,  Quarter: 6
 ## Standard-errors: Clustered (State) 
 ##              Estimate Std. Error  t value  Pr(&gt;|t|)    
@@ -236,7 +236,7 @@ Imai and coauthors propose panel-based matching as a way of implementing differe
 &lt;img src="images/Liu1.png" width="90%" style="display: block; margin: auto;" /&gt;
 
 ---
-### Functional Form
+### Functional Form and Parallel Trends
 
 `$$Y_{0,i,t}=f(X_{i,t})+h(U_{i,t})+\epsilon_{i,t}$$`
 
@@ -308,7 +308,7 @@ calfect &lt;- fect(Rate ~ numerictreat, index = c("State", "Quarter_Num"), force
 ```
 
 ```
-## 63 runs
+## 61 runs
 ```
 
 ```
@@ -326,8 +326,8 @@ calfect
 ## 
 ## ATT:
 ##                                ATT     S.E. CI.lower CI.upper   p.value
-## Tr obs equally weighted   -0.02246 0.004955 -0.03217 -0.01275 5.821e-06
-## Tr units equally weighted -0.02246 0.004955 -0.03217 -0.01275 5.821e-06
+## Tr obs equally weighted   -0.02246 0.005593 -0.03342  -0.0115 5.933e-05
+## Tr units equally weighted -0.02246 0.005593 -0.03342  -0.0115 5.933e-05
 ```
 
 ---
@@ -346,7 +346,7 @@ calife &lt;- fect(Rate ~ numerictreat, index = c("State", "Quarter_Num"), force 
 ```
 
 ```
-## 73 runs
+## 70 runs
 ```
 
 ```
@@ -364,11 +364,14 @@ calife
 ##     min.T0 = 1)
 ## 
 ## ATT:
-##                                ATT     S.E. CI.lower  CI.upper  p.value
-## Tr obs equally weighted   -0.02246 0.007015 -0.03621 -0.008709 0.001367
-## Tr units equally weighted -0.02246 0.007015 -0.03621 -0.008709 0.001367
+##                                ATT     S.E. CI.lower CI.upper   p.value
+## Tr obs equally weighted   -0.02246 0.006113 -0.03444 -0.01048 0.0002386
+## Tr units equally weighted -0.02246 0.006113 -0.03444 -0.01048 0.0002386
 ```
 
+---
+
+[An overview of recent directions.](https://doi.org/10.1016/j.jeconom.2023.03.008)
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

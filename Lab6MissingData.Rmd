@@ -39,6 +39,7 @@ ineqlm3 <- lm(Gini ~ Polity + log(GDP) + Polity:log(GDP), data=inequality)
 Try to put together a Tobit-2 selection model instead, positing an explanation for missingness the best
 that you can with the available data. Describe your assumptions and explain your results.
 
+
 ### Problem 2: Colonial Mortality, Expropriation Risk, and Economic Development
 
 In class, we discussed the Acemoglu et al. instrumental-variables natural experiment looking at colonial mortality, institutions, and economic development. You can find [the original article](https://doi.org/10.1257/aer.91.5). Replication data are [available](https://github.com/jnseawright/PS406/blob/main/data/ajrdata.csv) as well.

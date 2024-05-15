@@ -78,7 +78,7 @@ $Y_{0,i,t}$ and $Y_{1,i,t}$
 ---
 ### Difference-In-Differences
 
-$[Y_{1,i,t+k} - Y_{0,i,t+k}] - [Y_{0,j,t} - Y_{0,j,t}]$
+$[Y_{1,i,t+k} - Y_{0,j,t+k}] - [Y_{0,i,t} - Y_{0,j,t}]$
 
 ---
 ```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
@@ -219,7 +219,7 @@ include_graphics("images/Liu1.png")
 ```
 
 ---
-### Functional Form
+### Functional Form and Parallel Trends
 
 $$Y_{0,i,t}=f(X_{i,t})+h(U_{i,t})+\epsilon_{i,t}$$
 
@@ -284,3 +284,6 @@ calife <- fect(Rate ~ numerictreat, index = c("State", "Quarter_Num"), force = "
 calife
 ```
 
+---
+
+[An overview of recent directions.](https://doi.org/10.1016/j.jeconom.2023.03.008)
