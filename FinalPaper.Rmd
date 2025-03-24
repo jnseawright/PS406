@@ -1,5 +1,5 @@
 ---
-title: "Political Science 406 Final Paper: Research Design"
+title: "Political Science 406 Final Paper: Grant Proposal"
 date: "`r Sys.Date()`"
 output:
   html_document:
@@ -23,22 +23,12 @@ library(tidyverse)       # load libraries you always use here
 set.seed(27)             # make random results reproducible
 ```
 
-# Due Date: June 7, 2024
+# Due Date: June 13, 2025
 
-[Submit your research design here.](https://canvas.northwestern.edu/courses/211656/assignments/1392770)
+[Submit your research design here.](https://canvas.northwestern.edu/courses/230286/assignments/1562507)
 
-### Research Design
+### Grant Proposal
 
-For this paper, you will write and submit a complete research design for a quantitative causal inference using one or more of the methods from this course. The topic is your choice, and should be briefly introduced, although you should not spend more than 2.5 pages on discussing the topic and theory.
+The final project for this class is a mock grant proposal that features a research design that shows mastery of at least one cutting-edge quantitative causal inference estimator from this class. The proposal will be evaluated based on the criteria listed for the Northwestern Graduate School's [Graduate Research Grant](https://www.tgs.northwestern.edu/funding/fellowships-and-grants/internal-fellowships-grants/graduate-research-grant.html), and the format must meet the rules for the ``Description of the project'' section of a proposal for that grant --- five pages, double spaced, up to three pages of references/endnotes/figures --- with the exception that it does not need to already have IRB approval.
 
-Instead, most of the page length should be devoted to discussing your research design, assumptions, data sources, and limitations. A successful paper will describe a feasible and creative strategy for causal inference (4-5 pages), identify the necessary data including and new collection strategies necessary to complete the project in the future (about 1 page), and thoughtfully discuss strengths and weaknesses (2-3 pages).  
-
-While regression may be a part of the design, it is required that the paper also include at least one technique discussed in week 3 or later of the course. The entire paper should not exceed *10 pages* --- a hard limit.
-
-Grading will focus on:
-
-* whether the method from the course was applied correctly
-* whether data issues were thought through carefully
-* how careful connections are between the methods used and the social science that motivates the research
-* creativity and originality
-* care and thoroughness in discussion of strengths and weaknesses
+Note that a successful proposal will not only score well on the criteria for grant review --- which is good practice for your professional future! --- but will also show mastery of at least one cutting edge causal inference estimator. I am not going to list out here which estimators are cutting edge and which are not, but you are probably best off if you use an estimator that you did not know about before this quarter.
