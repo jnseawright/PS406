@@ -3,7 +3,7 @@ title: "1: Potential Outcomes and Experiments"
 subtitle: "Quantitative Causal Inference"
 author: "<large>J. Seawright</large>"
 institute: "<small>Northwestern Political Science</small>" 
-date: "March 26 and 27, 2024"
+date: "April 3, 2025"
 output: 
   xaringan::moon_reader:
     css: xaringan-themer.css
@@ -59,24 +59,26 @@ style_mono_accent(
 ---
 ### Business
 
+-   Presenting an estimator
+
 -   Weekly lab assignments
 
--   Final research design
+-   Final grant proposal
 
 ---
-### Online Experiment
+### What makes an experiment work?
 
 ---
 ### Potential Outcomes
 
--   Let's build a model of one person participating in the experiment.
+-   Let's build a mathematical model of one person participating in an experiment.
 
 ---
 ### Potential Outcomes
 
 -   Suppose we name that person $i$.
 
--   The person we're interested in says 1 when in the control group, and
+-   The person we're interested in has an outcome of 1 when in the control group, and
     0 when in the treatment group.
 
 ---
@@ -109,6 +111,8 @@ style_mono_accent(
 -   The causal effect of $W$ on $y$ is:
 
     -   $y_{i,t} - y_{i,c}$
+    
+    For hypothetical person $i$ above, this effect is $1 - 0 = 1$.
 
 ---
 ### The Average Treatment Effect
@@ -121,6 +125,11 @@ style_mono_accent(
 -   Here, interest focuses on the "average treatment effect":
 
     -   $E(y_{i,t}) - E(y_{i,c})$
+
+---
+### The Average Treatment Effect
+
+What helps us estimate the average treatment effect well?
 
 ---
 ### Assignment Mechanisms
@@ -162,7 +171,7 @@ possibilities.
 ---
 ### Experiments and Causal Inference
 
--   Under probabilistic and unconfounded assignment, the set of cases
+-   Under individualistic, probabilistic, and unconfounded assignment, the set of cases
     where $W_{i} = t$ produces a random sample from the population of
     $y_{t}$. Likewise, the set of cases where $W_{i} = c$ produces a
     random sample from the population of $y_{c}$. Thus:
@@ -188,6 +197,11 @@ mean(peruemotions$outsidervote[peruemotions$simpletreat==1]) - mean(peruemotions
 summ(lm(outsidervote ~ simpletreat, data=peruemotions))
 
 ```
+
+---
+### Assumptions
+
+What do we need to assume in order to get a causal inference here?
 
 ---
 ### Randomization Inference
@@ -291,54 +305,9 @@ bal.tab(peruemotionscovs, treat=peruemotions$simpletreat,
 ### Regression in Experiments
 
 Recall that $W_{i}$ as an indicator of treatment assignment in an
-experiment. Let's change the coding, such that $W_{i}$ equals 1 for
-treatment cases and 0 for control cases. Then we can write:
-
-$$Y_{i} = W_{i} Y_{i,t} + (1 - W_{i}) Y_{i,c}$$
-
-$$Y_{i} = Y_{i,c} + W_{i} (Y_{i,t} - Y_{i,c})$$
-
----
-### Regression in Experiments
-
-$$Y_{i} = \bar{Y}_{i,c} + W_{i} (\bar{Y}_{i,t} - \bar{Y}_{i,c}) +$$ 
-$$[Y_{i,c} - \bar{Y}_{i,c} + W_{i} (Y_{i,t} - \bar{Y}_{i,t} - Y_{i,c} + \bar{Y}_{i,c})]$$
-
----
-### Regression in Experiments
-
-Suppose we use OLS to estimate:
-
-$$Y_{i} = \beta_{0} + \beta_{1} W_{i} + \epsilon_{i}$$
-
-Will this work?
-
----
-### Regression in Experiments
-
-$$\hat{\beta}_{1} = \frac{cov(W, Y)}{var(W)} = \frac{\sum(W - \bar{W})(Y - \bar{Y})}{\sum(W - \bar{W})^2}$$
-
-Let $\pi$ equal the proportion of cases assigned to the treatment group.
-
-$$\hat{\beta}_{1} = \frac{\sum(W - \pi)(Y - \bar{Y})}{N \pi (1 - \pi)}$$
-
----
-### Regression in Experiments
-
-$$\hat{\beta}_{1} = \frac{\sum_{W: W_{i} = 1}(1 - \pi)(Y - \bar{Y}) - \sum_{W: W_{i} = 0}\pi (Y - \bar{Y})}{N \pi (1 - \pi)}$$
-
-$$\hat{\beta}_{1} = \frac{\Sigma_{W: W_{i} = 1} (Y_{i} - E(Y_{i}))}{N \pi} - \frac{\Sigma_{W: W_{i} = 0}(Y_{i} - E(Y_{i}))}{N (1 - \pi)}$$
-
----
-### Regression in Experiments
-
-$N \pi$ is just the number of cases where $W_{i} = 1$, and $N (1 - \pi)$
-is the number of cases where $W_{i} = 0$. So the last expression
-simplifies to:
-
-$$\hat{\beta}_{1} = \frac{\Sigma_{W: W_{i} = 1} Y_{i}}{N \pi} - \frac{\Sigma_{W: W_{i} = 0}Y_{i}}{N (1 - \pi)}$$
-
-$$\hat{\beta}_{1} = \bar{Y}_{i, W_{i} = 1} - \bar{Y}_{i, W_{i} = 0}$$
+experiment. A bivariate regression predicting the dependent variable based on $W$
+is algebraically the same as the difference in means we've looked at above, so it 
+is necessarily an okay causal inference.
 
 ---
 ### Regression in Experiments
@@ -494,7 +463,7 @@ O'Muircheartaigh and Hedges propose:
 ---
 ```{r, echo = TRUE, out.width="100%", fig.retina = 1}
 library(devtools)
-#devtools::install_github('benjamin-ackerman/generalize')
+if (!require("generalize")) devtools::install_github('benjamin-ackerman/generalize')
 library(generalize)
 ?assess
 ```

@@ -4,7 +4,8 @@
     <title>4: Natural Experiments</title>
     <meta charset="utf-8" />
     <meta name="author" content="J. Seawright" />
-    <script src="4naturalexperiments_files/header-attrs-2.25/header-attrs.js"></script>
+    <meta name="date" content="2025-04-24" />
+    <script src="4naturalexperiments_files/header-attrs-2.29/header-attrs.js"></script>
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
   </head>
   <body>
@@ -24,7 +25,7 @@ class: center, middle, inverse, title-slide
 ### <small>Northwestern Political Science</small>
 ]
 .date[
-### April 15 and 17, 2024
+### April 24, 2025
 ]
 
 ---
@@ -114,7 +115,7 @@ persons receiving the water of the different Companies.''
 
 ---
 
-```r
+``` r
 snowtable8 &lt;- read_csv("https://github.com/jnseawright/PS406/raw/main/data/snowtable8.csv")
 ```
 
@@ -129,12 +130,12 @@ snowtable8 &lt;- read_csv("https://github.com/jnseawright/PS406/raw/main/data/sn
 ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 ```
 
-```r
+``` r
 snowlm &lt;- lm(deathsOverall ~ supplier, data=snowtable8)
 ```
 ---
 
-```r
+``` r
 summary(snowlm)
 ```
 
@@ -145,7 +146,7 @@ summary(snowlm)
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
-## -69.333 -16.896  -1.625  16.813  54.667 
+## -69.333 -16.896  -1.625  16.812  54.667 
 ## 
 ## Coefficients:
 ##                                   Estimate Std. Error t value Pr(&gt;|t|)    
@@ -162,7 +163,7 @@ summary(snowlm)
 
 ---
 
-```r
+``` r
 snowlm2 &lt;- lm(I(log(pop1851))~ supplier, data=snowtable8)
 summary(snowlm2)
 ```
@@ -203,7 +204,7 @@ summary(snowlm2)
 
 ---
 
-```r
+``` r
 draft1970 &lt;- read_csv("https://github.com/jnseawright/PS406/raw/main/data/draft1970.csv")
 ```
 
@@ -218,7 +219,7 @@ draft1970 &lt;- read_csv("https://github.com/jnseawright/PS406/raw/main/data/dra
 ```
 ---
 
-```r
+``` r
 boxplot(rank~month, data=draft1970)
 ```
 
@@ -226,12 +227,12 @@ boxplot(rank~month, data=draft1970)
 
 ---
 
-```r
+``` r
 draftlm &lt;- lm(rank ~ day, data=draft1970)
 ```
 ---
 
-```r
+``` r
 summ(draftlm)
 ```
 
@@ -296,7 +297,7 @@ summ(draftlm)
 &lt;/table&gt;
 ---
 
-```r
+``` r
 draft1971 &lt;- read_csv("https://github.com/jnseawright/PS406/raw/main/data/draft1971.csv")
 ```
 
@@ -311,7 +312,7 @@ draft1971 &lt;- read_csv("https://github.com/jnseawright/PS406/raw/main/data/dra
 ```
 ---
 
-```r
+``` r
 boxplot(rank~month, data=draft1971)
 ```
 
@@ -319,12 +320,12 @@ boxplot(rank~month, data=draft1971)
 
 ---
 
-```r
+``` r
 draft71lm &lt;- lm(rank ~ day, data=draft1971)
 ```
 ---
 
-```r
+``` r
 summ(draft71lm)
 ```
 
@@ -420,16 +421,16 @@ summ(draft71lm)
 ---
 ### Colonialism and Development
 
-&lt;img src="images/settlers1.png" width="520" height="100%" style="display: block; margin: auto;" /&gt;
+&lt;img src="images/settlers1.png" height="100%" style="display: block; margin: auto;" /&gt;
 ---
 ### Colonialism and Development
 
-&lt;img src="images/settlers2.png" width="968" height="100%" style="display: block; margin: auto;" /&gt;
+&lt;img src="images/settlers2.png" height="100%" style="display: block; margin: auto;" /&gt;
 ---
 
 ### Colonialism and Development
 
-&lt;img src="images/settlers3.png" width="948" height="100%" style="display: block; margin: auto;" /&gt;
+&lt;img src="images/settlers3.png" height="100%" style="display: block; margin: auto;" /&gt;
 
 ---
 ### Colonialism and Development

@@ -4,7 +4,8 @@
     <title>9: Machine Learning and Causal Inference</title>
     <meta charset="utf-8" />
     <meta name="author" content="J. Seawright" />
-    <script src="9machinelearning_files/header-attrs-2.25/header-attrs.js"></script>
+    <meta name="date" content="2025-05-29" />
+    <script src="9machinelearning_files/header-attrs-2.29/header-attrs.js"></script>
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
   </head>
   <body>
@@ -24,7 +25,7 @@ class: center, middle, inverse, title-slide
 ### <small>Northwestern Political Science</small>
 ]
 .date[
-### May 20 and 22, 2024
+### May 29, 2025
 ]
 
 ---
@@ -115,20 +116,20 @@ additivity, linearity, etc.
 
 ---
 
-```r
+``` r
 library(rpart)
 ```
 
 ---
 
-```r
+``` r
 dem.cart &lt;- rpart(vdem_libdem ~ vdem_gender + vdem_corr + wdi_gdpcapcon2010 + wdi_mobile + wdi_gerp + une_surlgpef + wdi_fertility, data=qog_std_ts_jan22, na.action=na.omit)
 
 plot(dem.cart)
 text(dem.cart, use.n=TRUE)
 ```
 
-&lt;img src="9machinelearning_files/figure-html/unnamed-chunk-4-1.png" width="90%" style="display: block; margin: auto;" /&gt;
+&lt;img src="9machinelearning_files/figure-html/unnamed-chunk-4-1.png" width="70%" style="display: block; margin: auto;" /&gt;
 
 ---
 ### Random Forests
@@ -143,12 +144,12 @@ text(dem.cart, use.n=TRUE)
 
 ---
 
-```r
+``` r
 library(randomForest)
 ```
 
 ```
-## randomForest 4.7-1.1
+## randomForest 4.7-1.2
 ```
 
 ```
@@ -174,7 +175,7 @@ library(randomForest)
 
 ---
 
-```r
+``` r
 dem.rf &lt;- randomForest(vdem_libdem ~ wdi_gendeqr + bci_bci + wdi_gdpcapcon2010 + wdi_mobile + wdi_gerp + une_surlgpef + wdi_fertility, data=qog_std_ts_jan22, na.action=na.omit)
 
 dem.rf
@@ -188,13 +189,13 @@ dem.rf
 ##                      Number of trees: 500
 ## No. of variables tried at each split: 2
 ## 
-##           Mean of squared residuals: 0.008810406
-##                     % Var explained: 69.41
+##           Mean of squared residuals: 0.008876135
+##                     % Var explained: 69.18
 ```
 
 ---
 
-```r
+``` r
 library(randomForestExplainer)
 ```
 
@@ -206,16 +207,16 @@ library(randomForestExplainer)
 
 ---
 
-```r
+``` r
 dem.mindepth &lt;- min_depth_distribution(dem.rf)
 plot_min_depth_distribution(dem.mindepth)
 ```
 
-&lt;img src="9machinelearning_files/figure-html/unnamed-chunk-8-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+&lt;img src="9machinelearning_files/figure-html/unnamed-chunk-8-1.png" width="50%" style="display: block; margin: auto;" /&gt;
 
 ---
 
-```r
+``` r
 plot_min_depth_interactions(dem.rf)
 ```
 
@@ -240,34 +241,18 @@ plot_min_depth_interactions(dem.rf)
 ```
 
 ```
-## Warning: There were 5609 warnings in `summarise()`.
+## Warning: There were 5600 warnings in `summarise()`.
 ## The first warning was:
 ## ℹ In argument: `bci_bci = min(bci_bci, na.rm = TRUE)`.
-## ℹ In group 13: `tree = 2` and `split var = "wdi_gendeqr"`.
+## ℹ In group 2: `tree = 1` and `split var = "une_surlgpef"`.
 ## Caused by warning in `min()`:
 ## ! no non-missing arguments to min; returning Inf
-## ℹ Run `dplyr::last_dplyr_warnings()` to see the 5608 remaining warnings.
+## ℹ Run `dplyr::last_dplyr_warnings()` to see the 5599 remaining warnings.
 ```
 
-&lt;img src="9machinelearning_files/figure-html/unnamed-chunk-9-1.png" width="90%" style="display: block; margin: auto;" /&gt;
+&lt;img src="9machinelearning_files/figure-html/unnamed-chunk-9-1.png" width="70%" style="display: block; margin: auto;" /&gt;
 
----
-
-```
-## [1] "Warning: your forest does not contain information on local importance so 'mse_increase' measure cannot be extracted. To add it regrow the forest with the option localImp = TRUE and run this function again."
-```
-
-```
-## Warning: There were 5609 warnings in `summarise()`.
-## The first warning was:
-## ℹ In argument: `bci_bci = min(bci_bci, na.rm = TRUE)`.
-## ℹ In group 13: `tree = 2` and `split var = "wdi_gendeqr"`.
-## Caused by warning in `min()`:
-## ! no non-missing arguments to min; returning Inf
-## ℹ Run `dplyr::last_dplyr_warnings()` to see the 5608 remaining warnings.
-```
-
-&lt;img src="9machinelearning_files/figure-html/unnamed-chunk-10-1.png" width="90%" style="display: block; margin: auto;" /&gt;
+&lt;img src="images/rfinteraction.png" width="90%" style="display: block; margin: auto;" /&gt;
 
 ---
 ### Causal Forests
@@ -290,10 +275,13 @@ Using the AIPW to combine estimates that derive from causal forests gives us a *
 
 ---
 
+```
+## Warning: package 'grf' was built under R version 4.4.3
+```
 
 ---
 
-```r
+``` r
 demdata &lt;- qog_std_ts_jan22
 
 demdata &lt;- demdata %&gt;% filter(!is.na(vdem_libdem) &amp; !is.na(br_pres))
@@ -311,12 +299,12 @@ dem.cf
 ## Number of training samples: 9970 
 ## Variable importance: 
 ##     1     2     3     4     5     6     7 
-## 0.009 0.131 0.320 0.315 0.016 0.020 0.189
+## 0.009 0.148 0.330 0.279 0.017 0.020 0.197
 ```
 
 ---
 
-```r
+``` r
 demscores &lt;- data.frame(score=get_scores(dem.cf))
 
 p &lt;- demscores %&gt;%
@@ -329,38 +317,57 @@ p &lt;- demscores %&gt;%
 ```
 ---
 
-```r
+``` r
 p
 ```
 
 ```
-## Warning: Removed 23 rows containing non-finite outside the scale range
+## Warning: Removed 13 rows containing non-finite outside the scale range
 ## (`stat_bin()`).
+```
+
+```
+## Warning in grid.Call(C_stringMetric, as.graphicsAnnot(x$label)): font family
+## not found in Windows font database
+## Warning in grid.Call(C_stringMetric, as.graphicsAnnot(x$label)): font family
+## not found in Windows font database
+```
+
+```
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## font family not found in Windows font database
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## font family not found in Windows font database
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## font family not found in Windows font database
 ```
 
 &lt;img src="9machinelearning_files/figure-html/unnamed-chunk-15-1.png" width="50%" style="display: block; margin: auto;" /&gt;
 
 ---
+&lt;img src="images/cfcausalscores.png" width="90%" style="display: block; margin: auto;" /&gt;
 
-```r
+---
+
+``` r
 average_treatment_effect(dem.cf, target.sample = "overlap")
 ```
 
 ```
 ##     estimate      std.err 
-## -0.047092460  0.005020813
+## -0.046837070  0.005012132
 ```
 
-```r
+``` r
 average_treatment_effect(dem.cf, target.sample = "control")
 ```
 
 ```
 ##     estimate      std.err 
-## -0.017142835  0.004411511
+## -0.017043589  0.004399897
 ```
 
-```r
+``` r
 average_treatment_effect(dem.cf, target.sample = "treated")
 ```
 
@@ -373,12 +380,12 @@ average_treatment_effect(dem.cf, target.sample = "treated")
 
 ```
 ##     estimate      std.err 
-## -0.042287014  0.004145137
+## -0.041868636  0.004103802
 ```
 
 ---
 
-```r
+``` r
 temp.df &lt;- data.frame(demscore = demscores$score, ht_colonial = as.factor(demdata$ht_colonial))
 
 htcolonial_text &lt;- c("Not colonized", "Dutch", "Spanish", "Italian", "US", "British", "French", "Portuguese", "Belgian", "Brit/French", "Austral.")
@@ -392,20 +399,20 @@ p2 &lt;- temp.df %&gt;% ggplot( aes(x=ht_colonial, y=demscore)) +
 
 ---
 
-```r
+``` r
 p2
 ```
 
 ```
-## Warning: Removed 23 rows containing non-finite outside the scale range
+## Warning: Removed 13 rows containing non-finite outside the scale range
 ## (`stat_ydensity()`).
 ```
 
-&lt;img src="9machinelearning_files/figure-html/unnamed-chunk-18-1.png" width="50%" style="display: block; margin: auto;" /&gt;
+&lt;img src="9machinelearning_files/figure-html/unnamed-chunk-19-1.png" width="50%" style="display: block; margin: auto;" /&gt;
 
 ---
 
-```r
+``` r
 temp.df &lt;- data.frame(demscore = demscores$score, pop65 = demdata$wdi_pop65)
 
 p3 &lt;- temp.df %&gt;% ggplot(aes(x=pop65, y=demscore)) +
@@ -416,7 +423,7 @@ p3 &lt;- temp.df %&gt;% ggplot(aes(x=pop65, y=demscore)) +
 
 ---
 
-```r
+``` r
 p3
 ```
 
@@ -425,16 +432,35 @@ p3
 ```
 
 ```
-## Warning: Removed 924 rows containing non-finite outside the scale range
+## Warning: Removed 914 rows containing non-finite outside the scale range
 ## (`stat_smooth()`).
 ```
 
 ```
-## Warning: Removed 924 rows containing missing values or values outside the scale range
+## Warning: Removed 914 rows containing missing values or values outside the scale range
 ## (`geom_point()`).
 ```
 
-&lt;img src="9machinelearning_files/figure-html/unnamed-chunk-20-1.png" width="50%" style="display: block; margin: auto;" /&gt;
+```
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
+## family not found in Windows font database
+## Warning in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, : font
+## family not found in Windows font database
+```
+
+```
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## font family not found in Windows font database
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## font family not found in Windows font database
+## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
+## font family not found in Windows font database
+```
+
+&lt;img src="9machinelearning_files/figure-html/unnamed-chunk-21-1.png" width="50%" style="display: block; margin: auto;" /&gt;
+
+---
+&lt;img src="images/cfpop65scatterplot.png" width="90%" style="display: block; margin: auto;" /&gt;
 
 ---
 ### Picking Control Variables
@@ -472,7 +498,7 @@ If you are pretty sure you don't have any potential instruments in the data, and
 
 ---
 
-```r
+``` r
 qogwdi &lt;- qog_std_ts_jan22 %&gt;% filter(year &gt; 1979) %&gt;% select(starts_with("wdi") | starts_with("year") | starts_with("cname"))
 qogwdi &lt;- qogwdi[,colSums(is.na(qogwdi))&lt;3000]
 qogwdi$vdem_libdem &lt;- qog_std_ts_jan22$vdem_libdem[qog_std_ts_jan22$cname %in% qogwdi$cname &amp; qog_std_ts_jan22$year &gt;1979]
@@ -510,11 +536,11 @@ qogwdi.imp &lt;- mice(qogwdi, method = "cart")
 ```
 
 ```
-## Warning: Number of logged events: 1391
+## Warning: Number of logged events: 1384
 ```
 ---
 
-```r
+``` r
 qogimputed1 &lt;- mice::complete(qogwdi.imp)
 
 summary(lm(wdi_gdpcapgr~vdem_libdem + I(log(wdi_gdpcapcon2010)) + wdi_gerp, data=qogimputed1))
@@ -528,32 +554,32 @@ summary(lm(wdi_gdpcapgr~vdem_libdem + I(log(wdi_gdpcapcon2010)) + wdi_gerp, data
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
-## -66.531  -2.145   0.257   2.511 139.219 
+## -66.630  -2.211   0.260   2.530 138.901 
 ## 
 ## Coefficients:
 ##                            Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)                0.940233   0.495672   1.897 0.057878 .  
-## vdem_libdem                0.972985   0.294203   3.307 0.000946 ***
-## I(log(wdi_gdpcapcon2010)) -0.099058   0.054263  -1.825 0.067963 .  
-## wdi_gerp                   0.011616   0.003624   3.206 0.001353 ** 
+## (Intercept)                0.747878   0.514770   1.453 0.146306    
+## vdem_libdem                0.644974   0.302010   2.136 0.032740 *  
+## I(log(wdi_gdpcapcon2010)) -0.079341   0.055517  -1.429 0.153002    
+## wdi_gerp                   0.013138   0.003848   3.414 0.000644 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
-## Residual standard error: 6.068 on 8333 degrees of freedom
-## Multiple R-squared:  0.002705,	Adjusted R-squared:  0.002346 
-## F-statistic: 7.534 on 3 and 8333 DF,  p-value: 4.958e-05
+## Residual standard error: 6.279 on 8333 degrees of freedom
+## Multiple R-squared:  0.002033,	Adjusted R-squared:  0.001674 
+## F-statistic: 5.659 on 3 and 8333 DF,  p-value: 0.0007199
 ```
 
 ---
 
-```r
+``` r
 library(hdm)
 ```
 
 
 ---
 
-```r
+``` r
 demgrow.dualselection &lt;- rlassoEffects(wdi_gdpcapgr ~ . - year - cname - cname_qog - cname_year - wdi_gdpgr - wdi_popgr, data=qogimputed1, I=~vdem_libdem)
 demgrow.dualselection
 ```
@@ -567,10 +593,10 @@ demgrow.dualselection
 ## 
 ## Coefficients:
 ## vdem_libdem  
-##      0.1172
+##      0.1886
 ```
 
-```r
+``` r
 demgrow.dualselection$selection.matrix
 ```
 
@@ -604,9 +630,9 @@ demgrow.dualselection$selection.matrix
 ## wdi_gnicapatlcur            TRUE
 ## wdi_gnicur                 FALSE
 ## wdi_import                 FALSE
-## wdi_inflation              FALSE
+## wdi_inflation               TRUE
 ## wdi_internet                TRUE
-## wdi_lfpilo15                TRUE
+## wdi_lfpilo15               FALSE
 ## wdi_lifexp                 FALSE
 ## wdi_lifexpf                FALSE
 ## wdi_lifexpm                FALSE
@@ -672,7 +698,7 @@ In a standard adaptive LASSO, `\(\hat{w} = |\tilde{\beta}_{j}|^{-\gamma}\)`, whe
 
 ---
 
-```r
+``` r
 library(glmnet)
 ```
 
@@ -686,7 +712,7 @@ library(glmnet)
 
 ---
 
-```r
+``` r
 qogimpcomplete &lt;- qogimputed1[,colSums(is.na(qogimputed1))&lt;1]
 
 demgrow.adaptivelasso.part1 &lt;- lm(wdi_gdpcapgr ~ . - year - cname - cname_qog - cname_year - wdi_gdpgr - wdi_popgr, data=qogimpcomplete)
@@ -701,353 +727,353 @@ demgrow.adaptivelasso.part2 &lt;- glmnet(y=qogimputed1$wdi_gdpcapgr, x=xmat, pen
 
 ---
 
-```r
+``` r
 coef(demgrow.adaptivelasso.part2, 1)
 ```
 
 ```
 ## 59 x 1 sparse Matrix of class "dgCMatrix"
 ##                                 s1
-## (Intercept)          -1.395133e+01
-## wdi_agedr             2.491329e-02
-## wdi_araland           6.010310e-03
+## (Intercept)          -9.345746e+00
+## wdi_agedr             5.534674e-02
+## wdi_araland           1.373647e-03
 ## wdi_area              .           
-## wdi_birth            -5.306177e-02
-## wdi_co2              -4.521625e-02
-## wdi_death             1.678106e-01
-## wdi_enerenew          6.821570e-03
-## wdi_expmil           -4.493321e-03
-## wdi_export           -3.968471e-05
-## wdi_fdiin             2.849955e-03
-## wdi_fdiout           -6.248494e-03
-## wdi_fertility         4.101673e-02
-## wdi_forest            5.325325e-03
-## wdi_gdpagr           -2.911581e-02
+## wdi_birth            -1.032587e-01
+## wdi_co2              -3.521739e-02
+## wdi_death             9.029891e-02
+## wdi_enerenew          9.011291e-03
+## wdi_expmil            1.410503e-02
+## wdi_export            1.253821e-02
+## wdi_fdiin             2.122848e-03
+## wdi_fdiout            1.037552e-02
+## wdi_fertility         2.376557e-01
+## wdi_forest            4.922960e-03
+## wdi_gdpagr           -3.871891e-02
 ## wdi_gdpcapcon2010     .           
-## wdi_gdpcapcur         .           
+## wdi_gdpcapcur        -4.365055e-06
 ## wdi_gdpcappppcon2017  .           
-## wdi_gdpcappppcur      .           
-## wdi_gdpind            .           
+## wdi_gdpcappppcur     -8.084763e-06
+## wdi_gdpind           -1.605287e-02
 ## wdi_gdppppcon2017     .           
 ## wdi_gdppppcur         .           
-## wdi_gerp              3.866584e-02
-## wdi_gerpf            -2.919091e-02
-## wdi_gerpm            -7.241761e-03
-## wdi_gnicapatlcur     -5.171153e-06
+## wdi_gerp              5.182733e-02
+## wdi_gerpf            -2.619747e-02
+## wdi_gerpm            -2.373938e-02
+## wdi_gnicapatlcur      .           
 ## wdi_gnicur            .           
-## wdi_import           -9.348750e-03
-## wdi_inflation        -4.590109e-04
-## wdi_internet         -7.644254e-03
-## wdi_lfpilo15         -1.149052e-02
-## wdi_lifexp            5.279051e-02
+## wdi_import            .           
+## wdi_inflation        -9.724584e-04
+## wdi_internet         -8.993308e-03
+## wdi_lfpilo15         -6.833171e-03
+## wdi_lifexp           -8.590309e-02
 ## wdi_lifexpf           .           
-## wdi_lifexpm          -5.650036e-03
-## wdi_mobile           -2.080587e-03
-## wdi_mortf             .           
-## wdi_mortinf           .           
-## wdi_mortm            -1.582945e-03
-## wdi_mortnn            2.285820e-02
-## wdi_mortu5           -8.877202e-03
-## wdi_oilrent           2.480399e-02
+## wdi_lifexpm           8.262990e-02
+## wdi_mobile           -1.648997e-03
+## wdi_mortf            -2.125031e-03
+## wdi_mortinf          -3.006591e-02
+## wdi_mortm            -1.016983e-03
+## wdi_mortnn            3.832627e-02
+## wdi_mortu5            5.844230e-07
+## wdi_oilrent           3.047363e-02
 ## wdi_pop               .           
-## wdi_pop14            -9.186259e-03
-## wdi_pop1564           8.286508e-02
-## wdi_pop65            -1.034446e-01
-## wdi_popden            9.399361e-05
-## wdi_popf              1.078130e-01
-## wdi_poprul            1.385905e-02
-## wdi_poprulgr         -7.678467e-03
-## wdi_popurbagr        -1.531716e-01
+## wdi_pop14            -7.895719e-02
+## wdi_pop1564           9.824204e-02
+## wdi_pop65            -1.526973e-01
+## wdi_popden            1.517555e-04
+## wdi_popf              1.709450e-01
+## wdi_poprul            1.470778e-02
+## wdi_poprulgr         -5.620704e-03
+## wdi_popurbagr        -1.264933e-01
 ## wdi_refasy            .           
 ## wdi_refori            .           
 ## wdi_sva2010           .           
-## wdi_svapg             4.469830e-01
-## wdi_svapgdp          -1.293960e-02
-## wdi_tele              7.074912e-03
-## wdi_trade             7.049475e-03
-## wdi_tradeserv         3.993211e-04
-## wdi_wombuslawi        9.127360e-03
+## wdi_svapg             3.266980e-01
+## wdi_svapgdp          -4.406059e-02
+## wdi_tele              .           
+## wdi_trade            -7.087592e-03
+## wdi_tradeserv         9.052865e-03
+## wdi_wombuslawi        5.288284e-03
 ```
 ---
 
-```r
+``` r
 coef(demgrow.adaptivelasso.part2, 2)
 ```
 
 ```
 ## 59 x 1 sparse Matrix of class "dgCMatrix"
 ##                                 s1
-## (Intercept)          -1.395133e+01
-## wdi_agedr             2.491329e-02
-## wdi_araland           6.010310e-03
+## (Intercept)          -9.345746e+00
+## wdi_agedr             5.534674e-02
+## wdi_araland           1.373647e-03
 ## wdi_area              .           
-## wdi_birth            -5.306177e-02
-## wdi_co2              -4.521625e-02
-## wdi_death             1.678106e-01
-## wdi_enerenew          6.821570e-03
-## wdi_expmil           -4.493321e-03
-## wdi_export           -3.968471e-05
-## wdi_fdiin             2.849955e-03
-## wdi_fdiout           -6.248494e-03
-## wdi_fertility         4.101673e-02
-## wdi_forest            5.325325e-03
-## wdi_gdpagr           -2.911581e-02
+## wdi_birth            -1.032587e-01
+## wdi_co2              -3.521739e-02
+## wdi_death             9.029891e-02
+## wdi_enerenew          9.011291e-03
+## wdi_expmil            1.410503e-02
+## wdi_export            1.253821e-02
+## wdi_fdiin             2.122848e-03
+## wdi_fdiout            1.037552e-02
+## wdi_fertility         2.376557e-01
+## wdi_forest            4.922960e-03
+## wdi_gdpagr           -3.871891e-02
 ## wdi_gdpcapcon2010     .           
-## wdi_gdpcapcur         .           
+## wdi_gdpcapcur        -4.365055e-06
 ## wdi_gdpcappppcon2017  .           
-## wdi_gdpcappppcur      .           
-## wdi_gdpind            .           
+## wdi_gdpcappppcur     -8.084763e-06
+## wdi_gdpind           -1.605287e-02
 ## wdi_gdppppcon2017     .           
 ## wdi_gdppppcur         .           
-## wdi_gerp              3.866584e-02
-## wdi_gerpf            -2.919091e-02
-## wdi_gerpm            -7.241761e-03
-## wdi_gnicapatlcur     -5.171153e-06
+## wdi_gerp              5.182733e-02
+## wdi_gerpf            -2.619747e-02
+## wdi_gerpm            -2.373938e-02
+## wdi_gnicapatlcur      .           
 ## wdi_gnicur            .           
-## wdi_import           -9.348750e-03
-## wdi_inflation        -4.590109e-04
-## wdi_internet         -7.644254e-03
-## wdi_lfpilo15         -1.149052e-02
-## wdi_lifexp            5.279051e-02
+## wdi_import            .           
+## wdi_inflation        -9.724584e-04
+## wdi_internet         -8.993308e-03
+## wdi_lfpilo15         -6.833171e-03
+## wdi_lifexp           -8.590309e-02
 ## wdi_lifexpf           .           
-## wdi_lifexpm          -5.650036e-03
-## wdi_mobile           -2.080587e-03
-## wdi_mortf             .           
-## wdi_mortinf           .           
-## wdi_mortm            -1.582945e-03
-## wdi_mortnn            2.285820e-02
-## wdi_mortu5           -8.877202e-03
-## wdi_oilrent           2.480399e-02
+## wdi_lifexpm           8.262990e-02
+## wdi_mobile           -1.648997e-03
+## wdi_mortf            -2.125031e-03
+## wdi_mortinf          -3.006591e-02
+## wdi_mortm            -1.016983e-03
+## wdi_mortnn            3.832627e-02
+## wdi_mortu5            5.844230e-07
+## wdi_oilrent           3.047363e-02
 ## wdi_pop               .           
-## wdi_pop14            -9.186259e-03
-## wdi_pop1564           8.286508e-02
-## wdi_pop65            -1.034446e-01
-## wdi_popden            9.399361e-05
-## wdi_popf              1.078130e-01
-## wdi_poprul            1.385905e-02
-## wdi_poprulgr         -7.678467e-03
-## wdi_popurbagr        -1.531716e-01
+## wdi_pop14            -7.895719e-02
+## wdi_pop1564           9.824204e-02
+## wdi_pop65            -1.526973e-01
+## wdi_popden            1.517555e-04
+## wdi_popf              1.709450e-01
+## wdi_poprul            1.470778e-02
+## wdi_poprulgr         -5.620704e-03
+## wdi_popurbagr        -1.264933e-01
 ## wdi_refasy            .           
 ## wdi_refori            .           
 ## wdi_sva2010           .           
-## wdi_svapg             4.469830e-01
-## wdi_svapgdp          -1.293960e-02
-## wdi_tele              7.074912e-03
-## wdi_trade             7.049475e-03
-## wdi_tradeserv         3.993211e-04
-## wdi_wombuslawi        9.127360e-03
+## wdi_svapg             3.266980e-01
+## wdi_svapgdp          -4.406059e-02
+## wdi_tele              .           
+## wdi_trade            -7.087592e-03
+## wdi_tradeserv         9.052865e-03
+## wdi_wombuslawi        5.288284e-03
 ```
 ---
 
-```r
+``` r
 coef(demgrow.adaptivelasso.part2, 5)
 ```
 
 ```
 ## 59 x 1 sparse Matrix of class "dgCMatrix"
 ##                                 s1
-## (Intercept)          -1.395133e+01
-## wdi_agedr             2.491329e-02
-## wdi_araland           6.010310e-03
+## (Intercept)          -9.345746e+00
+## wdi_agedr             5.534674e-02
+## wdi_araland           1.373647e-03
 ## wdi_area              .           
-## wdi_birth            -5.306177e-02
-## wdi_co2              -4.521625e-02
-## wdi_death             1.678106e-01
-## wdi_enerenew          6.821570e-03
-## wdi_expmil           -4.493321e-03
-## wdi_export           -3.968471e-05
-## wdi_fdiin             2.849955e-03
-## wdi_fdiout           -6.248494e-03
-## wdi_fertility         4.101673e-02
-## wdi_forest            5.325325e-03
-## wdi_gdpagr           -2.911581e-02
+## wdi_birth            -1.032587e-01
+## wdi_co2              -3.521739e-02
+## wdi_death             9.029891e-02
+## wdi_enerenew          9.011291e-03
+## wdi_expmil            1.410503e-02
+## wdi_export            1.253821e-02
+## wdi_fdiin             2.122848e-03
+## wdi_fdiout            1.037552e-02
+## wdi_fertility         2.376557e-01
+## wdi_forest            4.922960e-03
+## wdi_gdpagr           -3.871891e-02
 ## wdi_gdpcapcon2010     .           
-## wdi_gdpcapcur         .           
+## wdi_gdpcapcur        -4.365055e-06
 ## wdi_gdpcappppcon2017  .           
-## wdi_gdpcappppcur      .           
-## wdi_gdpind            .           
+## wdi_gdpcappppcur     -8.084763e-06
+## wdi_gdpind           -1.605287e-02
 ## wdi_gdppppcon2017     .           
 ## wdi_gdppppcur         .           
-## wdi_gerp              3.866584e-02
-## wdi_gerpf            -2.919091e-02
-## wdi_gerpm            -7.241761e-03
-## wdi_gnicapatlcur     -5.171153e-06
+## wdi_gerp              5.182733e-02
+## wdi_gerpf            -2.619747e-02
+## wdi_gerpm            -2.373938e-02
+## wdi_gnicapatlcur      .           
 ## wdi_gnicur            .           
-## wdi_import           -9.348750e-03
-## wdi_inflation        -4.590109e-04
-## wdi_internet         -7.644254e-03
-## wdi_lfpilo15         -1.149052e-02
-## wdi_lifexp            5.279051e-02
+## wdi_import            .           
+## wdi_inflation        -9.724584e-04
+## wdi_internet         -8.993308e-03
+## wdi_lfpilo15         -6.833171e-03
+## wdi_lifexp           -8.590309e-02
 ## wdi_lifexpf           .           
-## wdi_lifexpm          -5.650036e-03
-## wdi_mobile           -2.080587e-03
-## wdi_mortf             .           
-## wdi_mortinf           .           
-## wdi_mortm            -1.582945e-03
-## wdi_mortnn            2.285820e-02
-## wdi_mortu5           -8.877202e-03
-## wdi_oilrent           2.480399e-02
+## wdi_lifexpm           8.262990e-02
+## wdi_mobile           -1.648997e-03
+## wdi_mortf            -2.125031e-03
+## wdi_mortinf          -3.006591e-02
+## wdi_mortm            -1.016983e-03
+## wdi_mortnn            3.832627e-02
+## wdi_mortu5            5.844230e-07
+## wdi_oilrent           3.047363e-02
 ## wdi_pop               .           
-## wdi_pop14            -9.186259e-03
-## wdi_pop1564           8.286508e-02
-## wdi_pop65            -1.034446e-01
-## wdi_popden            9.399361e-05
-## wdi_popf              1.078130e-01
-## wdi_poprul            1.385905e-02
-## wdi_poprulgr         -7.678467e-03
-## wdi_popurbagr        -1.531716e-01
+## wdi_pop14            -7.895719e-02
+## wdi_pop1564           9.824204e-02
+## wdi_pop65            -1.526973e-01
+## wdi_popden            1.517555e-04
+## wdi_popf              1.709450e-01
+## wdi_poprul            1.470778e-02
+## wdi_poprulgr         -5.620704e-03
+## wdi_popurbagr        -1.264933e-01
 ## wdi_refasy            .           
 ## wdi_refori            .           
 ## wdi_sva2010           .           
-## wdi_svapg             4.469830e-01
-## wdi_svapgdp          -1.293960e-02
-## wdi_tele              7.074912e-03
-## wdi_trade             7.049475e-03
-## wdi_tradeserv         3.993211e-04
-## wdi_wombuslawi        9.127360e-03
+## wdi_svapg             3.266980e-01
+## wdi_svapgdp          -4.406059e-02
+## wdi_tele              .           
+## wdi_trade            -7.087592e-03
+## wdi_tradeserv         9.052865e-03
+## wdi_wombuslawi        5.288284e-03
 ```
 ---
 
-```r
+``` r
 coef(demgrow.adaptivelasso.part2, 20)
 ```
 
 ```
 ## 59 x 1 sparse Matrix of class "dgCMatrix"
 ##                                 s1
-## (Intercept)          -1.395133e+01
-## wdi_agedr             2.491329e-02
-## wdi_araland           6.010310e-03
+## (Intercept)          -9.345746e+00
+## wdi_agedr             5.534674e-02
+## wdi_araland           1.373647e-03
 ## wdi_area              .           
-## wdi_birth            -5.306177e-02
-## wdi_co2              -4.521625e-02
-## wdi_death             1.678106e-01
-## wdi_enerenew          6.821570e-03
-## wdi_expmil           -4.493321e-03
-## wdi_export           -3.968471e-05
-## wdi_fdiin             2.849955e-03
-## wdi_fdiout           -6.248494e-03
-## wdi_fertility         4.101673e-02
-## wdi_forest            5.325325e-03
-## wdi_gdpagr           -2.911581e-02
+## wdi_birth            -1.032587e-01
+## wdi_co2              -3.521739e-02
+## wdi_death             9.029891e-02
+## wdi_enerenew          9.011291e-03
+## wdi_expmil            1.410503e-02
+## wdi_export            1.253821e-02
+## wdi_fdiin             2.122848e-03
+## wdi_fdiout            1.037552e-02
+## wdi_fertility         2.376557e-01
+## wdi_forest            4.922960e-03
+## wdi_gdpagr           -3.871891e-02
 ## wdi_gdpcapcon2010     .           
-## wdi_gdpcapcur         .           
+## wdi_gdpcapcur        -4.365055e-06
 ## wdi_gdpcappppcon2017  .           
-## wdi_gdpcappppcur      .           
-## wdi_gdpind            .           
+## wdi_gdpcappppcur     -8.084763e-06
+## wdi_gdpind           -1.605287e-02
 ## wdi_gdppppcon2017     .           
 ## wdi_gdppppcur         .           
-## wdi_gerp              3.866584e-02
-## wdi_gerpf            -2.919091e-02
-## wdi_gerpm            -7.241761e-03
-## wdi_gnicapatlcur     -5.171153e-06
+## wdi_gerp              5.182733e-02
+## wdi_gerpf            -2.619747e-02
+## wdi_gerpm            -2.373938e-02
+## wdi_gnicapatlcur      .           
 ## wdi_gnicur            .           
-## wdi_import           -9.348750e-03
-## wdi_inflation        -4.590109e-04
-## wdi_internet         -7.644254e-03
-## wdi_lfpilo15         -1.149052e-02
-## wdi_lifexp            5.279051e-02
+## wdi_import            .           
+## wdi_inflation        -9.724584e-04
+## wdi_internet         -8.993308e-03
+## wdi_lfpilo15         -6.833171e-03
+## wdi_lifexp           -8.590309e-02
 ## wdi_lifexpf           .           
-## wdi_lifexpm          -5.650036e-03
-## wdi_mobile           -2.080587e-03
-## wdi_mortf             .           
-## wdi_mortinf           .           
-## wdi_mortm            -1.582945e-03
-## wdi_mortnn            2.285820e-02
-## wdi_mortu5           -8.877202e-03
-## wdi_oilrent           2.480399e-02
+## wdi_lifexpm           8.262990e-02
+## wdi_mobile           -1.648997e-03
+## wdi_mortf            -2.125031e-03
+## wdi_mortinf          -3.006591e-02
+## wdi_mortm            -1.016983e-03
+## wdi_mortnn            3.832627e-02
+## wdi_mortu5            5.844230e-07
+## wdi_oilrent           3.047363e-02
 ## wdi_pop               .           
-## wdi_pop14            -9.186259e-03
-## wdi_pop1564           8.286508e-02
-## wdi_pop65            -1.034446e-01
-## wdi_popden            9.399361e-05
-## wdi_popf              1.078130e-01
-## wdi_poprul            1.385905e-02
-## wdi_poprulgr         -7.678467e-03
-## wdi_popurbagr        -1.531716e-01
+## wdi_pop14            -7.895719e-02
+## wdi_pop1564           9.824204e-02
+## wdi_pop65            -1.526973e-01
+## wdi_popden            1.517555e-04
+## wdi_popf              1.709450e-01
+## wdi_poprul            1.470778e-02
+## wdi_poprulgr         -5.620704e-03
+## wdi_popurbagr        -1.264933e-01
 ## wdi_refasy            .           
 ## wdi_refori            .           
 ## wdi_sva2010           .           
-## wdi_svapg             4.469830e-01
-## wdi_svapgdp          -1.293960e-02
-## wdi_tele              7.074912e-03
-## wdi_trade             7.049475e-03
-## wdi_tradeserv         3.993211e-04
-## wdi_wombuslawi        9.127360e-03
+## wdi_svapg             3.266980e-01
+## wdi_svapgdp          -4.406059e-02
+## wdi_tele              .           
+## wdi_trade            -7.087592e-03
+## wdi_tradeserv         9.052865e-03
+## wdi_wombuslawi        5.288284e-03
 ```
 ---
 
-```r
+``` r
 coef(demgrow.adaptivelasso.part2, 100)
 ```
 
 ```
 ## 59 x 1 sparse Matrix of class "dgCMatrix"
 ##                                 s1
-## (Intercept)          -1.279139e+01
-## wdi_agedr             1.426839e-02
-## wdi_araland           6.175575e-03
+## (Intercept)          -7.8852698479
+## wdi_agedr             0.0380252922
+## wdi_araland           0.0010582689
 ## wdi_area              .           
-## wdi_birth            -4.687363e-02
-## wdi_co2              -4.746908e-02
-## wdi_death             1.675470e-01
-## wdi_enerenew          6.204202e-03
-## wdi_expmil           -3.849392e-03
-## wdi_export            1.341476e-05
-## wdi_fdiin             2.587054e-03
-## wdi_fdiout           -5.932682e-03
-## wdi_fertility         2.652646e-03
-## wdi_forest            5.201204e-03
-## wdi_gdpagr           -2.796714e-02
+## wdi_birth            -0.1008766799
+## wdi_co2              -0.0471022393
+## wdi_death             0.0939185445
+## wdi_enerenew          0.0079707443
+## wdi_expmil            0.0126511418
+## wdi_export            0.0074040488
+## wdi_fdiin             0.0018750691
+## wdi_fdiout            0.0090568283
+## wdi_fertility         0.2303643697
+## wdi_forest            0.0045958984
+## wdi_gdpagr           -0.0356760398
 ## wdi_gdpcapcon2010     .           
 ## wdi_gdpcapcur         .           
 ## wdi_gdpcappppcon2017  .           
 ## wdi_gdpcappppcur      .           
-## wdi_gdpind            .           
+## wdi_gdpind           -0.0151387720
 ## wdi_gdppppcon2017     .           
 ## wdi_gdppppcur         .           
-## wdi_gerp              2.762326e-02
-## wdi_gerpf            -2.410414e-02
-## wdi_gerpm            -1.367547e-03
+## wdi_gerp              0.0211437388
+## wdi_gerpf            -0.0112513401
+## wdi_gerpm            -0.0080292673
 ## wdi_gnicapatlcur      .           
 ## wdi_gnicur            .           
-## wdi_import           -7.432283e-03
-## wdi_inflation        -4.372517e-04
-## wdi_internet         -8.748750e-03
-## wdi_lfpilo15         -1.129933e-02
-## wdi_lifexp            5.299797e-02
+## wdi_import           -0.0021360434
+## wdi_inflation        -0.0009520943
+## wdi_internet         -0.0118452781
+## wdi_lfpilo15         -0.0060847740
+## wdi_lifexp           -0.0757632329
 ## wdi_lifexpf           .           
-## wdi_lifexpm          -8.043970e-05
-## wdi_mobile           -1.698905e-03
-## wdi_mortf             .           
-## wdi_mortinf           .           
-## wdi_mortm            -1.179427e-03
-## wdi_mortnn            2.030371e-02
-## wdi_mortu5           -7.918641e-03
-## wdi_oilrent           2.447809e-02
+## wdi_lifexpm           0.0786970197
+## wdi_mobile           -0.0008612862
+## wdi_mortf            -0.0020418501
+## wdi_mortinf          -0.0300044604
+## wdi_mortm            -0.0005842015
+## wdi_mortnn            0.0380866007
+## wdi_mortu5            .           
+## wdi_oilrent           0.0279754542
 ## wdi_pop               .           
-## wdi_pop14             .           
-## wdi_pop1564           6.327569e-02
-## wdi_pop65            -9.450062e-02
-## wdi_popden            7.588841e-05
-## wdi_popf              1.061563e-01
-## wdi_poprul            1.390226e-02
-## wdi_poprulgr         -7.920976e-03
-## wdi_popurbagr        -1.531167e-01
+## wdi_pop14            -0.0616318556
+## wdi_pop1564           0.0686836984
+## wdi_pop65            -0.1423627426
+## wdi_popden            0.0001091097
+## wdi_popf              0.1753770788
+## wdi_poprul            0.0147829331
+## wdi_poprulgr         -0.0056146201
+## wdi_popurbagr        -0.1294318655
 ## wdi_refasy            .           
 ## wdi_refori            .           
 ## wdi_sva2010           .           
-## wdi_svapg             4.472446e-01
-## wdi_svapgdp          -1.255730e-02
-## wdi_tele              5.904178e-03
-## wdi_trade             6.155419e-03
-## wdi_tradeserv         .           
-## wdi_wombuslawi        8.101740e-03
+## wdi_svapg             0.3265806570
+## wdi_svapgdp          -0.0435683960
+## wdi_tele              .           
+## wdi_trade            -0.0032744835
+## wdi_tradeserv         0.0080185486
+## wdi_wombuslawi        0.0036530968
 ```
 
 ---
 
-```r
+``` r
 qogimpcomplete &lt;- qogimputed1[,colSums(is.na(qogimputed1))&lt;1]
 
 demgrow.adaptivelasso.part1 &lt;- lm(wdi_gdpcapgr ~ . - year - cname - cname_qog - cname_year - wdi_gdpgr - wdi_popgr, data=qogimpcomplete)
@@ -1062,348 +1088,348 @@ demgrow.adaptivelasso.part2 &lt;- glmnet(y=qogimputed1$wdi_gdpcapgr, x=xmat, pen
 
 ---
 
-```r
+``` r
 coef(demgrow.adaptivelasso.part2, 1)
 ```
 
 ```
 ## 59 x 1 sparse Matrix of class "dgCMatrix"
-##                                 s1
-## (Intercept)          -10.765557425
-## wdi_agedr              .          
-## wdi_araland            .          
-## wdi_area               .          
-## wdi_birth             -0.042737700
-## wdi_co2               -0.054995257
-## wdi_death              0.132601598
-## wdi_enerenew           .          
-## wdi_expmil             .          
-## wdi_export             .          
-## wdi_fdiin              .          
-## wdi_fdiout             .          
-## wdi_fertility         -0.043744637
-## wdi_forest             .          
-## wdi_gdpagr            -0.005809416
-## wdi_gdpcapcon2010      .          
-## wdi_gdpcapcur          .          
-## wdi_gdpcappppcon2017   .          
-## wdi_gdpcappppcur       .          
-## wdi_gdpind             .          
-## wdi_gdppppcon2017      .          
-## wdi_gdppppcur          .          
-## wdi_gerp               0.027814003
-## wdi_gerpf             -0.023509352
-## wdi_gerpm              .          
-## wdi_gnicapatlcur       .          
-## wdi_gnicur             .          
-## wdi_import             .          
-## wdi_inflation          .          
-## wdi_internet           .          
-## wdi_lfpilo15           .          
-## wdi_lifexp             0.052248098
-## wdi_lifexpf            .          
-## wdi_lifexpm            .          
-## wdi_mobile             .          
-## wdi_mortf              .          
-## wdi_mortinf            .          
-## wdi_mortm              .          
-## wdi_mortnn             .          
-## wdi_mortu5             .          
-## wdi_oilrent            0.019640978
-## wdi_pop                .          
-## wdi_pop14              .          
-## wdi_pop1564            0.017945854
-## wdi_pop65             -0.089313486
-## wdi_popden             .          
-## wdi_popf               0.136488009
-## wdi_poprul             .          
-## wdi_poprulgr           .          
-## wdi_popurbagr         -0.162989397
-## wdi_refasy             .          
-## wdi_refori             .          
-## wdi_sva2010            .          
-## wdi_svapg              0.454624943
-## wdi_svapgdp            .          
-## wdi_tele               .          
-## wdi_trade              0.000759602
-## wdi_tradeserv          .          
-## wdi_wombuslawi         .
+##                                s1
+## (Intercept)          -8.268600355
+## wdi_agedr             .          
+## wdi_araland           .          
+## wdi_area              .          
+## wdi_birth            -0.100726910
+## wdi_co2              -0.030405643
+## wdi_death             0.054934931
+## wdi_enerenew          .          
+## wdi_expmil            .          
+## wdi_export            .          
+## wdi_fdiin             .          
+## wdi_fdiout            .          
+## wdi_fertility         0.213900619
+## wdi_forest            .          
+## wdi_gdpagr           -0.002673310
+## wdi_gdpcapcon2010     .          
+## wdi_gdpcapcur         .          
+## wdi_gdpcappppcon2017  .          
+## wdi_gdpcappppcur      .          
+## wdi_gdpind            .          
+## wdi_gdppppcon2017     .          
+## wdi_gdppppcur         .          
+## wdi_gerp              0.002086477
+## wdi_gerpf             .          
+## wdi_gerpm             .          
+## wdi_gnicapatlcur      .          
+## wdi_gnicur            .          
+## wdi_import            .          
+## wdi_inflation         .          
+## wdi_internet          .          
+## wdi_lfpilo15          .          
+## wdi_lifexp           -0.029147464
+## wdi_lifexpf           .          
+## wdi_lifexpm           0.061713464
+## wdi_mobile            .          
+## wdi_mortf             .          
+## wdi_mortinf          -0.001893674
+## wdi_mortm             .          
+## wdi_mortnn            .          
+## wdi_mortu5            .          
+## wdi_oilrent           0.008902340
+## wdi_pop               .          
+## wdi_pop14            -0.001117606
+## wdi_pop1564           0.005267741
+## wdi_pop65            -0.101444663
+## wdi_popden            .          
+## wdi_popf              0.195803214
+## wdi_poprul            .          
+## wdi_poprulgr          .          
+## wdi_popurbagr        -0.132569663
+## wdi_refasy            .          
+## wdi_refori            .          
+## wdi_sva2010           .          
+## wdi_svapg             0.332691655
+## wdi_svapgdp          -0.022511383
+## wdi_tele              .          
+## wdi_trade             .          
+## wdi_tradeserv         .          
+## wdi_wombuslawi        .
 ```
 ---
 
-```r
+``` r
 coef(demgrow.adaptivelasso.part2, 2)
 ```
 
 ```
 ## 59 x 1 sparse Matrix of class "dgCMatrix"
-##                                 s1
-## (Intercept)          -10.765557425
-## wdi_agedr              .          
-## wdi_araland            .          
-## wdi_area               .          
-## wdi_birth             -0.042737700
-## wdi_co2               -0.054995257
-## wdi_death              0.132601598
-## wdi_enerenew           .          
-## wdi_expmil             .          
-## wdi_export             .          
-## wdi_fdiin              .          
-## wdi_fdiout             .          
-## wdi_fertility         -0.043744637
-## wdi_forest             .          
-## wdi_gdpagr            -0.005809416
-## wdi_gdpcapcon2010      .          
-## wdi_gdpcapcur          .          
-## wdi_gdpcappppcon2017   .          
-## wdi_gdpcappppcur       .          
-## wdi_gdpind             .          
-## wdi_gdppppcon2017      .          
-## wdi_gdppppcur          .          
-## wdi_gerp               0.027814003
-## wdi_gerpf             -0.023509352
-## wdi_gerpm              .          
-## wdi_gnicapatlcur       .          
-## wdi_gnicur             .          
-## wdi_import             .          
-## wdi_inflation          .          
-## wdi_internet           .          
-## wdi_lfpilo15           .          
-## wdi_lifexp             0.052248098
-## wdi_lifexpf            .          
-## wdi_lifexpm            .          
-## wdi_mobile             .          
-## wdi_mortf              .          
-## wdi_mortinf            .          
-## wdi_mortm              .          
-## wdi_mortnn             .          
-## wdi_mortu5             .          
-## wdi_oilrent            0.019640978
-## wdi_pop                .          
-## wdi_pop14              .          
-## wdi_pop1564            0.017945854
-## wdi_pop65             -0.089313486
-## wdi_popden             .          
-## wdi_popf               0.136488009
-## wdi_poprul             .          
-## wdi_poprulgr           .          
-## wdi_popurbagr         -0.162989397
-## wdi_refasy             .          
-## wdi_refori             .          
-## wdi_sva2010            .          
-## wdi_svapg              0.454624943
-## wdi_svapgdp            .          
-## wdi_tele               .          
-## wdi_trade              0.000759602
-## wdi_tradeserv          .          
-## wdi_wombuslawi         .
+##                                s1
+## (Intercept)          -8.268600355
+## wdi_agedr             .          
+## wdi_araland           .          
+## wdi_area              .          
+## wdi_birth            -0.100726910
+## wdi_co2              -0.030405643
+## wdi_death             0.054934931
+## wdi_enerenew          .          
+## wdi_expmil            .          
+## wdi_export            .          
+## wdi_fdiin             .          
+## wdi_fdiout            .          
+## wdi_fertility         0.213900619
+## wdi_forest            .          
+## wdi_gdpagr           -0.002673310
+## wdi_gdpcapcon2010     .          
+## wdi_gdpcapcur         .          
+## wdi_gdpcappppcon2017  .          
+## wdi_gdpcappppcur      .          
+## wdi_gdpind            .          
+## wdi_gdppppcon2017     .          
+## wdi_gdppppcur         .          
+## wdi_gerp              0.002086477
+## wdi_gerpf             .          
+## wdi_gerpm             .          
+## wdi_gnicapatlcur      .          
+## wdi_gnicur            .          
+## wdi_import            .          
+## wdi_inflation         .          
+## wdi_internet          .          
+## wdi_lfpilo15          .          
+## wdi_lifexp           -0.029147464
+## wdi_lifexpf           .          
+## wdi_lifexpm           0.061713464
+## wdi_mobile            .          
+## wdi_mortf             .          
+## wdi_mortinf          -0.001893674
+## wdi_mortm             .          
+## wdi_mortnn            .          
+## wdi_mortu5            .          
+## wdi_oilrent           0.008902340
+## wdi_pop               .          
+## wdi_pop14            -0.001117606
+## wdi_pop1564           0.005267741
+## wdi_pop65            -0.101444663
+## wdi_popden            .          
+## wdi_popf              0.195803214
+## wdi_poprul            .          
+## wdi_poprulgr          .          
+## wdi_popurbagr        -0.132569663
+## wdi_refasy            .          
+## wdi_refori            .          
+## wdi_sva2010           .          
+## wdi_svapg             0.332691655
+## wdi_svapgdp          -0.022511383
+## wdi_tele              .          
+## wdi_trade             .          
+## wdi_tradeserv         .          
+## wdi_wombuslawi        .
 ```
 ---
 
-```r
+``` r
 coef(demgrow.adaptivelasso.part2, 5)
 ```
 
 ```
 ## 59 x 1 sparse Matrix of class "dgCMatrix"
-##                                 s1
-## (Intercept)          -10.765557425
-## wdi_agedr              .          
-## wdi_araland            .          
-## wdi_area               .          
-## wdi_birth             -0.042737700
-## wdi_co2               -0.054995257
-## wdi_death              0.132601598
-## wdi_enerenew           .          
-## wdi_expmil             .          
-## wdi_export             .          
-## wdi_fdiin              .          
-## wdi_fdiout             .          
-## wdi_fertility         -0.043744637
-## wdi_forest             .          
-## wdi_gdpagr            -0.005809416
-## wdi_gdpcapcon2010      .          
-## wdi_gdpcapcur          .          
-## wdi_gdpcappppcon2017   .          
-## wdi_gdpcappppcur       .          
-## wdi_gdpind             .          
-## wdi_gdppppcon2017      .          
-## wdi_gdppppcur          .          
-## wdi_gerp               0.027814003
-## wdi_gerpf             -0.023509352
-## wdi_gerpm              .          
-## wdi_gnicapatlcur       .          
-## wdi_gnicur             .          
-## wdi_import             .          
-## wdi_inflation          .          
-## wdi_internet           .          
-## wdi_lfpilo15           .          
-## wdi_lifexp             0.052248098
-## wdi_lifexpf            .          
-## wdi_lifexpm            .          
-## wdi_mobile             .          
-## wdi_mortf              .          
-## wdi_mortinf            .          
-## wdi_mortm              .          
-## wdi_mortnn             .          
-## wdi_mortu5             .          
-## wdi_oilrent            0.019640978
-## wdi_pop                .          
-## wdi_pop14              .          
-## wdi_pop1564            0.017945854
-## wdi_pop65             -0.089313486
-## wdi_popden             .          
-## wdi_popf               0.136488009
-## wdi_poprul             .          
-## wdi_poprulgr           .          
-## wdi_popurbagr         -0.162989397
-## wdi_refasy             .          
-## wdi_refori             .          
-## wdi_sva2010            .          
-## wdi_svapg              0.454624943
-## wdi_svapgdp            .          
-## wdi_tele               .          
-## wdi_trade              0.000759602
-## wdi_tradeserv          .          
-## wdi_wombuslawi         .
+##                                s1
+## (Intercept)          -8.268600355
+## wdi_agedr             .          
+## wdi_araland           .          
+## wdi_area              .          
+## wdi_birth            -0.100726910
+## wdi_co2              -0.030405643
+## wdi_death             0.054934931
+## wdi_enerenew          .          
+## wdi_expmil            .          
+## wdi_export            .          
+## wdi_fdiin             .          
+## wdi_fdiout            .          
+## wdi_fertility         0.213900619
+## wdi_forest            .          
+## wdi_gdpagr           -0.002673310
+## wdi_gdpcapcon2010     .          
+## wdi_gdpcapcur         .          
+## wdi_gdpcappppcon2017  .          
+## wdi_gdpcappppcur      .          
+## wdi_gdpind            .          
+## wdi_gdppppcon2017     .          
+## wdi_gdppppcur         .          
+## wdi_gerp              0.002086477
+## wdi_gerpf             .          
+## wdi_gerpm             .          
+## wdi_gnicapatlcur      .          
+## wdi_gnicur            .          
+## wdi_import            .          
+## wdi_inflation         .          
+## wdi_internet          .          
+## wdi_lfpilo15          .          
+## wdi_lifexp           -0.029147464
+## wdi_lifexpf           .          
+## wdi_lifexpm           0.061713464
+## wdi_mobile            .          
+## wdi_mortf             .          
+## wdi_mortinf          -0.001893674
+## wdi_mortm             .          
+## wdi_mortnn            .          
+## wdi_mortu5            .          
+## wdi_oilrent           0.008902340
+## wdi_pop               .          
+## wdi_pop14            -0.001117606
+## wdi_pop1564           0.005267741
+## wdi_pop65            -0.101444663
+## wdi_popden            .          
+## wdi_popf              0.195803214
+## wdi_poprul            .          
+## wdi_poprulgr          .          
+## wdi_popurbagr        -0.132569663
+## wdi_refasy            .          
+## wdi_refori            .          
+## wdi_sva2010           .          
+## wdi_svapg             0.332691655
+## wdi_svapgdp          -0.022511383
+## wdi_tele              .          
+## wdi_trade             .          
+## wdi_tradeserv         .          
+## wdi_wombuslawi        .
 ```
 ---
 
-```r
+``` r
 coef(demgrow.adaptivelasso.part2, 20)
 ```
 
 ```
 ## 59 x 1 sparse Matrix of class "dgCMatrix"
-##                                 s1
-## (Intercept)          -10.765557425
-## wdi_agedr              .          
-## wdi_araland            .          
-## wdi_area               .          
-## wdi_birth             -0.042737700
-## wdi_co2               -0.054995257
-## wdi_death              0.132601598
-## wdi_enerenew           .          
-## wdi_expmil             .          
-## wdi_export             .          
-## wdi_fdiin              .          
-## wdi_fdiout             .          
-## wdi_fertility         -0.043744637
-## wdi_forest             .          
-## wdi_gdpagr            -0.005809416
-## wdi_gdpcapcon2010      .          
-## wdi_gdpcapcur          .          
-## wdi_gdpcappppcon2017   .          
-## wdi_gdpcappppcur       .          
-## wdi_gdpind             .          
-## wdi_gdppppcon2017      .          
-## wdi_gdppppcur          .          
-## wdi_gerp               0.027814003
-## wdi_gerpf             -0.023509352
-## wdi_gerpm              .          
-## wdi_gnicapatlcur       .          
-## wdi_gnicur             .          
-## wdi_import             .          
-## wdi_inflation          .          
-## wdi_internet           .          
-## wdi_lfpilo15           .          
-## wdi_lifexp             0.052248098
-## wdi_lifexpf            .          
-## wdi_lifexpm            .          
-## wdi_mobile             .          
-## wdi_mortf              .          
-## wdi_mortinf            .          
-## wdi_mortm              .          
-## wdi_mortnn             .          
-## wdi_mortu5             .          
-## wdi_oilrent            0.019640978
-## wdi_pop                .          
-## wdi_pop14              .          
-## wdi_pop1564            0.017945854
-## wdi_pop65             -0.089313486
-## wdi_popden             .          
-## wdi_popf               0.136488009
-## wdi_poprul             .          
-## wdi_poprulgr           .          
-## wdi_popurbagr         -0.162989397
-## wdi_refasy             .          
-## wdi_refori             .          
-## wdi_sva2010            .          
-## wdi_svapg              0.454624943
-## wdi_svapgdp            .          
-## wdi_tele               .          
-## wdi_trade              0.000759602
-## wdi_tradeserv          .          
-## wdi_wombuslawi         .
+##                                s1
+## (Intercept)          -8.268600355
+## wdi_agedr             .          
+## wdi_araland           .          
+## wdi_area              .          
+## wdi_birth            -0.100726910
+## wdi_co2              -0.030405643
+## wdi_death             0.054934931
+## wdi_enerenew          .          
+## wdi_expmil            .          
+## wdi_export            .          
+## wdi_fdiin             .          
+## wdi_fdiout            .          
+## wdi_fertility         0.213900619
+## wdi_forest            .          
+## wdi_gdpagr           -0.002673310
+## wdi_gdpcapcon2010     .          
+## wdi_gdpcapcur         .          
+## wdi_gdpcappppcon2017  .          
+## wdi_gdpcappppcur      .          
+## wdi_gdpind            .          
+## wdi_gdppppcon2017     .          
+## wdi_gdppppcur         .          
+## wdi_gerp              0.002086477
+## wdi_gerpf             .          
+## wdi_gerpm             .          
+## wdi_gnicapatlcur      .          
+## wdi_gnicur            .          
+## wdi_import            .          
+## wdi_inflation         .          
+## wdi_internet          .          
+## wdi_lfpilo15          .          
+## wdi_lifexp           -0.029147464
+## wdi_lifexpf           .          
+## wdi_lifexpm           0.061713464
+## wdi_mobile            .          
+## wdi_mortf             .          
+## wdi_mortinf          -0.001893674
+## wdi_mortm             .          
+## wdi_mortnn            .          
+## wdi_mortu5            .          
+## wdi_oilrent           0.008902340
+## wdi_pop               .          
+## wdi_pop14            -0.001117606
+## wdi_pop1564           0.005267741
+## wdi_pop65            -0.101444663
+## wdi_popden            .          
+## wdi_popf              0.195803214
+## wdi_poprul            .          
+## wdi_poprulgr          .          
+## wdi_popurbagr        -0.132569663
+## wdi_refasy            .          
+## wdi_refori            .          
+## wdi_sva2010           .          
+## wdi_svapg             0.332691655
+## wdi_svapgdp          -0.022511383
+## wdi_tele              .          
+## wdi_trade             .          
+## wdi_tradeserv         .          
+## wdi_wombuslawi        .
 ```
 ---
 
-```r
+``` r
 coef(demgrow.adaptivelasso.part2, 100)
 ```
 
 ```
 ## 59 x 1 sparse Matrix of class "dgCMatrix"
-##                                 s1
-## (Intercept)          -10.765557425
-## wdi_agedr              .          
-## wdi_araland            .          
-## wdi_area               .          
-## wdi_birth             -0.042737700
-## wdi_co2               -0.054995257
-## wdi_death              0.132601598
-## wdi_enerenew           .          
-## wdi_expmil             .          
-## wdi_export             .          
-## wdi_fdiin              .          
-## wdi_fdiout             .          
-## wdi_fertility         -0.043744637
-## wdi_forest             .          
-## wdi_gdpagr            -0.005809416
-## wdi_gdpcapcon2010      .          
-## wdi_gdpcapcur          .          
-## wdi_gdpcappppcon2017   .          
-## wdi_gdpcappppcur       .          
-## wdi_gdpind             .          
-## wdi_gdppppcon2017      .          
-## wdi_gdppppcur          .          
-## wdi_gerp               0.027814003
-## wdi_gerpf             -0.023509352
-## wdi_gerpm              .          
-## wdi_gnicapatlcur       .          
-## wdi_gnicur             .          
-## wdi_import             .          
-## wdi_inflation          .          
-## wdi_internet           .          
-## wdi_lfpilo15           .          
-## wdi_lifexp             0.052248098
-## wdi_lifexpf            .          
-## wdi_lifexpm            .          
-## wdi_mobile             .          
-## wdi_mortf              .          
-## wdi_mortinf            .          
-## wdi_mortm              .          
-## wdi_mortnn             .          
-## wdi_mortu5             .          
-## wdi_oilrent            0.019640978
-## wdi_pop                .          
-## wdi_pop14              .          
-## wdi_pop1564            0.017945854
-## wdi_pop65             -0.089313486
-## wdi_popden             .          
-## wdi_popf               0.136488009
-## wdi_poprul             .          
-## wdi_poprulgr           .          
-## wdi_popurbagr         -0.162989397
-## wdi_refasy             .          
-## wdi_refori             .          
-## wdi_sva2010            .          
-## wdi_svapg              0.454624943
-## wdi_svapgdp            .          
-## wdi_tele               .          
-## wdi_trade              0.000759602
-## wdi_tradeserv          .          
-## wdi_wombuslawi         .
+##                                s1
+## (Intercept)          -8.268600355
+## wdi_agedr             .          
+## wdi_araland           .          
+## wdi_area              .          
+## wdi_birth            -0.100726910
+## wdi_co2              -0.030405643
+## wdi_death             0.054934931
+## wdi_enerenew          .          
+## wdi_expmil            .          
+## wdi_export            .          
+## wdi_fdiin             .          
+## wdi_fdiout            .          
+## wdi_fertility         0.213900619
+## wdi_forest            .          
+## wdi_gdpagr           -0.002673310
+## wdi_gdpcapcon2010     .          
+## wdi_gdpcapcur         .          
+## wdi_gdpcappppcon2017  .          
+## wdi_gdpcappppcur      .          
+## wdi_gdpind            .          
+## wdi_gdppppcon2017     .          
+## wdi_gdppppcur         .          
+## wdi_gerp              0.002086477
+## wdi_gerpf             .          
+## wdi_gerpm             .          
+## wdi_gnicapatlcur      .          
+## wdi_gnicur            .          
+## wdi_import            .          
+## wdi_inflation         .          
+## wdi_internet          .          
+## wdi_lfpilo15          .          
+## wdi_lifexp           -0.029147464
+## wdi_lifexpf           .          
+## wdi_lifexpm           0.061713464
+## wdi_mobile            .          
+## wdi_mortf             .          
+## wdi_mortinf          -0.001893674
+## wdi_mortm             .          
+## wdi_mortnn            .          
+## wdi_mortu5            .          
+## wdi_oilrent           0.008902340
+## wdi_pop               .          
+## wdi_pop14            -0.001117606
+## wdi_pop1564           0.005267741
+## wdi_pop65            -0.101444663
+## wdi_popden            .          
+## wdi_popf              0.195803214
+## wdi_poprul            .          
+## wdi_poprulgr          .          
+## wdi_popurbagr        -0.132569663
+## wdi_refasy            .          
+## wdi_refori            .          
+## wdi_sva2010           .          
+## wdi_svapg             0.332691655
+## wdi_svapgdp          -0.022511383
+## wdi_tele              .          
+## wdi_trade             .          
+## wdi_tradeserv         .          
+## wdi_wombuslawi        .
 ```
 
 ---

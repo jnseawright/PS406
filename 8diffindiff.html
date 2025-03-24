@@ -4,7 +4,8 @@
     <title>8: Difference-in-Differences Designs</title>
     <meta charset="utf-8" />
     <meta name="author" content="J. Seawright" />
-    <script src="8diffindiff_files/header-attrs-2.26/header-attrs.js"></script>
+    <meta name="date" content="2025-05-22" />
+    <script src="8diffindiff_files/header-attrs-2.29/header-attrs.js"></script>
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
   </head>
   <body>
@@ -24,7 +25,7 @@ class: center, middle, inverse, title-slide
 ### <small>Northwestern Political Science</small>
 ]
 .date[
-### May 13 and 15, 2024
+### May 22, 2025
 ]
 
 ---
@@ -95,15 +96,26 @@ Starting simple, if we think *all* the confounding variables are constant either
 
 ---
 
-```r
+``` r
 library(causaldata)
+```
+
+```
+## Warning: package 'causaldata' was built under R version 4.4.3
+```
+
+``` r
 od &lt;- causaldata::organ_donations
 library(fixest)
 ```
 
+```
+## Warning: package 'fixest' was built under R version 4.4.3
+```
+
 ---
 
-```r
+``` r
 # Treatment variable
 od &lt;- od %&gt;%
     mutate(Treated = State == 'California' &amp; 
@@ -115,7 +127,7 @@ clfe &lt;- feols(Rate ~ Treated | State + Quarter,
 
 ---
 
-```r
+``` r
 summary(clfe)
 ```
 
@@ -150,7 +162,7 @@ One useful test is to statistically test whether the treatment and control group
 
 ---
 
-```r
+``` r
 od$calind &lt;- 1*(od$State=='California')
 odparalleltrends.lm &lt;- lm(Rate~Quarter_Num+Quarter_Num:calind, data=od[od$Quarter_Num&lt;4,])
 summary(odparalleltrends.lm)
@@ -181,25 +193,17 @@ summary(odparalleltrends.lm)
 
 ---
 
-```r
+``` r
 library(interactions)
 ```
 
 ```
-## 
-## Attaching package: 'interactions'
-```
-
-```
-## The following objects are masked from 'package:jtools':
-## 
-##     cat_plot, interact_plot, johnson_neyman, probe_interaction,
-##     sim_slopes
+## Warning: package 'interactions' was built under R version 4.4.3
 ```
 
 ---
 
-```r
+``` r
 interact_plot(odparalleltrends.lm, pred="Quarter_Num", modx="calind", interval=TRUE)
 ```
 
@@ -281,8 +285,12 @@ Matrix completion: conceptually similar to factor analysis; somewhat different p
 
 ---
 
-```r
+``` r
 library(fect)
+```
+
+```
+## Warning: package 'fect' was built under R version 4.4.3
 ```
 
 ```
@@ -293,10 +301,15 @@ library(fect)
 
 ---
 
-```r
-od$numerictreat &lt;- 1*od$Treated
-calfect &lt;- fect(Rate ~ numerictreat, index = c("State", "Quarter_Num"), force = "two-way",
-               data = od, se=1)
+``` r
+vdemeu &lt;- read.csv("data/vdemeu.csv")
+vdemeu &lt;- vdemeu[vdemeu$year&lt;2013,]
+eufect &lt;- fect(v2x_libdem ~ accession, index = c("country_name", "year"), force = "two-way",
+               data = vdemeu, method="fe",min.T0=1, se=1)
+```
+
+```
+## For identification purposes, units whose number of untreated periods &lt;1 are dropped automatically.
 ```
 
 ```
@@ -308,65 +321,88 @@ calfect &lt;- fect(Rate ~ numerictreat, index = c("State", "Quarter_Num"), force
 ```
 
 ```
-## 61 runs
+## 76 runs
 ```
 
 ```
-## Cannot use full pre-treatment periods in the F test. The first period is removed.
-```
-
-```r
-calfect
-```
-
-```
-## Call:
-## fect.formula(formula = Rate ~ numerictreat, data = od, index = c("State", 
-##     "Quarter_Num"), force = "two-way", se = 1)
 ## 
-## ATT:
-##                                ATT     S.E. CI.lower CI.upper   p.value
-## Tr obs equally weighted   -0.02246 0.005593 -0.03342  -0.0115 5.933e-05
-## Tr units equally weighted -0.02246 0.005593 -0.03342  -0.0115 5.933e-05
+```
+
+```
+## The estimated covariance matrix is irreversible.
+```
+
+```
+## 
+```
+
+``` r
+euife &lt;- fect(v2x_libdem ~ accession, index = c("country_name", "year"), force = "two-way",
+               data = vdemeu, method="ife",min.T0=1, se=1)
+```
+
+```
+## For identification purposes, units whose number of untreated periods &lt;1 are dropped automatically.
+```
+
+```
+## Parallel computing ...
+```
+
+```
+## Bootstrapping for uncertainties ...
+```
+
+```
+## 66 runs
+```
+
+```
+## 
+```
+
+```
+## The estimated covariance matrix is irreversible.
+```
+
+```
+## 
 ```
 
 ---
 
-```r
-calife &lt;- fect(Rate ~ numerictreat, index = c("State", "Quarter_Num"), force = "two-way",
-               data = od, method="ife",min.T0=1, se=1)
-```
-
-```
-## Parallel computing ...
-```
-
-```
-## Bootstrapping for uncertainties ...
-```
-
-```
-## 70 runs
-```
-
-```
-## Cannot use full pre-treatment periods in the F test. The first period is removed.
-```
-
-```r
-calife
+``` r
+eufect
 ```
 
 ```
 ## Call:
-## fect.formula(formula = Rate ~ numerictreat, data = od, index = c("State", 
-##     "Quarter_Num"), force = "two-way", method = "ife", se = 1, 
-##     min.T0 = 1)
+## fect.formula(formula = v2x_libdem ~ accession, data = vdemeu, 
+##     index = c("country_name", "year"), force = "two-way", method = "fe", 
+##     se = 1, min.T0 = 1)
 ## 
 ## ATT:
-##                                ATT     S.E. CI.lower CI.upper   p.value
-## Tr obs equally weighted   -0.02246 0.006113 -0.03444 -0.01048 0.0002386
-## Tr units equally weighted -0.02246 0.006113 -0.03444 -0.01048 0.0002386
+##                               ATT    S.E. CI.lower CI.upper   p.value
+## Tr obs equally weighted   -0.2067 0.06695  -0.3379 -0.07549 2.018e-03
+## Tr units equally weighted -0.2188 0.05398  -0.3246 -0.11300 5.044e-05
+```
+
+---
+
+``` r
+euife
+```
+
+```
+## Call:
+## fect.formula(formula = v2x_libdem ~ accession, data = vdemeu, 
+##     index = c("country_name", "year"), force = "two-way", method = "ife", 
+##     se = 1, min.T0 = 1)
+## 
+## ATT:
+##                               ATT    S.E. CI.lower CI.upper   p.value
+## Tr obs equally weighted   -0.2067 0.05658  -0.3176 -0.09583 2.584e-04
+## Tr units equally weighted -0.2188 0.04693  -0.3108 -0.12681 3.131e-06
 ```
 
 ---

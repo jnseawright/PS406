@@ -3,7 +3,7 @@ title: "9: Machine Learning and Causal Inference"
 subtitle: "Quantitative Causal Inference"
 author: "<large>J. Seawright</large>"
 institute: "<small>Northwestern Political Science</small>" 
-date: "May 20 and 22, 2024"
+date: "May 29, 2025"
 output: 
   xaringan::moon_reader:
     css: xaringan-themer.css
@@ -138,7 +138,7 @@ library(rpart)
 ```
 
 ---
-```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
+```{r, echo = TRUE, out.width="70%", fig.retina = 1, fig.align='center'}
 dem.cart <- rpart(vdem_libdem ~ vdem_gender + vdem_corr + wdi_gdpcapcon2010 + wdi_mobile + wdi_gerp + une_surlgpef + wdi_fertility, data=qog_std_ts_jan22, na.action=na.omit)
 
 plot(dem.cart)
@@ -174,19 +174,19 @@ library(randomForestExplainer)
 ```
 
 ---
-```{r, echo = TRUE, out.width="70%", fig.retina = 1, fig.align='center'}
+```{r, echo = TRUE, out.width="50%", fig.retina = 1, fig.align='center'}
 dem.mindepth <- min_depth_distribution(dem.rf)
 plot_min_depth_distribution(dem.mindepth)
 ```
 
 ---
-```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
+```{r, echo = TRUE, out.width="70%", fig.retina = 1, fig.align='center'}
 plot_min_depth_interactions(dem.rf)
 ```
 
----
 ```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
-plot_min_depth_interactions(dem.rf)
+
+include_graphics("images/rfinteraction.png")
 ```
 
 ---
@@ -246,6 +246,11 @@ p
 ```
 
 ---
+```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+include_graphics("images/cfcausalscores.png")
+```
+
+---
 ```{r, echo = TRUE, out.width="50%", fig.retina = 1, fig.align='center'}
 average_treatment_effect(dem.cf, target.sample = "overlap")
 average_treatment_effect(dem.cf, target.sample = "control")
@@ -283,6 +288,11 @@ p3 <- temp.df %>% ggplot(aes(x=pop65, y=demscore)) +
 ---
 ```{r, echo = TRUE, out.width="50%", fig.retina = 1, fig.align='center'}
 p3
+```
+
+---
+```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+include_graphics("images/cfpop65scatterplot.png")
 ```
 
 ---

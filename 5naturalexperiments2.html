@@ -4,7 +4,8 @@
     <title>5: Instrumental Variables and RDD</title>
     <meta charset="utf-8" />
     <meta name="author" content="J. Seawright" />
-    <script src="5naturalexperiments2_files/header-attrs-2.25/header-attrs.js"></script>
+    <meta name="date" content="2025-05-01" />
+    <script src="5naturalexperiments2_files/header-attrs-2.29/header-attrs.js"></script>
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
   </head>
   <body>
@@ -24,7 +25,7 @@ class: center, middle, inverse, title-slide
 ### <small>Northwestern Political Science</small>
 ]
 .date[
-### April 22 and 24, 2024
+### May 1, 2025
 ]
 
 ---
@@ -111,7 +112,7 @@ then `\(\mathbf{z}\)` meets the mathematical definition of an *instrument*.
 
 ---
 
-```r
+``` r
 library(dagitty)
 hypotheticalinstruments.dag &lt;- dagitty( "dag { Polarization -&gt; DemocraticErosion ElitePower -&gt; DemocraticErosion Corruption -&gt; Polarization Corruption -&gt; DemocraticErosion SocialMedia -&gt; Polarization PrimaryElections -&gt; Polarization PrimaryElections -&gt; ElitePower EconomicInequality -&gt; ElitePower EconomicInequality -&gt; Polarization Polarization [exposure]
 DemocraticErosion [outcome]}" )
@@ -119,14 +120,14 @@ DemocraticErosion [outcome]}" )
 
 ---
 
-```r
+``` r
 plot( hypotheticalinstruments.dag )
 ```
 
 &lt;img src="5naturalexperiments2_files/figure-html/unnamed-chunk-3-1.png" width="50%" /&gt;
 ---
 
-```r
+``` r
 instrumentalVariables(hypotheticalinstruments.dag)
 ```
 
@@ -255,14 +256,14 @@ $$
 
 ---
 
-```r
+``` r
 library(haven)
 mss_repdata_1_ &lt;- read_dta("https://github.com/jnseawright/PS406/raw/main/data/mss_repdata%20(1).dta")
 ```
 
 ---
 
-```r
+``` r
 library(ivreg)
 migueliv &lt;- ivreg(any_prio ~ gdp_g + gdp_g_l + y_0 + polity2l + ethfrac + relfrac + Oil + lpopl1 + lmtnest | GPCP_g + GPCP_g_l+ y_0 + polity2l + ethfrac + relfrac + Oil + lpopl1 + lmtnest, data=mss_repdata_1_)
 summary(migueliv)
@@ -309,14 +310,14 @@ summary(migueliv)
 
 ---
 
-```r
+``` r
 library(lmtest)
 library(sandwich)
 ```
 
 ---
 
-```r
+``` r
 coeftest(migueliv, vcov = vcovCL(migueliv, cluster = ~country_name))
 ```
 
@@ -374,7 +375,7 @@ coeftest(migueliv, vcov = vcovCL(migueliv, cluster = ~country_name))
 
 ---
 
-```r
+``` r
 summary(migueliv)
 ```
 
@@ -432,7 +433,7 @@ summary(migueliv)
 
 ---
 
-```r
+``` r
 miguellm2 &lt;- lm(any_prio ~ gdp_g + gdp_g_l +GPCP_g + GPCP_g_l + y_0 + polity2l + ethfrac + relfrac + Oil + lpopl1 + lmtnest + year:country_name, data=mss_repdata_1_)
 
 summary(miguellm2)
@@ -576,14 +577,14 @@ summary(miguellm2)
 
 ---
 
-```r
+``` r
 library(readr)
 peruemotions &lt;- read_csv("https://github.com/jnseawright/PS406/raw/main/data/peruemotions.csv")
 ```
 
 ---
 
-```r
+``` r
 summary(lm(outsidervote~simpletreat, data=peruemotions))
 ```
 
@@ -610,7 +611,7 @@ summary(lm(outsidervote~simpletreat, data=peruemotions))
 
 ---
 
-```r
+``` r
 summary(lm(outsidervote~enojado, data=peruemotions))
 ```
 
@@ -637,7 +638,7 @@ summary(lm(outsidervote~enojado, data=peruemotions))
 
 ---
 
-```r
+``` r
 summary(ivreg(outsidervote~enojado|simpletreat,data=peruemotions))
 ```
 
@@ -670,7 +671,7 @@ summary(ivreg(outsidervote~enojado|simpletreat,data=peruemotions))
 
 ---
 
-```r
+``` r
 summary(lm(outsidervote~enojado+simpletreat, data=peruemotions))
 ```
 
@@ -733,46 +734,47 @@ summary(lm(outsidervote~enojado+simpletreat, data=peruemotions))
 
 ---
 
-```r
+``` r
 peruemotionstrim &lt;- na.omit(data.frame(enojado=peruemotions$enojado, 
        outsidervote=peruemotions$outsidervote, 
        simpletreat=peruemotions$simpletreat, 
        Cuzco=peruemotions$Cuzco,
        age=peruemotions$age))
-
+#packageurl &lt;- "http://cran.r-project.org/src/contrib/Archive/icsw/icsw_1.0.0.tar.gz"
+#install.packages(packageurl, repos=NULL, type="source")
 library(icsw)
 ```
 
 ---
 
-```r
+``` r
 exp.reweight &lt;- with(peruemotionstrim, icsw.tsls(D=enojado, Y=outsidervote, 
        Z=simpletreat, X=cbind(1,Cuzco), W=cbind(Cuzco,age), R=100))
 ```
 
 ---
 
-```r
+``` r
 exp.reweight$coefficients
 ```
 
 ```
 ##                   Cuzco           D 
-##  0.41656667 -0.05675972  1.11601116
+##  0.35982616 -0.09801187  6.14701458
 ```
 
-```r
+``` r
 exp.reweight$coefs.se.boot
 ```
 
 ```
-##                 Cuzco          D 
-##  0.1992271  1.8754453 83.9986929
+##                   Cuzco           D 
+##   0.2133571   1.8464919 105.6180688
 ```
 
 ---
 
-```r
+``` r
 sidelm &lt;- lm(enojado ~ simpletreat+Cuzco+age, data= peruemotionstrim)
 summary(sidelm)
 ```
@@ -814,20 +816,6 @@ summary(sidelm)
 ---
 ### RDD
 
--   Regression-discontinuity designs (Thistlethwaite and Campbell 1960)
-    are a systematic way of finding natural experiments.
-
-    1.  Suppose treatment assignment is based on passing a threshold on
-        a measured, underlying continuous variable.
-
-    2.  Then, cases just above and just below the threshold should be
-        basically identical.
-
-    3.  So comparing borderline cases allows a valid causal inference.
-
----
-### RDD
-
 -   An RDD can be analyzed by comparing simple average scores just above
     and just below the threshold.
 
@@ -847,7 +835,7 @@ summary(sidelm)
 
 ---
 
-```r
+``` r
 #This coding example due to Yuta Toyama.
 demmeans &lt;- split(lmb_data$democrat, cut(lmb_data$lagdemvoteshare, 100)) %&gt;%
   lapply(mean) %&gt;%
@@ -858,7 +846,7 @@ agg_lmb_data &lt;- data.frame(democrat = demmeans, lagdemvoteshare = seq(0.01,1,
 
 ---
 
-```r
+``` r
 lmb_data &lt;- lmb_data %&gt;%
   mutate(gg_group = if_else(lagdemvoteshare &gt; 0.5, 1,0))
 
@@ -874,33 +862,31 @@ gg_srd = ggplot(data=lmb_data, aes(lagdemvoteshare, democrat)) +
 
 ---
 
-```r
+``` r
 gg_srd + stat_smooth(aes(lagdemvoteshare, democrat, group = gg_group),
   method = "lm"
   , formula = y ~ x + I(x^2))
 ```
 
-&lt;img src="5naturalexperiments2_files/figure-html/unnamed-chunk-25-1.png" width="90%" style="display: block; margin: auto;" /&gt;
+&lt;img src="5naturalexperiments2_files/figure-html/unnamed-chunk-25-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
 
 ---
-&lt;img src="5naturalexperiments2_files/figure-html/unnamed-chunk-26-1.png" width="70%" style="display: block; margin: auto;" /&gt;
 
----
-
-```r
+``` r
 gg_srd + stat_smooth(data=lmb_data %&gt;% filter(lagdemvoteshare&gt;.45 &amp; lagdemvoteshare&lt;.55),
   aes(lagdemvoteshare, democrat, group = gg_group),
   method = "lm", formula = y ~ x + I(x^2))
 ```
 
-&lt;img src="5naturalexperiments2_files/figure-html/unnamed-chunk-27-1.png" width="90%" style="display: block; margin: auto;" /&gt;
+&lt;img src="5naturalexperiments2_files/figure-html/unnamed-chunk-26-1.png" width="90%" style="display: block; margin: auto;" /&gt;
 
 ---
-&lt;img src="5naturalexperiments2_files/figure-html/unnamed-chunk-28-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+&lt;img src="5naturalexperiments2_files/figure-html/unnamed-chunk-27-1.png" width="70%" style="display: block; margin: auto;" /&gt;
 
 ---
 
-```r
+``` r
 lmb_subset &lt;- lmb_data %&gt;%
      filter(lagdemvoteshare&gt;.48 &amp; lagdemvoteshare&lt;.52)
 
@@ -950,7 +936,7 @@ summary(lm_1)
 
 ---
 
-```r
+``` r
 lmb_subset &lt;- lmb_data %&gt;%
      filter(lagdemvoteshare&gt;.49 &amp; lagdemvoteshare&lt;.51)
 
@@ -976,7 +962,7 @@ summary(lm_1)
 
 ---
 
-```r
+``` r
 lmb_subset &lt;- lmb_data %&gt;%
      filter(lagdemvoteshare&gt;.495 &amp; lagdemvoteshare&lt;.505)
 
@@ -1023,7 +1009,7 @@ summary(lm_1)
 
 ---
 
-```r
+``` r
 library(rdd)
 rddik &lt;- RDestimate(score ~ lagdemvoteshare, cutpoint=0.5, data=lmb_data)
 summary(rddik)
@@ -1059,7 +1045,7 @@ summary(rddik)
 
 ---
 
-```r
+``` r
 library(rdrobust)
 rdbw2 &lt;- rdbwselect(lmb_data$score, lmb_data$lagdemvoteshare, c=0.5)
 summary(rdbw2)
@@ -1088,7 +1074,7 @@ summary(rdbw2)
 
 ---
 
-```r
+``` r
 lmb_subset &lt;- lmb_data %&gt;%
      filter(lagdemvoteshare&gt;.41 &amp; lagdemvoteshare&lt;.59)
 

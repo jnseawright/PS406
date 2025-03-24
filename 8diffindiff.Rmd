@@ -3,7 +3,7 @@ title: "8: Difference-in-Differences Designs"
 subtitle: "Quantitative Causal Inference"
 author: "<large>J. Seawright</large>"
 institute: "<small>Northwestern Political Science</small>" 
-date: "May 13 and 15, 2024"
+date: "May 22, 2025"
 output: 
   xaringan::moon_reader:
     css: xaringan-themer.css
@@ -271,17 +271,22 @@ library(fect)
 
 ---
 ```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
-od$numerictreat <- 1*od$Treated
-calfect <- fect(Rate ~ numerictreat, index = c("State", "Quarter_Num"), force = "two-way",
-               data = od, se=1)
-calfect
+vdemeu <- read.csv("data/vdemeu.csv")
+vdemeu <- vdemeu[vdemeu$year<2013,]
+eufect <- fect(v2x_libdem ~ accession, index = c("country_name", "year"), force = "two-way",
+               data = vdemeu, method="fe",min.T0=1, se=1)
+euife <- fect(v2x_libdem ~ accession, index = c("country_name", "year"), force = "two-way",
+               data = vdemeu, method="ife",min.T0=1, se=1)
 ```
 
 ---
 ```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
-calife <- fect(Rate ~ numerictreat, index = c("State", "Quarter_Num"), force = "two-way",
-               data = od, method="ife",min.T0=1, se=1)
-calife
+eufect
+```
+
+---
+```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
+euife
 ```
 
 ---

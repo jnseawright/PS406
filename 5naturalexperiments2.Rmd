@@ -3,7 +3,7 @@ title: "5: Instrumental Variables and RDD"
 subtitle: "Quantitative Causal Inference"
 author: "<large>J. Seawright</large>"
 institute: "<small>Northwestern Political Science</small>" 
-date: "April 22 and 24, 2024"
+date: "May 1, 2025"
 output: 
   xaringan::moon_reader:
     css: xaringan-themer.css
@@ -414,7 +414,8 @@ peruemotionstrim <- na.omit(data.frame(enojado=peruemotions$enojado,
        simpletreat=peruemotions$simpletreat, 
        Cuzco=peruemotions$Cuzco,
        age=peruemotions$age))
-
+#packageurl <- "http://cran.r-project.org/src/contrib/Archive/icsw/icsw_1.0.0.tar.gz"
+#install.packages(packageurl, repos=NULL, type="source")
 library(icsw)
 ```
 
@@ -447,20 +448,6 @@ summary(sidelm)
     under some alternative assumptions.
 
 -   If a reviewer demands it of you.
-
----
-### RDD
-
--   Regression-discontinuity designs (Thistlethwaite and Campbell 1960)
-    are a systematic way of finding natural experiments.
-
-    1.  Suppose treatment assignment is based on passing a threshold on
-        a measured, underlying continuous variable.
-
-    2.  Then, cases just above and just below the threshold should be
-        basically identical.
-
-    3.  So comparing borderline cases allows a valid causal inference.
 
 ---
 ### RDD
@@ -521,18 +508,12 @@ gg_srd = ggplot(data=lmb_data, aes(lagdemvoteshare, democrat)) +
 ```
 
 ---
-```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
+```{r, echo = TRUE, out.width="70%", fig.retina = 1, fig.align='center'}
 gg_srd + stat_smooth(aes(lagdemvoteshare, democrat, group = gg_group),
   method = "lm"
   , formula = y ~ x + I(x^2))
 ```
 
----
-```{r, echo = FALSE, out.width="70%", fig.retina = 1, fig.align='center'}
-gg_srd + stat_smooth(aes(lagdemvoteshare, democrat, group = gg_group),
-  method = "lm"
-  , formula = y ~ x + I(x^2))
-```
 
 ---
 ```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}

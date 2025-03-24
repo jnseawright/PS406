@@ -3,7 +3,7 @@ title: "2: Regression for Causal Inference"
 subtitle: "Quantitative Causal Inference"
 author: "<large>J. Seawright</large>"
 institute: "<small>Northwestern Political Science</small>" 
-date: "April 1 and 3, 2024"
+date: "April 10, 2025"
 output: 
   xaringan::moon_reader:
     css: xaringan-themer.css
@@ -75,7 +75,8 @@ cases with $X=0$?
 ### Regression for Causal Inference
 
 $$\begin{aligned}
-Y_{i} = \mu_{0} + D_{i} (\mu_{1} - \mu_{0}) + \{\nu_{0} + D_{i} (\nu_{1} - \nu_{0})\}\end{aligned}$$
+(Y_{i}| X_{i}=0) = \\
+(\mu_{0} + D_{i} (\mu_{1} - \mu_{0}) + \{\nu_{0} + D_{i} (\nu_{1} - \nu_{0})\}|X_{i}=0)\end{aligned}$$
 
 ---
 ### Regression for Causal Inference
@@ -140,13 +141,19 @@ $$\begin{aligned}
         $\mathbf{D}$ to $\mathbf{y}$, and
 
     2.  no element of $\mathbb{X}$ is caused by $\mathbf{D}$ or any of
-        its unmeasured causes *and* some other unmeasured cause of
-        $\mathbf{y}$, and
+        its unmeasured causes *and* $\mathbf{y}$ or some other cause of it, 
 
     3.  all causes of $\mathbf{D}$ that are also causes of $\mathbf{y}$
         have some element of $\mathbb{X}$ somewhere on the causal path
         from the unmeasured initial cause to either $\mathbf{D}$ or
-        $\mathbf{y}$.
+        $\mathbf{y}$,
+
+---
+### Regression for Causal Inference
+
+-   These conditions imply that:
+
+    4\.  no element of $\mathbb{X}$ causes $\mathbf{D}$ without also having an independent causal pathway to $\mathbf{y}$.
 
 ---
 ```{r, echo = FALSE, out.width="90%", fig.retina = 1}
@@ -385,7 +392,7 @@ qog2000demsin2020clean <- qog2000demsin2020 %>% filter(!is.na(br_pres) & !is.na(
 
 ---
 ```{r, echo = TRUE, out.width="90%", fig.retina = 1}
-preslmw.uri <- lmw(~ br_pres + as.factor(ht_colonial) +  ccp_systyear + br_pvote, data = qog2000demsin2020clean,
+preslmw.uri <- lmw(~ br_pres + as.factor(ht_colonial) + br_pvote, data = qog2000demsin2020clean,
                 estimand = "ATT", method = "URI", treat = "br_pres")
 
 preslmw.urifit <- lmw_est(preslmw.uri, outcome = "vdem_libdem")
@@ -395,7 +402,7 @@ summary(preslmw.urifit)
 
 ---
 ```{r, echo = TRUE, out.width="90%", fig.retina = 1}
-preslmw.mri <- lmw(~ br_pres + as.factor(ht_colonial) +  ccp_systyear + br_pvote, data = qog2000demsin2020clean,
+preslmw.mri <- lmw(~ br_pres + as.factor(ht_colonial) + br_pvote, data = qog2000demsin2020clean,
                    estimand = "ATT", method = "MRI", treat = "br_pres")
 
 preslmw.mrifit <- lmw_est(preslmw.mri, outcome = "vdem_libdem")
@@ -410,7 +417,7 @@ plot(preslmw.mri)
 
 ---
 ```{r, echo = TRUE, out.width="60%", fig.retina = 1}
- plot(preslmw.mri, type="extrapolation", variables=~ccp_systyear)
+ plot(preslmw.mri, type="extrapolation", variables=~ht_colonial)
 ```
 
 ---
@@ -420,17 +427,25 @@ plot(preslmw.mri, type="influence", outcome="vdem_libdem")
 
 ---
 ```{r, echo = TRUE, out.width="90%", fig.retina = 1}
-qog2000demsin2020clean$cname[11]
+qog2000demsin2020clean$cname[47]
 
-qog2000demsin2020clean$br_pres[11]
+qog2000demsin2020clean$br_pres[47]
 
-qog2000demsin2020clean$ht_colonial[11]
+qog2000demsin2020clean$ht_colonial[47]
 
-qog2000demsin2020clean$ccp_systyear[11]
+qog2000demsin2020clean$ccp_systyear[47]
 
-qog2000demsin2020clean$br_pvote[11]
+qog2000demsin2020clean$br_pvote[47]
+```
 
-qog2000demsin2020clean$vdem_libdem[11]
+---
+```{r, echo = TRUE, out.width="90%", fig.retina = 1}
+qog2000demsin2020clean$vdem_libdem[47]
+```
+
+---
+```{r, echo = TRUE, out.width="60%", fig.retina = 1}
+hist(qog2000demsin2020clean$vdem_libdem[qog2000demsin2020clean$ht_colonial==0])
 ```
 
 ---
@@ -445,15 +460,15 @@ include_graphics("images/htcolonial.png")
 
 ---
 ```{r, echo = TRUE, out.width="90%", fig.retina = 1}
-qog2000demsin2020nocabo <- qog2000demsin2020clean %>% filter(cname != "Cabo Verde")
+qog2000demsin2020nopoland <- qog2000demsin2020clean %>% filter(cname != "Poland")
 
-preslmw.mrinocabo <- lmw(~ br_pres + as.factor(ht_colonial) +  
-                           ccp_systyear + br_pvote, 
-                         data = qog2000demsin2020nocabo,
+preslmw.mrinopoland <- lmw(~ br_pres + as.factor(ht_colonial) +  
+                           br_pvote, 
+                         data = qog2000demsin2020nopoland,
                    estimand = "ATT", method = "MRI", treat = "br_pres")
 
-preslmw.mrifitnocabo <- lmw_est(preslmw.mrinocabo, outcome = "vdem_libdem")
+preslmw.mrifitnopoland <- lmw_est(preslmw.mrinopoland, outcome = "vdem_libdem")
 
-summary(preslmw.mrifitnocabo)
+summary(preslmw.mrifitnopoland)
 
 ```

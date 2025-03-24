@@ -4,7 +4,8 @@
     <title>6: Missing Data and Selection</title>
     <meta charset="utf-8" />
     <meta name="author" content="J. Seawright" />
-    <script src="6missingdata_files/header-attrs-2.25/header-attrs.js"></script>
+    <meta name="date" content="2025-05-08" />
+    <script src="6missingdata_files/header-attrs-2.29/header-attrs.js"></script>
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
   </head>
   <body>
@@ -24,7 +25,7 @@ class: center, middle, inverse, title-slide
 ### <small>Northwestern Political Science</small>
 ]
 .date[
-### April 29 and May 1, 2024
+### May 8, 2025
 ]
 
 ---
@@ -100,7 +101,7 @@ pre[class] {
 
 ---
 
-```r
+``` r
 summary(lm(outsidervote ~ simpletreat,
   data=peruemotions))
 ```
@@ -128,7 +129,7 @@ summary(lm(outsidervote ~ simpletreat,
 
 ---
 
-```r
+``` r
 perueffects &lt;- 1:100
 
 for (i in 1:100){
@@ -141,15 +142,15 @@ summary(perueffects)
 
 ```
 ##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
-## -0.01123  0.08630  0.12860  0.12707  0.15891  0.29941
+## -0.01081  0.06527  0.10402  0.10510  0.14240  0.24326
 ```
 
-```r
+``` r
 sd(perueffects)
 ```
 
 ```
-## [1] 0.05483775
+## [1] 0.05123922
 ```
 
 ---
@@ -161,7 +162,7 @@ sd(perueffects)
 
 ---
 
-```r
+``` r
 library(boot)
 library(Rlab)
 ```
@@ -196,7 +197,7 @@ library(Rlab)
 
 ---
 
-```r
+``` r
 perumareffects &lt;- 1:100
 
 missing.prob &lt;- inv.logit(-2.3 + -.5*peruemotions$edlevel + -.2*peruemotions$classid + peruemotions$leftright)
@@ -212,16 +213,16 @@ summary(perumareffects)
 ```
 
 ```
-##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-## 0.01244 0.04584 0.06573 0.06638 0.08519 0.12732
+##      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
+## 0.0004623 0.0496878 0.0753508 0.0717409 0.0958720 0.1353022
 ```
 
-```r
+``` r
 sd(perumareffects)
 ```
 
 ```
-## [1] 0.02581488
+## [1] 0.02980111
 ```
 
 ---
@@ -233,14 +234,15 @@ sd(perumareffects)
 
 ---
 
-```r
+``` r
 perunonigeffects &lt;- 1:100
 
-missing.threshold &lt;- -2.3 + -.5*peruemotions$edlevel + -.2*peruemotions$classid + peruemotions$leftright
-perunonigsubset &lt;- peruemotions[missing.threshold&gt;-.1,]
+missing.threshold &lt;- -2.3 + 4*peruemotions$outsidervote
+missing.threshold[is.na(missing.threshold)] &lt;- .3
 
 for (i in 1:100){
-  perutemp &lt;- perunonigsubset[sample(1:nrow(perunonigsubset),nrow(perunonigsubset)-50, replace = TRUE),]
+  perutemp &lt;- peruemotions
+  perutemp$outsidervote[rbern(length(missing.threshold),1-inv.logit(missing.threshold))==1] &lt;- NA
   perunonigeffects[i] &lt;- lm(outsidervote ~ simpletreat, data=perutemp)$coef[2]
 }
 
@@ -249,15 +251,15 @@ summary(perunonigeffects)
 
 ```
 ##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
-## 0.008685 0.274847 0.330423 0.330428 0.397436 0.583333
+## -0.04230  0.01185  0.03083  0.03413  0.05822  0.11926
 ```
 
-```r
+``` r
 sd(perunonigeffects)
 ```
 
 ```
-## [1] 0.1070357
+## [1] 0.03611283
 ```
 
 ---
@@ -288,7 +290,7 @@ Deleting the entire case when one or more value is missing is called ''listwise 
 
 ---
 
-```r
+``` r
 perumareffects2 &lt;- 1:100
 
 missing.prob &lt;- inv.logit(-2.3 + -.5*peruemotions$edlevel + -.2*peruemotions$classid + peruemotions$leftright)
@@ -304,16 +306,16 @@ summary(perumareffects2)
 ```
 
 ```
-##      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
-## -0.004363  0.055605  0.072930  0.072949  0.089792  0.140132
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+## 0.01354 0.05579 0.07244 0.07111 0.08925 0.13583
 ```
 
-```r
+``` r
 sd(perumareffects2)
 ```
 
 ```
-## [1] 0.02558818
+## [1] 0.02530328
 ```
 
 
@@ -327,7 +329,7 @@ We can use the known values of variables within a case to come up with a best gu
 
 1. Come up with an initial guess for all the missing values.
 
-2. Choose one variable ($Y_{i}$) to work on. Use the initial guesses, as well as the observed values, for all the other variables to run a regression with `\(YX_{i}\)` as the outcome and `\(Y_{-i}\)` as well as `\(X\)` as the predictors. Draw fitted values from that regression for the missing values on `\(Y_{i}\)`.
+2. Choose one variable (`\(Y_{i}\)`) to work on. Use the initial guesses, as well as the observed values, for all the other variables to run a regression with `\(YX_{i}\)` as the outcome and `\(Y_{-i}\)` as well as `\(X\)` as the predictors. Draw fitted values from that regression for the missing values on `\(Y_{i}\)`.
 
 ---
 ### Multiple Imputation
@@ -363,15 +365,8 @@ For `\(M\)` imputations:
 
 ---
 
-```r
+``` r
 library(mice)
-```
-
-```
-## Registered S3 methods overwritten by 'broom':
-##   method            from  
-##   tidy.glht         jtools
-##   tidy.summary.glht jtools
 ```
 
 ```
@@ -393,7 +388,7 @@ library(mice)
 
 ---
 
-```r
+``` r
 perumieffects &lt;- 1:100
 
 missing.prob &lt;- inv.logit(-2.3 + -.5*peruemotions$edlevel + -.2*peruemotions$classid + peruemotions$leftright)
@@ -3809,21 +3804,21 @@ for (i in 1:100){
 
 ---
 
-```r
+``` r
 summary(perumieffects)
 ```
 
 ```
 ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-## 0.02747 0.07118 0.09077 0.08803 0.10271 0.14002
+## 0.03244 0.06965 0.08631 0.08848 0.10844 0.16011
 ```
 
-```r
+``` r
 sd(perumieffects)
 ```
 
 ```
-## [1] 0.02307165
+## [1] 0.02503659
 ```
 
 ---
@@ -3860,203 +3855,424 @@ mice defaults to 5, because of the older received wisdom of the literature.
 &lt;img src="images/pepinsky2.jpg" width="90%" style="display: block; margin: auto;" /&gt;
 
 ---
-&lt;img src="images/LallRobinson1.png" width="90%" style="display: block; margin: auto;" /&gt;
+&lt;img src="images/LaqueurTitle.png" width="90%" style="display: block; margin: auto;" /&gt;
 
 ---
-&lt;img src="images/LallRobinson2.png" width="90%" style="display: block; margin: auto;" /&gt;
+&lt;img src="images/Laqueur1.png" width="90%" style="display: block; margin: auto;" /&gt;
 
 ---
-&lt;img src="images/LallRobinson3.png" width="90%" style="display: block; margin: auto;" /&gt;
+&lt;img src="images/Laqueur2.png" width="90%" style="display: block; margin: auto;" /&gt;
 
 ---
-&lt;img src="images/LallRobinson4.png" width="90%" style="display: block; margin: auto;" /&gt;
+&lt;img src="images/crossvalidatedrisk.png" width="90%" style="display: block; margin: auto;" /&gt;
 
 ---
-
-```r
-library(rMIDAS)
-```
-
-```
-## Loading required package: data.table
-```
-
-```
-## 
-## Attaching package: 'data.table'
-```
-
-```
-## The following objects are masked from 'package:dplyr':
-## 
-##     between, first, last
-```
-
-```
-## Loading required package: mltools
-```
-
-```
-## Loading required package: reticulate
-```
-
-```
-## rMIDAS is loaded. Please read https://github.com/MIDASverse/rMIDAS for additional help on how to set up and configure your environment. If you want to change your Python environment use 'reset_rMIDAS_env()' to reset your configuration. After resetting, you'll need to restart the R session and run 'library(rMIDAS)' again.
-```
-
-```
-## 
-## ## 
-## ## rMIDAS: Multiple Imputation using Denoising Autoencoders 
-## ## Authors: Thomas Robinson and Ranjit Lall 
-## ## Please visit https://github.com/MIDASverse/rMIDAS for more information 
-## ##
-```
-
-```
-## 
-## Attaching package: 'rMIDAS'
-```
-
-```
-## The following object is masked from 'package:mice':
-## 
-##     complete
-```
-
-```
-## The following object is masked from 'package:dplyr':
-## 
-##     combine
-```
+&lt;img src="images/Laqueur3.png" width="90%" style="display: block; margin: auto;" /&gt;
 
 ---
 
-```r
-adult &lt;- read.csv("https://raw.githubusercontent.com/MIDASverse/MIDASpy/master/Examples/adult_data.csv",
-                  row.names = 1)[1:1000,]
-                  
-set.seed(89)
+``` r
+library(superMICE)
+```
 
-adult &lt;- add_missingness(adult, prop = 0.1)
+```
+## Warning: package 'superMICE' was built under R version 4.4.3
+```
 
-adult_cat &lt;- c('workclass','marital_status','relationship','race','education','occupation','native_country')
-adult_bin &lt;- c('sex','class_labels')
+``` r
+perusupermieffects &lt;- 1:10
+
+missing.prob &lt;- inv.logit(-2.3 + -.5*peruemotions$edlevel + -.2*peruemotions$classid + peruemotions$leftright)
+missing.prob[is.na(missing.prob)] &lt;- .3
+SL.lib &lt;- c("SL.mean", "SL.biglasso", "SL.randomForest")
+
+for (i in 1:10){
+  perutemp &lt;- peruemotions
+  perutemp$outsidervote[rbern(length(missing.prob),missing.prob)==1] &lt;- NA
+  perumice &lt;- mice::mice(perutemp,
+                method = "SuperLearner",
+                SL.library = SL.lib,
+                kernel = "gaussian",
+                bw = c(0.25, 1, 5))
+  perusupermieffects[i] &lt;- summary(pool(with(perumice, summary(lm(outsidervote ~ simpletreat)))))[2,2]
+}
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age
+```
+
+```
+## Loading required package: nnls
+```
+
+```
+## Loading required namespace: randomForest
+```
+
+```
+## Loading required namespace: biglasso
+```
+
+```
+##   preocupado  risk  outsidervote
+##   1   2  age  preocupado  risk  outsidervote
+##   1   3  age  preocupado  risk  outsidervote
+##   1   4  age  preocupado  risk  outsidervote
+##   1   5  age  preocupado  risk  outsidervote
+##   2   1  age  preocupado  risk  outsidervote
+##   2   2  age  preocupado  risk  outsidervote
+##   2   3  age  preocupado  risk  outsidervote
+##   2   4  age  preocupado  risk  outsidervote
+##   2   5  age  preocupado  risk  outsidervote
+##   3   1  age  preocupado  risk  outsidervote
+##   3   2  age  preocupado  risk  outsidervote
+##   3   3  age  preocupado  risk  outsidervote
+##   3   4  age  preocupado  risk  outsidervote
+##   3   5  age  preocupado  risk  outsidervote
+##   4   1  age  preocupado  risk  outsidervote
+##   4   2  age  preocupado  risk  outsidervote
+##   4   3  age  preocupado  risk  outsidervote
+##   4   4  age  preocupado  risk  outsidervote
+##   4   5  age  preocupado  risk  outsidervote
+##   5   1  age  preocupado  risk  outsidervote
+##   5   2  age  preocupado  risk  outsidervote
+##   5   3  age  preocupado  risk  outsidervote
+##   5   4  age  preocupado  risk  outsidervote
+##   5   5  age  preocupado  risk  outsidervote
+```
+
+```
+## Warning: Number of logged events: 56
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk  outsidervote
+##   1   2  age  preocupado  risk  outsidervote
+##   1   3  age  preocupado  risk  outsidervote
+##   1   4  age  preocupado  risk  outsidervote
+##   1   5  age  preocupado  risk  outsidervote
+##   2   1  age  preocupado  risk  outsidervote
+##   2   2  age  preocupado  risk  outsidervote
+##   2   3  age  preocupado  risk  outsidervote
+##   2   4  age  preocupado  risk  outsidervote
+##   2   5  age  preocupado  risk  outsidervote
+##   3   1  age  preocupado  risk  outsidervote
+##   3   2  age  preocupado  risk  outsidervote
+##   3   3  age  preocupado  risk  outsidervote
+##   3   4  age  preocupado  risk  outsidervote
+##   3   5  age  preocupado  risk  outsidervote
+##   4   1  age  preocupado  risk  outsidervote
+##   4   2  age  preocupado  risk  outsidervote
+##   4   3  age  preocupado  risk  outsidervote
+##   4   4  age  preocupado  risk  outsidervote
+##   4   5  age  preocupado  risk  outsidervote
+##   5   1  age  preocupado  risk  outsidervote
+##   5   2  age  preocupado  risk  outsidervote
+##   5   3  age  preocupado  risk  outsidervote
+##   5   4  age  preocupado  risk  outsidervote
+##   5   5  age  preocupado  risk  outsidervote
+```
+
+```
+## Warning: Number of logged events: 56
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk  outsidervote
+##   1   2  age  preocupado  risk  outsidervote
+##   1   3  age  preocupado  risk  outsidervote
+##   1   4  age  preocupado  risk  outsidervote
+##   1   5  age  preocupado  risk  outsidervote
+##   2   1  age  preocupado  risk  outsidervote
+##   2   2  age  preocupado  risk  outsidervote
+##   2   3  age  preocupado  risk  outsidervote
+##   2   4  age  preocupado  risk  outsidervote
+##   2   5  age  preocupado  risk  outsidervote
+##   3   1  age  preocupado  risk  outsidervote
+##   3   2  age  preocupado  risk  outsidervote
+##   3   3  age  preocupado  risk  outsidervote
+##   3   4  age  preocupado  risk  outsidervote
+##   3   5  age  preocupado  risk  outsidervote
+##   4   1  age  preocupado  risk  outsidervote
+##   4   2  age  preocupado  risk  outsidervote
+##   4   3  age  preocupado  risk  outsidervote
+##   4   4  age  preocupado  risk  outsidervote
+##   4   5  age  preocupado  risk  outsidervote
+##   5   1  age  preocupado  risk  outsidervote
+##   5   2  age  preocupado  risk  outsidervote
+##   5   3  age  preocupado  risk  outsidervote
+##   5   4  age  preocupado  risk  outsidervote
+##   5   5  age  preocupado  risk  outsidervote
+```
+
+```
+## Warning: Number of logged events: 56
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk  outsidervote
+##   1   2  age  preocupado  risk  outsidervote
+##   1   3  age  preocupado  risk  outsidervote
+##   1   4  age  preocupado  risk  outsidervote
+##   1   5  age  preocupado  risk  outsidervote
+##   2   1  age  preocupado  risk  outsidervote
+##   2   2  age  preocupado  risk  outsidervote
+##   2   3  age  preocupado  risk  outsidervote
+##   2   4  age  preocupado  risk  outsidervote
+##   2   5  age  preocupado  risk  outsidervote
+##   3   1  age  preocupado  risk  outsidervote
+##   3   2  age  preocupado  risk  outsidervote
+##   3   3  age  preocupado  risk  outsidervote
+##   3   4  age  preocupado  risk  outsidervote
+##   3   5  age  preocupado  risk  outsidervote
+##   4   1  age  preocupado  risk  outsidervote
+##   4   2  age  preocupado  risk  outsidervote
+##   4   3  age  preocupado  risk  outsidervote
+##   4   4  age  preocupado  risk  outsidervote
+##   4   5  age  preocupado  risk  outsidervote
+##   5   1  age  preocupado  risk  outsidervote
+##   5   2  age  preocupado  risk  outsidervote
+##   5   3  age  preocupado  risk  outsidervote
+##   5   4  age  preocupado  risk  outsidervote
+##   5   5  age  preocupado  risk  outsidervote
+```
+
+```
+## Warning: Number of logged events: 56
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk  outsidervote
+##   1   2  age  preocupado  risk  outsidervote
+##   1   3  age  preocupado  risk  outsidervote
+##   1   4  age  preocupado  risk  outsidervote
+##   1   5  age  preocupado  risk  outsidervote
+##   2   1  age  preocupado  risk  outsidervote
+##   2   2  age  preocupado  risk  outsidervote
+##   2   3  age  preocupado  risk  outsidervote
+##   2   4  age  preocupado  risk  outsidervote
+##   2   5  age  preocupado  risk  outsidervote
+##   3   1  age  preocupado  risk  outsidervote
+##   3   2  age  preocupado  risk  outsidervote
+##   3   3  age  preocupado  risk  outsidervote
+##   3   4  age  preocupado  risk  outsidervote
+##   3   5  age  preocupado  risk  outsidervote
+##   4   1  age  preocupado  risk  outsidervote
+##   4   2  age  preocupado  risk  outsidervote
+##   4   3  age  preocupado  risk  outsidervote
+##   4   4  age  preocupado  risk  outsidervote
+##   4   5  age  preocupado  risk  outsidervote
+##   5   1  age  preocupado  risk  outsidervote
+##   5   2  age  preocupado  risk  outsidervote
+##   5   3  age  preocupado  risk  outsidervote
+##   5   4  age  preocupado  risk  outsidervote
+##   5   5  age  preocupado  risk  outsidervote
+```
+
+```
+## Warning: Number of logged events: 56
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk  outsidervote
+##   1   2  age  preocupado  risk  outsidervote
+##   1   3  age  preocupado  risk  outsidervote
+##   1   4  age  preocupado  risk  outsidervote
+##   1   5  age  preocupado  risk  outsidervote
+##   2   1  age  preocupado  risk  outsidervote
+##   2   2  age  preocupado  risk  outsidervote
+##   2   3  age  preocupado  risk  outsidervote
+##   2   4  age  preocupado  risk  outsidervote
+##   2   5  age  preocupado  risk  outsidervote
+##   3   1  age  preocupado  risk  outsidervote
+##   3   2  age  preocupado  risk  outsidervote
+##   3   3  age  preocupado  risk  outsidervote
+##   3   4  age  preocupado  risk  outsidervote
+##   3   5  age  preocupado  risk  outsidervote
+##   4   1  age  preocupado  risk  outsidervote
+##   4   2  age  preocupado  risk  outsidervote
+##   4   3  age  preocupado  risk  outsidervote
+##   4   4  age  preocupado  risk  outsidervote
+##   4   5  age  preocupado  risk  outsidervote
+##   5   1  age  preocupado  risk  outsidervote
+##   5   2  age  preocupado  risk  outsidervote
+##   5   3  age  preocupado  risk  outsidervote
+##   5   4  age  preocupado  risk  outsidervote
+##   5   5  age  preocupado  risk  outsidervote
+```
+
+```
+## Warning: Number of logged events: 56
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk  outsidervote
+##   1   2  age  preocupado  risk  outsidervote
+##   1   3  age  preocupado  risk  outsidervote
+##   1   4  age  preocupado  risk  outsidervote
+##   1   5  age  preocupado  risk  outsidervote
+##   2   1  age  preocupado  risk  outsidervote
+##   2   2  age  preocupado  risk  outsidervote
+##   2   3  age  preocupado  risk  outsidervote
+##   2   4  age  preocupado  risk  outsidervote
+##   2   5  age  preocupado  risk  outsidervote
+##   3   1  age  preocupado  risk  outsidervote
+##   3   2  age  preocupado  risk  outsidervote
+##   3   3  age  preocupado  risk  outsidervote
+##   3   4  age  preocupado  risk  outsidervote
+##   3   5  age  preocupado  risk  outsidervote
+##   4   1  age  preocupado  risk  outsidervote
+##   4   2  age  preocupado  risk  outsidervote
+##   4   3  age  preocupado  risk  outsidervote
+##   4   4  age  preocupado  risk  outsidervote
+##   4   5  age  preocupado  risk  outsidervote
+##   5   1  age  preocupado  risk  outsidervote
+##   5   2  age  preocupado  risk  outsidervote
+##   5   3  age  preocupado  risk  outsidervote
+##   5   4  age  preocupado  risk  outsidervote
+##   5   5  age  preocupado  risk  outsidervote
+```
+
+```
+## Warning: Number of logged events: 56
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk  outsidervote
+##   1   2  age  preocupado  risk  outsidervote
+##   1   3  age  preocupado  risk  outsidervote
+##   1   4  age  preocupado  risk  outsidervote
+##   1   5  age  preocupado  risk  outsidervote
+##   2   1  age  preocupado  risk  outsidervote
+##   2   2  age  preocupado  risk  outsidervote
+##   2   3  age  preocupado  risk  outsidervote
+##   2   4  age  preocupado  risk  outsidervote
+##   2   5  age  preocupado  risk  outsidervote
+##   3   1  age  preocupado  risk  outsidervote
+##   3   2  age  preocupado  risk  outsidervote
+##   3   3  age  preocupado  risk  outsidervote
+##   3   4  age  preocupado  risk  outsidervote
+##   3   5  age  preocupado  risk  outsidervote
+##   4   1  age  preocupado  risk  outsidervote
+##   4   2  age  preocupado  risk  outsidervote
+##   4   3  age  preocupado  risk  outsidervote
+##   4   4  age  preocupado  risk  outsidervote
+##   4   5  age  preocupado  risk  outsidervote
+##   5   1  age  preocupado  risk  outsidervote
+##   5   2  age  preocupado  risk  outsidervote
+##   5   3  age  preocupado  risk  outsidervote
+##   5   4  age  preocupado  risk  outsidervote
+##   5   5  age  preocupado  risk  outsidervote
+```
+
+```
+## Warning: Number of logged events: 56
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk  outsidervote
+##   1   2  age  preocupado  risk  outsidervote
+##   1   3  age  preocupado  risk  outsidervote
+##   1   4  age  preocupado  risk  outsidervote
+##   1   5  age  preocupado  risk  outsidervote
+##   2   1  age  preocupado  risk  outsidervote
+##   2   2  age  preocupado  risk  outsidervote
+##   2   3  age  preocupado  risk  outsidervote
+##   2   4  age  preocupado  risk  outsidervote
+##   2   5  age  preocupado  risk  outsidervote
+##   3   1  age  preocupado  risk  outsidervote
+##   3   2  age  preocupado  risk  outsidervote
+##   3   3  age  preocupado  risk  outsidervote
+##   3   4  age  preocupado  risk  outsidervote
+##   3   5  age  preocupado  risk  outsidervote
+##   4   1  age  preocupado  risk  outsidervote
+##   4   2  age  preocupado  risk  outsidervote
+##   4   3  age  preocupado  risk  outsidervote
+##   4   4  age  preocupado  risk  outsidervote
+##   4   5  age  preocupado  risk  outsidervote
+##   5   1  age  preocupado  risk  outsidervote
+##   5   2  age  preocupado  risk  outsidervote
+##   5   3  age  preocupado  risk  outsidervote
+##   5   4  age  preocupado  risk  outsidervote
+##   5   5  age  preocupado  risk  outsidervote
+```
+
+```
+## Warning: Number of logged events: 56
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  age  preocupado  risk  outsidervote
+##   1   2  age  preocupado  risk  outsidervote
+##   1   3  age  preocupado  risk  outsidervote
+##   1   4  age  preocupado  risk  outsidervote
+##   1   5  age  preocupado  risk  outsidervote
+##   2   1  age  preocupado  risk  outsidervote
+##   2   2  age  preocupado  risk  outsidervote
+##   2   3  age  preocupado  risk  outsidervote
+##   2   4  age  preocupado  risk  outsidervote
+##   2   5  age  preocupado  risk  outsidervote
+##   3   1  age  preocupado  risk  outsidervote
+##   3   2  age  preocupado  risk  outsidervote
+##   3   3  age  preocupado  risk  outsidervote
+##   3   4  age  preocupado  risk  outsidervote
+##   3   5  age  preocupado  risk  outsidervote
+##   4   1  age  preocupado  risk  outsidervote
+##   4   2  age  preocupado  risk  outsidervote
+##   4   3  age  preocupado  risk  outsidervote
+##   4   4  age  preocupado  risk  outsidervote
+##   4   5  age  preocupado  risk  outsidervote
+##   5   1  age  preocupado  risk  outsidervote
+##   5   2  age  preocupado  risk  outsidervote
+##   5   3  age  preocupado  risk  outsidervote
+##   5   4  age  preocupado  risk  outsidervote
+##   5   5  age  preocupado  risk  outsidervote
+```
+
+```
+## Warning: Number of logged events: 56
 ```
 
 ---
 
-```r
-# Apply rMIDAS preprocessing steps
-adult_conv &lt;- convert(adult, 
-                      bin_cols = adult_bin, 
-                      cat_cols = adult_cat,
-                      minmax_scale = TRUE)
-                      
-# Train the model for 20 epochs
-adult_train &lt;- train(adult_conv,
-                       training_epochs = 20,
-                       layer_structure = c(128,128),
-                       input_drop = 0.75,
-                       seed = 89)
+``` r
+summary(perusupermieffects)
 ```
 
 ```
-## Initialising Python connection
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+## 0.04584 0.06917 0.08015 0.07585 0.08419 0.09300
+```
+
+``` r
+sd(perusupermieffects)
 ```
 
 ```
-## Size index: [6, 2, 7, 7, 6, 5, 16, 15, 28]
-## 
-## Computation graph constructed
-## 
-## Model initialised
-## 
-## Epoch: 0 , loss: 15.425102526141751
-## Epoch: 1 , loss: 11.575412704098609
-## Epoch: 2 , loss: 10.832637033154887
-## Epoch: 3 , loss: 10.304061566629718
-## Epoch: 4 , loss: 9.765719213793355
-## Epoch: 5 , loss: 9.319725882622503
-## Epoch: 6 , loss: 9.116159323723085
-## Epoch: 7 , loss: 8.958550299367596
-## Epoch: 8 , loss: 8.84914945017907
-## Epoch: 9 , loss: 8.707810271170832
-## Epoch: 10 , loss: 8.663570819362517
-## Epoch: 11 , loss: 8.485841258879631
-## Epoch: 12 , loss: 8.392308350532286
-## Epoch: 13 , loss: 8.251723835545201
-## Epoch: 14 , loss: 8.204197591350924
-## Epoch: 15 , loss: 8.092920018780616
-## Epoch: 16 , loss: 8.00652704700347
-## Epoch: 17 , loss: 7.909171573577389
-## Epoch: 18 , loss: 7.851328249900572
-## Epoch: 19 , loss: 7.870914905301986
-## Training complete. Saving file...
-## Model saved in file: /tmp/Rtmpdumtj3
-```
-                       
----
-
-```r
-# Generate 10 imputed datasets
-adult_complete &lt;- complete(adult_train, m = 10)
+## [1] 0.01466376
 ```
 
-```
-## Model restored.
-```
-
-```
-## Imputations generated. Completing post-imputation transformations.
-```
-
-```r
-# Inspect first imputed dataset:
-head(adult_complete[[1]])
-```
-
-```
-##        age   fnlwgt education_num capital_gain capital_loss hours_per_week
-## 1 39.00000  77516.0      10.29833         2174      0.00000             40
-## 2 35.18876  83311.0      13.00000            0      0.00000             13
-## 3 38.00000 215646.0       9.00000            0      0.00000             40
-## 4 53.00000 234721.0       7.00000            0     15.65065             40
-## 5 33.40419 338409.0      13.00000            0      0.00000             40
-## 6 37.00000 217086.3      14.00000            0      0.00000             40
-##      sex class_labels        workclass     marital_status  relationship  race
-## 1   Male        &lt;=50K        State-gov      Never-married Not-in-family White
-## 2   Male        &lt;=50K Self-emp-not-inc Married-civ-spouse       Husband Black
-## 3   Male        &lt;=50K          Private           Divorced Not-in-family White
-## 4   Male        &lt;=50K          Private Married-civ-spouse       Husband Black
-## 5 Female        &lt;=50K          Private Married-civ-spouse          Wife Black
-## 6 Female        &lt;=50K          Private Married-civ-spouse          Wife White
-##   education        occupation native_country
-## 1 Bachelors      Adm-clerical  United-States
-## 2   7th-8th   Exec-managerial  United-States
-## 3   HS-grad Handlers-cleaners  United-States
-## 4      11th Handlers-cleaners          India
-## 5 Bachelors    Prof-specialty           Cuba
-## 6   HS-grad   Exec-managerial  United-States
-```
-
----
-
-```r
-# Estimate logit model on 10 completed datasets (using Rubin's combination rules)
-adult_model &lt;- combine("class_labels ~ hours_per_week + sex", 
-                    adult_complete,
-                    family = stats::binomial)
-
-adult_model
-```
-
-```
-##             term    estimate   std.error statistic       df      p.value
-## 1    (Intercept)  3.60382544 0.378016943  9.533502 153.8611 3.233115e-17
-## 2 hours_per_week -0.04751595 0.008343872 -5.694712 135.4036 7.360355e-08
-## 3        sexMale -0.73352548 0.186321410 -3.936882 778.4736 8.994080e-05
-```
 
 ---
 ### Non-Ignorable Missingness
@@ -4104,11 +4320,15 @@ a score of 800, even though it is likely that these students are not
 
 ---
 
-```r
+``` r
 dat &lt;- read.csv(
      "https://stats.idre.ucla.edu/stat/data/tobit.csv")
 
 library(VGAM)
+```
+
+```
+## Warning: package 'VGAM' was built under R version 4.4.3
 ```
 
 ```
@@ -4132,7 +4352,7 @@ library(VGAM)
 
 ---
 
-```r
+``` r
 summary(lm(apt ~ read + math +
           prog,  
           data = dat))
@@ -4164,7 +4384,7 @@ summary(lm(apt ~ read + math +
 
 ---
 
-```r
+``` r
 summary(m &lt;- vglm(apt ~ read + math +
           prog, tobit(Upper = 800), 
           data = dat))
@@ -4267,8 +4487,12 @@ Heckman instead substitutes the first regression into the second regression. You
 
 ---
 
-```r
+``` r
 library(sampleSelection)
+```
+
+```
+## Warning: package 'sampleSelection' was built under R version 4.4.3
 ```
 
 ```
@@ -4276,7 +4500,15 @@ library(sampleSelection)
 ```
 
 ```
+## Warning: package 'maxLik' was built under R version 4.4.3
+```
+
+```
 ## Loading required package: miscTools
+```
+
+```
+## Warning: package 'miscTools' was built under R version 4.4.3
 ```
 
 ```
@@ -4301,7 +4533,7 @@ library(sampleSelection)
 
 ---
 
-```r
+``` r
 data("Mroz87")
 ols1 = lm(log(wage) ~ educ + exper + I( exper^2 ) + city, data=subset(Mroz87, lfp==1))
 summary(ols1)
@@ -4334,7 +4566,7 @@ summary(ols1)
 
 ---
 
-```r
+``` r
 data("Mroz87")
 ols1 = lm(log(wage) ~ educ + exper + I( exper^2 ) + city, data=subset(Mroz87, lfp==1))
 summary(ols1)
@@ -4367,7 +4599,7 @@ summary(ols1)
 
 ---
 
-```r
+``` r
 mroz.tobit = selection( lfp ~ age + I( age^2 ) + kids5 + huswage + educ,
                  log(wage) ~ educ + exper + I( exper^2 ) + city, data=Mroz87 )
 summary(mroz.tobit)
@@ -4408,7 +4640,7 @@ summary(mroz.tobit)
 
 ---
 
-```r
+``` r
 mroz.heckit = heckit( lfp ~ age + I( age^2 ) + kids5 + huswage + educ,
                  log(wage) ~ educ + exper + I( exper^2 ) + city, data=Mroz87 )
 summary(mroz.heckit)

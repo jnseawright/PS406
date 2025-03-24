@@ -3,7 +3,7 @@ title: "7: Synthetic Controls, Sensitivity Analysis and Bounds"
 subtitle: "Quantitative Causal Inference"
 author: "<large>J. Seawright</large>"
 institute: "<small>Northwestern Political Science</small>" 
-date: "May 6 and 8, 2024"
+date: "May 15, 2025"
 output: 
   xaringan::moon_reader:
     css: xaringan-themer.css

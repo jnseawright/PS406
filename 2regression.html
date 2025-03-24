@@ -4,7 +4,8 @@
     <title>2: Regression for Causal Inference</title>
     <meta charset="utf-8" />
     <meta name="author" content="J. Seawright" />
-    <script src="2regression_files/header-attrs-2.25/header-attrs.js"></script>
+    <meta name="date" content="2025-04-10" />
+    <script src="2regression_files/header-attrs-2.29/header-attrs.js"></script>
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
   </head>
   <body>
@@ -24,7 +25,7 @@ class: center, middle, inverse, title-slide
 ### <small>Northwestern Political Science</small>
 ]
 .date[
-### April 1 and 3, 2024
+### April 10, 2025
 ]
 
 ---
@@ -64,7 +65,8 @@ cases with `\(X=0\)`?
 ### Regression for Causal Inference
 
 `$$\begin{aligned}
-Y_{i} = \mu_{0} + D_{i} (\mu_{1} - \mu_{0}) + \{\nu_{0} + D_{i} (\nu_{1} - \nu_{0})\}\end{aligned}$$`
+(Y_{i}| X_{i}=0) = \\
+(\mu_{0} + D_{i} (\mu_{1} - \mu_{0}) + \{\nu_{0} + D_{i} (\nu_{1} - \nu_{0})\}|X_{i}=0)\end{aligned}$$`
 
 ---
 ### Regression for Causal Inference
@@ -129,13 +131,19 @@ Y_{i} &amp; = \beta_{0} + D_{i} \beta_{1} + X_{i} \beta_{2} + X_{i} D_{i} \beta_
         `\(\mathbf{D}\)` to `\(\mathbf{y}\)`, and
 
     2.  no element of `\(\mathbb{X}\)` is caused by `\(\mathbf{D}\)` or any of
-        its unmeasured causes *and* some other unmeasured cause of
-        `\(\mathbf{y}\)`, and
+        its unmeasured causes *and* `\(\mathbf{y}\)` or some other cause of it, 
 
     3.  all causes of `\(\mathbf{D}\)` that are also causes of `\(\mathbf{y}\)`
         have some element of `\(\mathbb{X}\)` somewhere on the causal path
         from the unmeasured initial cause to either `\(\mathbf{D}\)` or
-        `\(\mathbf{y}\)`.
+        `\(\mathbf{y}\)`,
+
+---
+### Regression for Causal Inference
+
+-   These conditions imply that:
+
+    4\.  no element of `\(\mathbb{X}\)` causes `\(\mathbf{D}\)` without also having an independent causal pathway to `\(\mathbf{y}\)`.
 
 ---
 &lt;img src="images/goodcontrol.jpg" width="90%" /&gt;
@@ -169,19 +177,19 @@ Y_{i} &amp; = \beta_{0} + D_{i} \beta_{1} + X_{i} \beta_{2} + X_{i} D_{i} \beta_
 
 ---
 
-```r
+``` r
 library(dagitty)
 ```
 
 ---
 
-```r
+``` r
 LupuPeisahkinDAG1 &lt;- dagitty( "dag {Dekulakized -&gt; Victimization PreSovietWealth -&gt; Victimization SovietOpposition -&gt; Victimization PreSovietReligiosity -&gt; Victimization PriorRegion -&gt; Victimization DeportationRegion -&gt; Victimization DeportationRegion -&gt; Religiosity PriorRegion -&gt; Religiosity PreSovietReligiosity -&gt; Religiosity SovietOpposition -&gt; Religiosity PreSovietWealth -&gt; Religiosity Victimization -&gt; Religiosity Dekulakized -&gt; Religiosity}" )
 ```
 
 ---
 
-```r
+``` r
 plot( LupuPeisahkinDAG1 )
 ```
 
@@ -193,13 +201,13 @@ plot( LupuPeisahkinDAG1 )
 
 ---
 
-```r
+``` r
 LupuPeisahkinDAG2 &lt;- dagitty( "dag {Dekulakized &lt;- Victimization PreSovietWealth -&gt; Victimization SovietOpposition -&gt; Victimization PreSovietReligiosity -&gt; Victimization PriorRegion -&gt; Victimization DeportationRegion &lt;- Victimization DeportationRegion -&gt; Religiosity PriorRegion -&gt; Religiosity PreSovietReligiosity -&gt; Religiosity SovietOpposition -&gt; Religiosity PreSovietWealth -&gt; Religiosity Victimization -&gt; Religiosity Dekulakized -&gt; Religiosity}" )
 ```
 
 ---
 
-```r
+``` r
 plot( LupuPeisahkinDAG2 )
 ```
 
@@ -211,7 +219,7 @@ plot( LupuPeisahkinDAG2 )
 
 ---
 
-```r
+``` r
 adjustmentSets(LupuPeisahkinDAG1, exposure = "Victimization", outcome = "Religiosity")
 ```
 
@@ -220,7 +228,7 @@ adjustmentSets(LupuPeisahkinDAG1, exposure = "Victimization", outcome = "Religio
 ##   PreSovietWealth, PriorRegion, SovietOpposition }
 ```
 
-```r
+``` r
 adjustmentSets(LupuPeisahkinDAG2, exposure = "Victimization", outcome = "Religiosity")
 ```
 
@@ -231,7 +239,7 @@ adjustmentSets(LupuPeisahkinDAG2, exposure = "Victimization", outcome = "Religio
 
 ---
 
-```r
+``` r
 instrumentalVariables(LupuPeisahkinDAG1, exposure = "Victimization", outcome = "Religiosity")
 
 instrumentalVariables(LupuPeisahkinDAG2, exposure = "Victimization", outcome = "Religiosity")
@@ -239,7 +247,7 @@ instrumentalVariables(LupuPeisahkinDAG2, exposure = "Victimization", outcome = "
 
 ---
 
-```r
+``` r
 impliedConditionalIndependencies(LupuPeisahkinDAG1)
 ```
 
@@ -263,7 +271,7 @@ impliedConditionalIndependencies(LupuPeisahkinDAG1)
 
 ---
 
-```r
+``` r
 library(tidyverse)
 ```
 
@@ -271,8 +279,8 @@ library(tidyverse)
 ## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
 ## ✔ forcats   1.0.0     ✔ stringr   1.5.1
 ## ✔ lubridate 1.9.3     ✔ tibble    3.2.1
-## ✔ purrr     1.0.2     ✔ tidyr     1.3.0
-## ✔ readr     2.1.4     
+## ✔ purrr     1.0.2     ✔ tidyr     1.3.1
+## ✔ readr     2.1.5     
 ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
 ## ✖ nlme::collapse() masks dplyr::collapse()
 ## ✖ dplyr::filter()  masks stats::filter()
@@ -282,7 +290,7 @@ library(tidyverse)
 
 ---
 
-```r
+``` r
 qog_std_ts_jan22 &lt;- read_csv("https://github.com/jnseawright/PS406/raw/main/data/qog_std_ts_jan22.csv")
 ```
 
@@ -305,7 +313,7 @@ qog_std_ts_jan22 &lt;- read_csv("https://github.com/jnseawright/PS406/raw/main/d
 ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 ```
 
-```r
+``` r
 qogdems2000 &lt;- qog_std_ts_jan22 %&gt;% 
   filter(year==2000 &amp; vdem_libdem &gt; 0.5)
 
@@ -317,69 +325,197 @@ preslm &lt;- lm(vdem_libdem ~ br_pres, data=qog2000demsin2020)
 
 ---
 
-```r
+``` r
 summ(preslm)
 ```
 
-```
-## MODEL INFO:
-## Observations: 61 (1 missing obs. deleted)
-## Dependent Variable: vdem_libdem
-## Type: OLS linear regression 
-## 
-## MODEL FIT:
-## F(1,59) = 2.05, p = 0.16
-## R² = 0.03
-## Adj. R² = 0.02 
-## 
-## Standard errors: OLS
-## ------------------------------------------------
-##                      Est.   S.E.   t val.      p
-## ----------------- ------- ------ -------- ------
-## (Intercept)          0.71   0.03    27.19   0.00
-## br_pres             -0.06   0.04    -1.43   0.16
-## ------------------------------------------------
-```
+&lt;table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; Observations &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 61 (1 missing obs. deleted) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; Dependent variable &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; vdem_libdem &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; Type &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; OLS linear regression &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt; &lt;table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; F(1,59) &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2.05 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; R² &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.03 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; Adj. R² &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.02 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt; &lt;table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;border-bottom: 0;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Est. &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; S.E. &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; t val. &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; (Intercept) &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.71 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 27.19 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; br_pres &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.06 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.04 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -1.43 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.16 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;tfoot&gt;&lt;tr&gt;&lt;td style="padding: 0; " colspan="100%"&gt;
+&lt;sup&gt;&lt;/sup&gt; Standard errors: OLS&lt;/td&gt;&lt;/tr&gt;&lt;/tfoot&gt;
+&lt;/table&gt;
 
 ---
 
-```r
+``` r
 preslm2 &lt;- lm(vdem_libdem ~ br_pres + as.factor(ht_colonial) +  ccp_systyear + br_pvote, data=qog2000demsin2020)
 ```
 
 ---
 
-```r
+``` r
 summ(preslm2)
 ```
 
-```
-## MODEL INFO:
-## Observations: 58 (4 missing obs. deleted)
-## Dependent Variable: vdem_libdem
-## Type: OLS linear regression 
-## 
-## MODEL FIT:
-## F(9,48) = 3.30, p = 0.00
-## R² = 0.38
-## Adj. R² = 0.27 
-## 
-## Standard errors: OLS
-## ------------------------------------------------------------
-##                                  Est.   S.E.   t val.      p
-## ----------------------------- ------- ------ -------- ------
-## (Intercept)                      2.50   0.76     3.29   0.00
-## br_pres                          0.03   0.04     0.76   0.45
-## as.factor(ht_colonial)1         -0.31   0.14    -2.26   0.03
-## as.factor(ht_colonial)2         -0.09   0.07    -1.42   0.16
-## as.factor(ht_colonial)5         -0.12   0.05    -2.28   0.03
-## as.factor(ht_colonial)6         -0.24   0.11    -2.26   0.03
-## as.factor(ht_colonial)7         -0.13   0.08    -1.59   0.12
-## as.factor(ht_colonial)9         -0.07   0.13    -0.49   0.63
-## ccp_systyear                    -0.00   0.00    -2.36   0.02
-## br_pvote                         0.04   0.05     0.95   0.35
-## ------------------------------------------------------------
-```
+&lt;table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; Observations &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 58 (4 missing obs. deleted) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; Dependent variable &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; vdem_libdem &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; Type &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; OLS linear regression &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt; &lt;table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; F(9,48) &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.30 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; R² &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.38 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; Adj. R² &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.27 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt; &lt;table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;border-bottom: 0;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Est. &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; S.E. &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; t val. &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; (Intercept) &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2.50 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.76 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.29 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; br_pres &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.04 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.76 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.45 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; as.factor(ht_colonial)1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.31 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.14 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -2.26 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.03 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; as.factor(ht_colonial)2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.09 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.07 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -1.42 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.16 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; as.factor(ht_colonial)5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.12 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.05 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -2.28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.03 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; as.factor(ht_colonial)6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.24 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -2.26 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.03 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; as.factor(ht_colonial)7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.13 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.08 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -1.59 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.12 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; as.factor(ht_colonial)9 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.07 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.13 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.49 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.63 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; ccp_systyear &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -2.36 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.02 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; br_pvote &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.04 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.05 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.95 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.35 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;tfoot&gt;&lt;tr&gt;&lt;td style="padding: 0; " colspan="100%"&gt;
+&lt;sup&gt;&lt;/sup&gt; Standard errors: OLS&lt;/td&gt;&lt;/tr&gt;&lt;/tfoot&gt;
+&lt;/table&gt;
 
 ---
 ### How Much Does It Hurt to Be Wrong?
@@ -465,28 +601,35 @@ If there is causal heterogeneity, the OLS weights are a biased estimator of ATE,
 
 ---
 
-```r
+``` r
 library(lmw)
+```
 
+```
+## Warning: package 'lmw' was built under R version 4.4.3
+```
+
+``` r
 qog2000demsin2020clean &lt;- qog2000demsin2020 %&gt;% filter(!is.na(br_pres) &amp; !is.na(ccp_systyear) &amp; 
                                                          !is.na(ht_colonial) &amp; !is.na(br_pvote))
 ```
 
 ---
 
-```r
-preslmw.uri &lt;- lmw(~ br_pres + as.factor(ht_colonial) +  ccp_systyear + br_pvote, data = qog2000demsin2020clean,
+``` r
+preslmw.uri &lt;- lmw(~ br_pres + as.factor(ht_colonial) + br_pvote, data = qog2000demsin2020clean,
                 estimand = "ATT", method = "URI", treat = "br_pres")
 
 preslmw.urifit &lt;- lmw_est(preslmw.uri, outcome = "vdem_libdem")
 ```
 
 ```
-## Warning in meatHC(x, type = type, omega = omega): HC3 covariances become
-## numerically unstable if hat values are close to 1 as for observations 29, 44
+## Warning in meatHC(x, type = type, omega = omega): HC3 covariances are
+## numerically unstable for hat values close to 1 (and undefined if exactly 1) as
+## for observation(s) 29, 44
 ```
 
-```r
+``` r
 summary(preslmw.urifit)
 ```
 
@@ -494,44 +637,49 @@ summary(preslmw.urifit)
 ## 
 ## Effect estimates:
 ##              Estimate Std. Error 95% CI L 95% CI U t value Pr(&gt;|t|)
-## E[Y₁-Y₀|A=1]  0.03085    0.04089 -0.05136  0.11305   0.754    0.454
+## E[Y₁-Y₀|A=1]  0.02045    0.03772 -0.05535  0.09625   0.542     0.59
 ## 
-## Residual standard error: 0.1312 on 48 degrees of freedom
+## Residual standard error: 0.1371 on 49 degrees of freedom
 ```
 
 ---
 
-```r
-preslmw.mri &lt;- lmw(~ br_pres + as.factor(ht_colonial) +  ccp_systyear + br_pvote, data = qog2000demsin2020clean,
+``` r
+preslmw.mri &lt;- lmw(~ br_pres + as.factor(ht_colonial) + br_pvote, data = qog2000demsin2020clean,
                    estimand = "ATT", method = "MRI", treat = "br_pres")
 
 preslmw.mrifit &lt;- lmw_est(preslmw.mri, outcome = "vdem_libdem")
 ```
 
 ```
-## Warning in meatHC(x, type = type, omega = omega): HC3 covariances become
-## numerically unstable if hat values are close to 1 as for observations 11, 29,
-## 44
+## Warning in meatHC(x, type = type, omega = omega): HC3 covariances are
+## numerically unstable for hat values close to 1 (and undefined if exactly 1) as
+## for observation(s) 11, 29, 44
 ```
 
-```r
+``` r
 summary(preslmw.mrifit)
 ```
 
 ```
 ## 
 ## Effect estimates:
-##      Estimate Std. Error 95% CI L 95% CI U t value Pr(&gt;|t|)
+##              Estimate Std. Error 95% CI L 95% CI U t value Pr(&gt;|t|)
+## E[Y₁-Y₀|A=1]  0.02144    0.03880 -0.05667  0.09955   0.552    0.583
 ## 
-## Residual standard error: 0.134 on 44 degrees of freedom
+## Residual standard error: 0.1396 on 46 degrees of freedom
 ## 
 ## Potential outcome means:
-##      Estimate Std. Error 95% CI L 95% CI U t value Pr(&gt;|t|)
+##           Estimate Std. Error 95% CI L 95% CI U t value Pr(&gt;|t|)    
+## E[Y₀|A=1]  0.62856    0.03964  0.54877  0.70835   15.86   &lt;2e-16 ***
+## E[Y₁|A=1]  0.65000    0.03184  0.58590  0.71410   20.41   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
 ---
 
-```r
+``` r
 plot(preslmw.mri)
 ```
 
@@ -539,15 +687,15 @@ plot(preslmw.mri)
 
 ---
 
-```r
- plot(preslmw.mri, type="extrapolation", variables=~ccp_systyear)
+``` r
+ plot(preslmw.mri, type="extrapolation", variables=~ht_colonial)
 ```
 
 &lt;img src="2regression_files/figure-html/unnamed-chunk-34-1.png" width="60%" /&gt;
 
 ---
 
-```r
+``` r
 plot(preslmw.mri, type="influence", outcome="vdem_libdem")
 ```
 
@@ -555,57 +703,67 @@ plot(preslmw.mri, type="influence", outcome="vdem_libdem")
 
 ---
 
-```r
-qog2000demsin2020clean$cname[11]
+``` r
+qog2000demsin2020clean$cname[47]
 ```
 
 ```
-## [1] "Cabo Verde"
+## [1] "Poland"
 ```
 
-```r
-qog2000demsin2020clean$br_pres[11]
-```
-
-```
-## [1] 0
-```
-
-```r
-qog2000demsin2020clean$ht_colonial[11]
-```
-
-```
-## [1] 7
-```
-
-```r
-qog2000demsin2020clean$ccp_systyear[11]
-```
-
-```
-## [1] 1980
-```
-
-```r
-qog2000demsin2020clean$br_pvote[11]
+``` r
+qog2000demsin2020clean$br_pres[47]
 ```
 
 ```
 ## [1] 1
 ```
 
-```r
-qog2000demsin2020clean$vdem_libdem[11]
+``` r
+qog2000demsin2020clean$ht_colonial[47]
 ```
 
 ```
-## [1] 0.69
+## [1] 0
+```
+
+``` r
+qog2000demsin2020clean$ccp_systyear[47]
+```
+
+```
+## [1] 1997
+```
+
+``` r
+qog2000demsin2020clean$br_pvote[47]
+```
+
+```
+## [1] 1
 ```
 
 ---
 
-```r
+``` r
+qog2000demsin2020clean$vdem_libdem[47]
+```
+
+```
+## [1] 0.487
+```
+
+---
+
+``` r
+hist(qog2000demsin2020clean$vdem_libdem[qog2000demsin2020clean$ht_colonial==0])
+```
+
+&lt;img src="2regression_files/figure-html/unnamed-chunk-38-1.png" width="60%" /&gt;
+
+---
+
+``` r
 with(qog2000demsin2020clean, table(ht_colonial, br_pres))
 ```
 
@@ -626,40 +784,36 @@ with(qog2000demsin2020clean, table(ht_colonial, br_pres))
 
 ---
 
-```r
-qog2000demsin2020nocabo &lt;- qog2000demsin2020clean %&gt;% filter(cname != "Cabo Verde")
+``` r
+qog2000demsin2020nopoland &lt;- qog2000demsin2020clean %&gt;% filter(cname != "Poland")
 
-preslmw.mrinocabo &lt;- lmw(~ br_pres + as.factor(ht_colonial) +  
-                           ccp_systyear + br_pvote, 
-                         data = qog2000demsin2020nocabo,
+preslmw.mrinopoland &lt;- lmw(~ br_pres + as.factor(ht_colonial) +  
+                           br_pvote, 
+                         data = qog2000demsin2020nopoland,
                    estimand = "ATT", method = "MRI", treat = "br_pres")
 
-preslmw.mrifitnocabo &lt;- lmw_est(preslmw.mrinocabo, outcome = "vdem_libdem")
+preslmw.mrifitnopoland &lt;- lmw_est(preslmw.mrinopoland, outcome = "vdem_libdem")
 ```
 
 ```
-## Warning in meatHC(x, type = type, omega = omega): HC3 covariances become
-## numerically unstable if hat values are close to 1 as for observations 28, 43
+## Warning in meatHC(x, type = type, omega = omega): HC3 covariances are
+## numerically unstable for hat values close to 1 (and undefined if exactly 1) as
+## for observation(s) 11, 29, 44
 ```
 
-```r
-summary(preslmw.mrifitnocabo)
+``` r
+summary(preslmw.mrifitnopoland)
 ```
 
 ```
 ## 
 ## Effect estimates:
-##              Estimate Std. Error 95% CI L 95% CI U t value Pr(&gt;|t|)
-## E[Y₁-Y₀|A=1]  0.05419    0.04791 -0.04236  0.15075   1.131    0.264
+##      Estimate Std. Error 95% CI L 95% CI U t value Pr(&gt;|t|)
 ## 
-## Residual standard error: 0.134 on 44 degrees of freedom
+## Residual standard error: 0.1336 on 45 degrees of freedom
 ## 
 ## Potential outcome means:
-##           Estimate Std. Error 95% CI L 95% CI U t value Pr(&gt;|t|)    
-## E[Y₀|A=1]  0.59581    0.04447  0.50619  0.68543   13.40   &lt;2e-16 ***
-## E[Y₁|A=1]  0.65000    0.03688  0.57567  0.72433   17.62   &lt;2e-16 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+##      Estimate Std. Error 95% CI L 95% CI U t value Pr(&gt;|t|)
 ```
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>

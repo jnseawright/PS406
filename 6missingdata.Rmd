@@ -3,7 +3,7 @@ title: "6: Missing Data and Selection"
 subtitle: "Quantitative Causal Inference"
 author: "<large>J. Seawright</large>"
 institute: "<small>Northwestern Political Science</small>" 
-date: "April 29 and May 1, 2024"
+date: "May 8, 2025"
 output: 
   xaringan::moon_reader:
     css: xaringan-themer.css
@@ -170,11 +170,12 @@ sd(perumareffects)
 ```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
 perunonigeffects <- 1:100
 
-missing.threshold <- -2.3 + -.5*peruemotions$edlevel + -.2*peruemotions$classid + peruemotions$leftright
-perunonigsubset <- peruemotions[missing.threshold>-.1,]
+missing.threshold <- -2.3 + 4*peruemotions$outsidervote
+missing.threshold[is.na(missing.threshold)] <- .3
 
 for (i in 1:100){
-  perutemp <- perunonigsubset[sample(1:nrow(perunonigsubset),nrow(perunonigsubset)-50, replace = TRUE),]
+  perutemp <- peruemotions
+  perutemp$outsidervote[rbern(length(missing.threshold),1-inv.logit(missing.threshold))==1] <- NA
   perunonigeffects[i] <- lm(outsidervote ~ simpletreat, data=perutemp)$coef[2]
 }
 
@@ -354,76 +355,57 @@ include_graphics("images/pepinsky2.jpg")
 
 ---
 ```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
-include_graphics("images/LallRobinson1.png")
+include_graphics("images/LaqueurTitle.png")
 ```
 
 ---
 ```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
-include_graphics("images/LallRobinson2.png")
+include_graphics("images/Laqueur1.png")
 ```
 
 ---
 ```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
-include_graphics("images/LallRobinson3.png")
+include_graphics("images/Laqueur2.png")
 ```
 
 ---
 ```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
-include_graphics("images/LallRobinson4.png")
+include_graphics("images/crossvalidatedrisk.png")
+```
+
+---
+```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+include_graphics("images/Laqueur3.png")
 ```
 
 ---
 ```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
-library(rMIDAS)
+library(superMICE)
+
+perusupermieffects <- 1:10
+
+missing.prob <- inv.logit(-2.3 + -.5*peruemotions$edlevel + -.2*peruemotions$classid + peruemotions$leftright)
+missing.prob[is.na(missing.prob)] <- .3
+SL.lib <- c("SL.mean", "SL.biglasso", "SL.randomForest")
+
+for (i in 1:10){
+  perutemp <- peruemotions
+  perutemp$outsidervote[rbern(length(missing.prob),missing.prob)==1] <- NA
+  perumice <- mice::mice(perutemp,
+                method = "SuperLearner",
+                SL.library = SL.lib,
+                kernel = "gaussian",
+                bw = c(0.25, 1, 5))
+  perusupermieffects[i] <- summary(pool(with(perumice, summary(lm(outsidervote ~ simpletreat)))))[2,2]
+}
 ```
 
 ---
 ```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
-adult <- read.csv("https://raw.githubusercontent.com/MIDASverse/MIDASpy/master/Examples/adult_data.csv",
-                  row.names = 1)[1:1000,]
-                  
-set.seed(89)
-
-adult <- add_missingness(adult, prop = 0.1)
-
-adult_cat <- c('workclass','marital_status','relationship','race','education','occupation','native_country')
-adult_bin <- c('sex','class_labels')
+summary(perusupermieffects)
+sd(perusupermieffects)
 ```
 
----
-```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
-# Apply rMIDAS preprocessing steps
-adult_conv <- convert(adult, 
-                      bin_cols = adult_bin, 
-                      cat_cols = adult_cat,
-                      minmax_scale = TRUE)
-                      
-# Train the model for 20 epochs
-adult_train <- train(adult_conv,
-                       training_epochs = 20,
-                       layer_structure = c(128,128),
-                       input_drop = 0.75,
-                       seed = 89)
-```
-                       
----
-```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
-# Generate 10 imputed datasets
-adult_complete <- complete(adult_train, m = 10)
-
-# Inspect first imputed dataset:
-head(adult_complete[[1]])
-```
-
----
-```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
-# Estimate logit model on 10 completed datasets (using Rubin's combination rules)
-adult_model <- combine("class_labels ~ hours_per_week + sex", 
-                    adult_complete,
-                    family = stats::binomial)
-
-adult_model
-```
 
 ---
 ### Non-Ignorable Missingness

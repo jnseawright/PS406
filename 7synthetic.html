@@ -4,7 +4,8 @@
     <title>7: Synthetic Controls, Sensitivity Analysis and Bounds</title>
     <meta charset="utf-8" />
     <meta name="author" content="J. Seawright" />
-    <script src="7synthetic_files/header-attrs-2.25/header-attrs.js"></script>
+    <meta name="date" content="2025-05-15" />
+    <script src="7synthetic_files/header-attrs-2.29/header-attrs.js"></script>
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
   </head>
   <body>
@@ -24,7 +25,7 @@ class: center, middle, inverse, title-slide
 ### <small>Northwestern Political Science</small>
 ]
 .date[
-### May 6 and 8, 2024
+### May 15, 2025
 ]
 
 ---
@@ -155,7 +156,7 @@ Minimize `\(X_{i, t} -  \mathbb{X}_{j, t} W\)` for `\(t &lt; t_{treat}\)`.
 
 ---
 
-```r
+``` r
 library(Synth)
 ```
 
@@ -170,7 +171,7 @@ library(Synth)
 
 ---
 
-```r
+``` r
 afripanel &lt;- read.csv("https://github.com/jnseawright/PS406/raw/main/data/afripanel.csv")
 
 malidata &lt;- afripanel[afripanel$WBCode=="MLI" | afripanel$cont_dem_ind==1,]
@@ -180,7 +181,7 @@ malicontrols &lt;- unique(malidata$WBCode[malidata$WBCode!="MLI"&amp;malidata$WB
 
 ---
 
-```r
+``` r
 mali.prep &lt;- dataprep(
     foo=malidata, 
     predictors=c(
@@ -383,7 +384,7 @@ mali.prep &lt;- dataprep(
 
 ---
 
-```r
+``` r
 mali.synth &lt;- synth(mali.prep)
 ```
 
@@ -411,7 +412,7 @@ mali.synth &lt;- synth(mali.prep)
 
 ---
 
-```r
+``` r
 path.plot(synth.res=mali.synth, dataprep.res=mali.prep,
            Ylab="Log GDP per capita", Legend=NA, tr.intake=1991,
            Ylim=c(6,8) , Main="Mali"
@@ -501,8 +502,12 @@ change in our causal inference.
 
 ---
 
-```r
+``` r
 library(sensemakr)
+```
+
+```
+## Warning: package 'sensemakr' was built under R version 4.4.3
 ```
 
 ```
@@ -515,14 +520,14 @@ library(sensemakr)
 
 ---
 
-```r
+``` r
 perulm &lt;- lm(outsidervote ~ simpletreat, data=peruemotions)
 peru.sens1 &lt;- sensemakr(perulm, "simpletreat")
 ```
 
 ---
 
-```r
+``` r
 peru.sens1
 ```
 
@@ -548,7 +553,7 @@ peru.sens1
 
 ---
 
-```r
+``` r
 plot(peru.sens1)
 ```
 
@@ -556,14 +561,14 @@ plot(peru.sens1)
 
 ---
 
-```r
+``` r
 perulm2 &lt;- lm(risk ~ simpletreat + edlevel + classid + leftright + age + I(age^2), data=peruemotions)
 peru.sens2 &lt;- sensemakr(perulm2, "simpletreat", benchmark_covariates="age")
 ```
 
 ---
 
-```r
+``` r
 plot(peru.sens2)
 ```
 
@@ -637,13 +642,17 @@ Manski and Nagin look at the average treatment effect:
 
 ---
 
-```r
+``` r
 library(ATbounds)
+```
+
+```
+## Warning: package 'ATbounds' was built under R version 4.4.3
 ```
 
 ---
 
-```r
+``` r
 nswre_treated &lt;- read.table("http://users.nber.org/~rdehejia/data/nswre74_treated.txt")
 
 colnames(nswre_treated) &lt;- c("treat","age","edu","black","hispanic", "married","nodegree","RE74","RE75","RE78")
@@ -663,7 +672,7 @@ model &lt;- lm(Y ~ D)
 
 ---
 
-```r
+``` r
 summary(model)
 ```
 
@@ -690,7 +699,7 @@ summary(model)
 
 ---
 
-```r
+``` r
 rps &lt;- rep(mean(D),length(D))
 bns_nsw &lt;- atebounds(Y, D, X, rps, Q=1)
 summary(bns_nsw)
@@ -707,7 +716,7 @@ summary(bns_nsw)
 
 ---
 
-```r
+``` r
 bns_nsw2 &lt;- atebounds(Y, D, X, rps, Q=2)
 summary(bns_nsw2)
 ```

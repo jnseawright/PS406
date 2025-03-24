@@ -4,7 +4,8 @@
     <title>3: Matching</title>
     <meta charset="utf-8" />
     <meta name="author" content="J. Seawright" />
-    <script src="3matching_files/header-attrs-2.25/header-attrs.js"></script>
+    <meta name="date" content="2025-04-17" />
+    <script src="3matching_files/header-attrs-2.29/header-attrs.js"></script>
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
   </head>
   <body>
@@ -24,7 +25,7 @@ class: center, middle, inverse, title-slide
 ### <small>Northwestern Political Science</small>
 ]
 .date[
-### April 8 and 10, 2024
+### April 17, 2025
 ]
 
 ---
@@ -254,7 +255,7 @@ A well-estimated propensity score contains all the information about
 
 ---
 
-```r
+``` r
 fourelec &lt;- read.csv("https://github.com/jnseawright/PS406/raw/main/data/fourelec.csv")
 
 fourelectrim &lt;- na.omit(data.frame(
@@ -272,7 +273,7 @@ fourelectrim &lt;- fourelectrim %&gt;% filter(quota==0)
 
 ---
 
-```r
+``` r
 pscore &lt;- glm(maj ~ prop65 +
          I(log(lyp)) + gastil + federal +
          col_uka + laam,
@@ -282,8 +283,12 @@ pscore &lt;- glm(maj ~ prop65 +
 
 ---
 
-```r
+``` r
 library(Matching)
+```
+
+```
+## Warning: package 'Matching' was built under R version 4.4.3
 ```
 
 ```
@@ -303,7 +308,7 @@ library(Matching)
 
 ```
 ## ## 
-## ##  Matching (Version 4.10-14, Build Date: 2023-09-13)
+## ##  Matching (Version 4.10-15, Build Date: 2024-10-14)
 ## ##  See https://www.jsekhon.com for additional documentation.
 ## ##  Please cite software as:
 ## ##   Jasjeet S. Sekhon. 2011. ``Multivariate and Propensity Score Matching
@@ -314,7 +319,7 @@ library(Matching)
 
 ---
 
-```r
+``` r
 firstmatch &lt;- with(fourelectrim,Match(
    Y=wom_1st,Tr=maj,X=pscore,est="ATT"))
 
@@ -336,7 +341,7 @@ summary(firstmatch)
 
 ---
 
-```r
+``` r
 secondmatch &lt;- with(fourelectrim,Match(
     Y=wom_1st,Tr=maj,X=pscore,est="ATC"))
 summary(secondmatch)
@@ -359,7 +364,7 @@ summary(secondmatch)
 ### What are the actual matches?
 
 
-```r
+``` r
 firstmatched.data &lt;- data.frame(treated.country = fourelectrim$country[firstmatch$index.treated],
                                 control.country = fourelectrim$country[firstmatch$index.control],
                                 treated.wom_1st = fourelectrim$wom_1st[firstmatch$index.treated],
@@ -370,7 +375,7 @@ firstmatched.data &lt;- data.frame(treated.country = fourelectrim$country[firstm
 
 ---
 
-```r
+``` r
 firstmatched.data 
 ```
 
@@ -431,13 +436,17 @@ firstmatched.data
 
 ---
 
-```r
+``` r
 library(optmatch) 
+```
+
+```
+## Warning: package 'optmatch' was built under R version 4.4.3
 ```
 
 ---
 
-```r
+``` r
     elecrulespscore &lt;- glm(maj ~ prop65 +
          I(log(lyp)) + gastil + federal +
          col_uka + laam,
@@ -456,7 +465,7 @@ library(optmatch)
 ## (equivalent number of matched pairs).
 ```
 
-```r
+``` r
     anova(lm(fourelectrim$wom_1st ~ elecrules.pairmatch + fourelectrim$maj))
 ```
 
@@ -481,7 +490,7 @@ library(optmatch)
 
 ---
 
-```r
+``` r
     elecrules.fullmatch &lt;- fullmatch(maj ~ prop65 +
          I(log(lyp)) + gastil + federal +
          col_uka + laam, data=fourelectrim)
@@ -496,7 +505,7 @@ library(optmatch)
 ## (equivalent number of matched pairs).
 ```
 
-```r
+``` r
     anova(lm(fourelectrim$wom_1st ~ elecrules.fullmatch + fourelectrim$maj))
 ```
 
@@ -512,7 +521,7 @@ library(optmatch)
 
 ---
 
-```r
+``` r
     elecrules.distmat &lt;- match_on(maj ~ prop65 +
          I(log(lyp)) + gastil + federal +
          col_uka + laam, data=fourelectrim) +   
@@ -531,7 +540,7 @@ library(optmatch)
 ## 1.17  1.9 1.19 1.22 1.20 1.20  1.9 1.22 1.11 1.23  1.9
 ```
 
-```r
+``` r
     summary(elecrules.caliperfull)
 ```
 
@@ -544,7 +553,7 @@ library(optmatch)
 ```
 ---
 
-```r
+``` r
     anova(lm(fourelectrim$wom_1st ~ elecrules.caliperfull + fourelectrim$maj))
 ```
 
@@ -560,8 +569,12 @@ library(optmatch)
 
 ---
 
-```r
+``` r
 library(cem)
+```
+
+```
+## Warning: package 'cem' was built under R version 4.4.3
 ```
 
 ```
@@ -590,7 +603,7 @@ library(cem)
 
 ---
 
-```r
+``` r
 elecrules.cem &lt;- cem(treatment="maj", data=fourelectrim, drop="wom_1st")
 ```
 
@@ -604,13 +617,13 @@ elecrules.cem &lt;- cem(treatment="maj", data=fourelectrim, drop="wom_1st")
 ## Using 'maj'='1' as baseline group
 ```
 
-```r
+``` r
 elecrules.att &lt;- att(elecrules.cem, wom_1st ~ maj, data=fourelectrim)
 ```
 
 ---
 
-```r
+``` r
 summary(elecrules.att)
 ```
 
@@ -647,7 +660,7 @@ summary(elecrules.att)
 
 ---
 
-```r
+``` r
 firstmatch.mb &lt;- MatchBalance(maj~prop65 +
          I(log(lyp)) + gastil + federal +
          col_uka + laam, data=fourelectrim, 
@@ -672,7 +685,7 @@ firstmatch.mb &lt;- MatchBalance(maj~prop65 +
 ## 
 ## var ratio (Tr/Co).....    0.83882 	 	     1.3321 
 ## T-test p-value........ 0.00038984 	 	    0.25273 
-## KS Bootstrap p-value.. &lt; 2.22e-16 	 	       0.04 
+## KS Bootstrap p-value..      0.006 	 	      0.032 
 ## KS Naive p-value......  0.0026349 	 	   0.047003 
 ## KS Statistic..........    0.46429 	 	       0.36 
 ## 
@@ -693,7 +706,7 @@ firstmatch.mb &lt;- MatchBalance(maj~prop65 +
 ## 
 ## var ratio (Tr/Co).....     2.2316 	 	     15.733 
 ## T-test p-value........      0.123 	 	    0.18286 
-## KS Bootstrap p-value..      0.146 	 	       0.01 
+## KS Bootstrap p-value..      0.148 	 	      0.004 
 ## KS Naive p-value......    0.18069 	 	  0.0055155 
 ## KS Statistic..........    0.27619 	 	       0.44 
 ## 
@@ -714,7 +727,7 @@ firstmatch.mb &lt;- MatchBalance(maj~prop65 +
 ## 
 ## var ratio (Tr/Co).....     1.6859 	 	     1.9046 
 ## T-test p-value........     0.1635 	 	   0.058258 
-## KS Bootstrap p-value..      0.162 	 	      0.008 
+## KS Bootstrap p-value..      0.188 	 	      0.004 
 ## KS Naive p-value......     0.1935 	 	  0.0081118 
 ## KS Statistic..........     0.2631 	 	       0.44 
 ## 
@@ -753,7 +766,7 @@ firstmatch.mb &lt;- MatchBalance(maj~prop65 +
 ## 
 ## var ratio (Tr/Co).....      1.067 	 	    0.98596 
 ## T-test p-value........   2.33e-07 	 	   0.057417 
-## KS Bootstrap p-value.. &lt; 2.22e-16 	 	      0.004 
+## KS Bootstrap p-value.. &lt; 2.22e-16 	 	      0.002 
 ## KS Naive p-value......  3.223e-06 	 	   0.002344 
 ## KS Statistic..........    0.63333 	 	       0.48 
 ## 
@@ -777,23 +790,27 @@ firstmatch.mb &lt;- MatchBalance(maj~prop65 +
 ## 
 ## 
 ## Before Matching Minimum p.value: &lt; 2.22e-16 
-## Variable Name(s): prop65 col_uka  Number(s): 1 5 
+## Variable Name(s): col_uka  Number(s): 5 
 ## 
-## After Matching Minimum p.value: 0.004 
+## After Matching Minimum p.value: 0.002 
 ## Variable Name(s): col_uka  Number(s): 5
 ```
 
 ---
 
-```r
+``` r
 library(cobalt)
 ```
 
 ```
-##  cobalt (Version 4.5.3, Build Date: 2024-01-09)
+## Warning: package 'cobalt' was built under R version 4.4.3
 ```
 
-```r
+```
+##  cobalt (Version 4.5.5, Build Date: 2024-04-02)
+```
+
+``` r
 bal.tab(elecrules.fullmatch, maj ~ prop65 +
             I(log(lyp)) + gastil + federal +
             col_uka + laam, data=fourelectrim,
@@ -855,7 +872,7 @@ bal.tab(elecrules.fullmatch, maj ~ prop65 +
 
 ---
 
-```r
+``` r
 library(rbounds)
 
 psens(fourelectrim$wom_1st[firstmatch$index.treated],
