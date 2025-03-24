@@ -2,7 +2,7 @@
 
 <img src="images/causalinference.jpg" width="200">
 
-[Syllabus](https://jnseawright.github.io/PS406/causalinferencesyllabus2024.pdf)
+[Syllabus](https://jnseawright.github.io/PS406/causalinferencesyllabus2025.pdf)
 
 ### Slides and Code from Seminar
 
@@ -28,6 +28,10 @@
 * [Week 8: Difference-in-Differences Designs](https://jnseawright.github.io/PS406/Lab8DiffinDiff.html)
 * [Week 9: Machine Learning and Causal Inference](https://jnseawright.github.io/PS406/Lab9MachineLearning.html)
 
-### Final Paper
+### Final Grant Proposal
 
-* [Research Design](https://jnseawright.github.io/PS406/FinalPaper.html)
+* [Grant Proposal](https://jnseawright.github.io/PS406/FinalPaper.html)
+
+### Presenting an Estimator In Class
+
+* [Presenting an Estimator](https://canvas.northwestern.edu/courses/230286/assignments/1562510)
