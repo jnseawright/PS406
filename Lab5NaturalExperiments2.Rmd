@@ -23,9 +23,9 @@ library(tidyverse)       # load libraries you always use here
 set.seed(27)             # make random results reproducible
 ```
 
-# Due Date: May 3, 2024
+# Due Date: May 9, 2025
 
-[Submit your lab here.](https://canvas.northwestern.edu/courses/211656/assignments/1392656)
+[Submit your lab here.](https://canvas.northwestern.edu/courses/230286/assignments/1562397)
 
 ### Problem 1: Rainfall, Economic Shocks, and Civil Conflict
 
@@ -39,18 +39,7 @@ How strong is the instrument? Are there any obvious difficulties with the estima
 
 Assume that the instrument is unproblematic. What is the causal meaning of the estimate?
 
-
-### Problem 2: Making a Change
-
-Change the instrument in the Miguel et al. data by adding the 0.2 times the outcome variable to the
-instrument. How do the coefficient estimates change, and what does this mean?
-
-### Problem 3: LATE to PATE
-
-Reestimate the Miguel et al. model, reweighting to get the PATE instead of the LATE. Describe your
-steps, and explain whether we learn anything new from this procedure.
-
-### Problem 4: Regression Discontinuity and Partisan Sheriffs
+### Problem 2: Regression Discontinuity and Partisan Sheriffs
 
 Our [original article](https://doi.org/10.1017/S0003055419000613) here is by Thompson. 
 
@@ -59,3 +48,13 @@ Replicate one of the key RDD analyses from the article as closely as you can, us
 Taking advantage of the things you learned in class about RDD, are there ways you would have changed
 or improved the statistical analysis? Make those changes, and report the result, emphasizing any effects this
 would have on the substantive conclusions to be drawn.
+
+A good tool for carrying out regression-discontinuity analysis is the rdd library in R, which is documented [here](https://cran.r-project.org/web/packages/rdd/).
+
+A straightforward way to quickly analyze an RDD is like this:
+
+```{r, echo=TRUE, eval=FALSE}
+rdoutput <- RDestimate(OUTCOME_VARIABLE ~ ASSIGNMENT_VARIABLE, cutpoint=0.5, data=DATAFRAME)
+```
+
+Then, having run that, you can use summary and plot to get good, quick results. There may still be things you want to adjust, but this is the quickest starting point.

@@ -10,9 +10,9 @@
 
 
 
-<meta name="date" content="2024-05-06" />
+<meta name="date" content="2025-03-24" />
 
-<title>Political Science 406 Lab 7: Bounds and Synthetic Control</title>
+<title>Political Science 406 Lab 7: Synthetic Control</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -220,6 +220,107 @@ ul.task-list{list-style: none;}
 
 
 
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ background-color: #f8f8f8; }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ef2929; } 
+code span.an { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.at { color: #204a87; } 
+code span.bn { color: #0000cf; } 
+code span.cf { color: #204a87; font-weight: bold; } 
+code span.ch { color: #4e9a06; } 
+code span.cn { color: #8f5902; } 
+code span.co { color: #8f5902; font-style: italic; } 
+code span.cv { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.do { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.dt { color: #204a87; } 
+code span.dv { color: #0000cf; } 
+code span.er { color: #a40000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #0000cf; } 
+code span.fu { color: #204a87; font-weight: bold; } 
+code span.im { } 
+code span.in { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.kw { color: #204a87; font-weight: bold; } 
+code span.op { color: #ce5c00; font-weight: bold; } 
+code span.ot { color: #8f5902; } 
+code span.pp { color: #8f5902; font-style: italic; } 
+code span.sc { color: #ce5c00; font-weight: bold; } 
+code span.ss { color: #4e9a06; } 
+code span.st { color: #4e9a06; } 
+code span.va { color: #000000; } 
+code span.vs { color: #4e9a06; } 
+code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
 
 
 
@@ -320,46 +421,58 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">Political Science 406 Lab 7: Bounds and
-Synthetic Control</h1>
-<h4 class="date">2024-05-06</h4>
+<h1 class="title toc-ignore">Political Science 406 Lab 7: Synthetic
+Control</h1>
+<h4 class="date">2025-03-24</h4>
 
 </div>
 
 
-<div id="due-date-may-17-2024" class="section level1">
-<h1>Due Date: May 17, 2024</h1>
-<p><a href="https://canvas.northwestern.edu/courses/211656/assignments/1392659">Submit
+<div id="due-date-may-23-2025" class="section level1">
+<h1>Due Date: May 23, 2025</h1>
+<p><a href="https://canvas.northwestern.edu/courses/230286/assignments/1562447">Submit
 your lab here.</a></p>
-<div id="problem-1-in-your-face-television" class="section level3">
-<h3>Problem 1: In-Your-Face Television</h3>
-<p>Consider Mutz’s 2007 APSR article, “Effects of “in-your-face”
-television discourse on perceptions of a legitimate opposition.” The
-data for several of the analyses is available on the course website as
-mutz.csv. The treatment variable, treat is randomly assigned and
-reflects whether a research subject saw a civil or uncivil debate
-between a Democrat and a Republican. Outcome variables include mfvcanth
-for the feeling thermometer score for your own candidate; lfvcanth, for
-the feeling thermometer score for the other candidate; own, for the
-perceived legitimacy of policy arguments for the participant’s own issue
-stance; and other, for the perceived legitimacy of policy arguments for
-the opposite issue stance.</p>
-<p>Look only at the bivariate relationship between treat and lfvcanth.
-How strong would omitted variables need to be in order to substantially
-affect the estimated relationship? Answer using both sensitivity
-analysis and extreme bounds analysis. (For the extreme bounds analysis,
-you may choose to dichotomize variables as helpful. This is artificial
-and probably shouldn’t be done in real research, but can be useful in
-exercises.)</p>
-</div>
-<div id="problem-2-trump-and-immigration" class="section level3">
-<h3>Problem 2: Trump and Immigration</h3>
+<div id="problem-1-trump-and-global-warming" class="section level3">
+<h3>Problem 1: Trump and Global Warming</h3>
 <p>Can we use a synthetic controls strategy to come up with a
-statistical test of the effect of Trump’s election in 2016 on (legal
-and/or illegal) immigration to the U.S.? Provide a proposed research
-design complete with necessary data and estimator, explain the required
-assumptions, and discuss the strengths and weaknesses of your proposal.
-Then show your results if possible.</p>
+statistical test of the effect of Trump’s election in 2016 on carbon
+emissions by the U.S.? Provide a proposed research design complete with
+necessary data and estimator, explain the required assumptions, and
+discuss the strengths and weaknesses of your proposal. Then show your
+results if possible.</p>
+<p>The library for synthetic controls in R is Synth, documented <a href="https://cran.r-project.org/web/packages/Synth/index.html">here</a>.</p>
+<p>This library works in somewhat unusual ways relative to most other
+stuff in R. Most of the work is done inside the dataprep command:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>example.prep <span class="ot">&lt;-</span> <span class="fu">dataprep</span>(</span>
+<span id="cb1-2"><a href="#cb1-2"></a>    <span class="at">foo=</span>DATAFRAME, </span>
+<span id="cb1-3"><a href="#cb1-3"></a>    <span class="at">predictors=</span><span class="fu">c</span>(</span>
+<span id="cb1-4"><a href="#cb1-4"></a>      <span class="st">&quot;BACKGROUND_VARIABLE_1&quot;</span>,</span>
+<span id="cb1-5"><a href="#cb1-5"></a>      <span class="st">&quot;BACKGROUND_VARIABLE_2&quot;</span>,</span>
+<span id="cb1-6"><a href="#cb1-6"></a>      <span class="st">&quot;BACKGROUND_VARIABLE_3&quot;</span>,</span>
+<span id="cb1-7"><a href="#cb1-7"></a>      <span class="st">&quot;BACKGROUND_VARIABLE_4&quot;</span></span>
+<span id="cb1-8"><a href="#cb1-8"></a>    ),</span>
+<span id="cb1-9"><a href="#cb1-9"></a>    <span class="at">dependent=</span><span class="st">&quot;OUTCOME_VARIABLE&quot;</span>,</span>
+<span id="cb1-10"><a href="#cb1-10"></a>    <span class="at">unit.variable=</span><span class="st">&quot;SEQUENTIAL_NUMBER_THAT_IDENTIFIES_CASES&quot;</span>,</span>
+<span id="cb1-11"><a href="#cb1-11"></a>    <span class="at">time.variable=</span><span class="st">&quot;SEQUENTIAL_NUMBER_THAT_IDENTIFIES_TIME_PERIODS&quot;</span>, </span>
+<span id="cb1-12"><a href="#cb1-12"></a>    <span class="at">treatment.identifier=</span><span class="st">&quot;NAME_OF_TREATMENT_CASE&quot;</span>, </span>
+<span id="cb1-13"><a href="#cb1-13"></a>    <span class="at">controls.identifier=</span>LIST_OF_NAMES_OF_CONTROL_CASES,          </span>
+<span id="cb1-14"><a href="#cb1-14"></a>    <span class="at">time.predictors.prior=</span><span class="fu">c</span>(<span class="dv">1975</span><span class="sc">:</span><span class="dv">1990</span>), <span class="co">#The first number should be the time </span></span>
+<span id="cb1-15"><a href="#cb1-15"></a>                          <span class="co">#period that the data starts, and the second</span></span>
+<span id="cb1-16"><a href="#cb1-16"></a>                          <span class="co">#should be the time period before the treatment.</span></span>
+<span id="cb1-17"><a href="#cb1-17"></a>    <span class="at">time.optimize.ssr=</span><span class="fu">c</span>(<span class="dv">1975</span><span class="sc">:</span><span class="dv">1989</span>), <span class="co">#Optimize over the period before the treatment.</span></span>
+<span id="cb1-18"><a href="#cb1-18"></a>    <span class="at">time.plot=</span><span class="fu">c</span>(<span class="dv">1975</span><span class="sc">:</span><span class="dv">2008</span>), <span class="co">#Plot all the data.</span></span>
+<span id="cb1-19"><a href="#cb1-19"></a>    <span class="at">unit.names.variable=</span><span class="st">&quot;ALPHABETICAL_VARIABLE_THAT_IDENTIFIES_CASES&quot;</span></span>
+<span id="cb1-20"><a href="#cb1-20"></a>)</span></code></pre></div>
+<p>Then, once you’ve set up the scenario, you can run the synthetic
+control:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>example.synth <span class="ot">&lt;-</span> <span class="fu">synth</span>(example.prep)</span></code></pre></div>
+<p>Finally, we usually like to get graphs for this process:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">path.plot</span>(<span class="at">synth.res=</span>example.synth, <span class="at">dataprep.res=</span>example.prep,</span>
+<span id="cb3-2"><a href="#cb3-2"></a>           <span class="at">Ylab=</span><span class="st">&quot;OUTCOME_VARIABLE&quot;</span>, <span class="at">Legend=</span><span class="cn">NA</span>, <span class="at">tr.intake=</span><span class="dv">1991</span>,</span>
+<span id="cb3-3"><a href="#cb3-3"></a>           <span class="at">Ylim=</span><span class="fu">c</span>(<span class="dv">6</span>,<span class="dv">8</span>) , <span class="at">Main=</span><span class="st">&quot;NAME_OF_TREATMENT_CASE&quot;</span></span>
+<span id="cb3-4"><a href="#cb3-4"></a>)<span class="st">```</span></span>
+<span id="cb3-5"><a href="#cb3-5"></a></span>
+<span id="cb3-6"><a href="#cb3-6"></a><span class="at">You may need to change the tr.intake to match your treatment year, and you may need to change the Ylim to match the range of your outcome variable.</span></span></code></pre></div>
 </div>
 </div>
 

@@ -23,9 +23,9 @@ library(tidyverse)       # load libraries you always use here
 set.seed(27)             # make random results reproducible
 ```
 
-# Due Date: April 5, 2024
+# Due Date: April 11, 2025
 
-[Submit your lab here.](https://canvas.northwestern.edu/courses/211656/assignments/1391316)
+[Submit your lab here.](https://canvas.northwestern.edu/courses/230286/assignments/1562190)
 
 ### Problem 1: Analyzing Experimental Data: Difference in Means
 
@@ -33,14 +33,22 @@ In this lab, you will reanalyze the results of the experiment reported in Dunnin
 
 First, use the difference in means to estimate one of the main treatment effects discussed in the paper (disregard compliance, i.e., subjects’ perception of the ethnicity of the politician and of whether a joking cousin relationship exists). Use randomization inference to find a P value for that difference. Discuss the results and any causal implications.
 
-### Problem 2: Analyzing Experimental Data: Multivariate Regression
+The R library used in class for randomization inference is ri2, and you can find its documentation and a vignette [here.](https://cran.r-project.org/web/packages/ri2/index.html)
 
-Now, fit a multivariate model. Choose the control variables that make sense to you; explain why, potentially using a DAG or other formal causal reasoning. Is your estimate of the main treatment effect consistent with the result from the difference in means? What does the regression teach us about the causal relationships, relative to the difference in means?
+One key step is to declare the research design for the randomization inference. This involves specifying the total sample size as well as the sample size per treatment group. You do this with the declare_ra() function, using the N parameter to set up the total sample size, the m parameter to specify the size of the treatment group in a two-group design, or the m_each parameter to provide a list of sample sizes for each treatment group in a multi-group design.
 
-### Problem 3: Analyzing Experimental Data: Mediation
+Then, you can use the conduct_ri() function to combine that declaration with a formula that provides a model, some data, and a null hypothesis.
+
+### Problem 2: Analyzing Experimental Data: Mediation
 
 Estimate a mediation effect that helps clarify a hypothesis in the article, using what seems to you to be a reasonable set of control variables. Again, explain your model and assumptions using whatever form of reasoning makes sense for you. Are your results consistent with the arguments of the article?
 
-### Problem 4: Analyzing Experimental Data: Compliance
+The R library used for mediation in class is (intuitively enough) mediation, and you can find its documentation and a vignette [here.](https://cran.r-project.org/web/packages/mediation/index.html)
 
-A final major issue in experimentation involves compliance -- the proportion of people who actually end up in the treatment group they are assigned to. What is the compliance rate in this experiment? Would it be a good idea to estimate the treatment effect using the treatment group that people thought they were in, instead of the treatment group people were assigned to, as the independent variable? Why or why not? Discuss this choice in terms of the potential outcomes framework or some other way that makes sense to you, and explain whether you think the experiment is a direct experiment or an encouragement design.
+The essential steps to this process are, first, to create a data frame containing the variables necessary for your mediation analysis and to run na.omit on that data frame, because this analysis is not friendly to missing data. Second, run a regression predicting your mediator based on the treatment variable and any control variables you find appropriate. Third, run a regression predicting your outcome based on the mediator, the treatment variable, and any control variables you find appropriate. Third, run a command like the following:
+
+```{r, echo = TRUE, eval=FALSE, out.width="70%", fig.retina = 1}
+mediator_output <- mediate(REGRESSION_PREDICTING_MEDIATOR, REGRESSION_PREDICTING_OUTCOME, treat="TREATMENT_VARIABLE", mediator = "MEDIATOR_VARIABLE")
+```
+
+You will likely want to run the summary and plot commands on the output of this command. You may also want to run the medsens command to check how sensitive the model is to omitted variables.

@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2024-03-20" />
+<meta name="date" content="2025-03-24" />
 
 <title>Political Science 406 Lab 3: Matching</title>
 
@@ -229,6 +229,7 @@ overflow: visible;
 }
 </style>
 <style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
@@ -421,14 +422,14 @@ display: none;
 
 
 <h1 class="title toc-ignore">Political Science 406 Lab 3: Matching</h1>
-<h4 class="date">2024-03-20</h4>
+<h4 class="date">2025-03-24</h4>
 
 </div>
 
 
-<div id="due-date-april-19-2024" class="section level1">
-<h1>Due Date: April 19, 2024</h1>
-<p><a href="https://canvas.northwestern.edu/courses/211656/assignments/1392641">Submit
+<div id="due-date-april-25-2025" class="section level1">
+<h1>Due Date: April 25, 2025</h1>
+<p><a href="https://canvas.northwestern.edu/courses/230286/assignments/1562275">Submit
 your lab here.</a></p>
 <div id="problem-1-estimating-a-propensity-score" class="section level3">
 <h3>Problem 1: Estimating a Propensity Score</h3>
@@ -439,17 +440,25 @@ hypothesis, we will compare self-identified Republicans with
 self-identified Independents and those who report no par- tisan
 preference in the <a href="https://electionstudies.org/%20data-center/2016-time-series-study/">2016
 American National Election Study data</a>.</p>
-<p>Begin by recoding variable V161155 such that Republicans get a score
+<p>It’s of course possible to directly download the ANES data from the
+website and load it manually, but it’s also available through an R
+library for convenience:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="fu">library</span>(devtools)</span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="fu">install_github</span>(<span class="st">&quot;jamesmartherus/anesr&quot;</span>)</span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="fu">library</span>(anesr)</span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="fu">data</span>(<span class="st">&quot;timeseries_2016&quot;</span>)</span></code></pre></div>
+<p>Begin by recoding variable v161155 such that Republicans get a score
 of 1, independents/no preference respondents get a score of 0, and all
 others are missing.</p>
-<p>Potential confounding variables include education (V161270), social
-class (V083250X), race (V161310x), region of residence (V163003), and
+<p>Potential confounding variables include education (v161270), social
+class (v161307), race (V161310x), region of residence (V163003), and
 degree of attention to politics (V161003). Recode these variables in a
-suitable way.</p>
+suitable way. Note that negative numbers should usually be missing, and
+numbers in the 90s are often error codes of some kind.</p>
 <p>First, estimate a propensity score for Republican identification
 conditional on these variables:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>temp1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(repvind <span class="sc">~</span> ed <span class="sc">+</span> class <span class="sc">+</span> race <span class="sc">+</span> region <span class="sc">+</span> attention, <span class="at">data=</span>anes2008)</span>
-<span id="cb1-2"><a href="#cb1-2"></a>pscore1 <span class="ot">&lt;-</span> <span class="fu">fitted</span>(temp1)</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>temp1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(repvind <span class="sc">~</span> ed <span class="sc">+</span> class <span class="sc">+</span> race <span class="sc">+</span> region <span class="sc">+</span> attention, <span class="at">data=</span>anes2016)</span>
+<span id="cb2-2"><a href="#cb2-2"></a>pscore1 <span class="ot">&lt;-</span> <span class="fu">fitted</span>(temp1)</span></code></pre></div>
 <p>Briefly discuss the adequacy of the model, as well as the substantive
 patterns that you find. Make any corrections or adjustments that seem
 relevant.</p>
@@ -460,32 +469,28 @@ relevant.</p>
 about politics (V161495) more often than non-partisans — a variable
 called repvind below. First, set up a clean data set for the matching
 exercise:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>mediadata <span class="ot">&lt;-</span> <span class="fu">na.omit</span>(<span class="fu">data.frame</span>(<span class="at">repvind=</span>anes2016<span class="sc">$</span>repvind, <span class="at">ed=</span>anes2016<span class="sc">$</span>ed,</span>
-<span id="cb2-2"><a href="#cb2-2"></a><span class="at">class=</span>anes2016<span class="sc">$</span>class, <span class="at">race=</span>anes2016<span class="sc">$</span>race, <span class="at">region=</span>anes2016<span class="sc">$</span>region,</span>
-<span id="cb2-3"><a href="#cb2-3"></a><span class="at">attention=</span>anes2016<span class="sc">$</span>attention, <span class="at">internetnews=</span>anes2016<span class="sc">$</span>internetnews))</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>mediadata <span class="ot">&lt;-</span> <span class="fu">na.omit</span>(<span class="fu">data.frame</span>(<span class="at">repvind=</span>anes2016<span class="sc">$</span>repvind, <span class="at">ed=</span>anes2016<span class="sc">$</span>ed,</span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="at">class=</span>anes2016<span class="sc">$</span>class, <span class="at">race=</span>anes2016<span class="sc">$</span>race, <span class="at">region=</span>anes2016<span class="sc">$</span>region,</span>
+<span id="cb3-3"><a href="#cb3-3"></a><span class="at">attention=</span>anes2016<span class="sc">$</span>attention, <span class="at">internetnews=</span>anes2016<span class="sc">$</span>internetnews))</span></code></pre></div>
 <p>Using this cleaned data set, re-estimate your propensity score model
 and store fitted values from that model in a new variable. With this
 propensity score, run a pairwise matching estimate of the effect of
 Republicanness on internet usage. What are your results? Check the
 quality of balance after matching.</p>
+<p>The main library we use for matching in class is called Matching, and
+you can find the R supporting materials <a href="https://cran.r-project.org/web/packages/Matching/index.html">here</a>.
+The core code isn’t hard to use, once you’ve gotten rid of missing data
+and estimated a propensity score. Just do something like this:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>matchoutput <span class="ot">&lt;-</span> <span class="fu">with</span>(DATA_WITHOUT_NAS ,<span class="fu">Match</span>(</span>
+<span id="cb4-2"><a href="#cb4-2"></a>   <span class="at">Y=</span>OUTCOME_VARIABLE, <span class="at">Tr=</span>TREATMENT_VARIABLE, <span class="at">X=</span>PROPENSITY_SCORE, <span class="at">est=</span><span class="st">&quot;ATT&quot;</span>))</span>
+<span id="cb4-3"><a href="#cb4-3"></a></span>
+<span id="cb4-4"><a href="#cb4-4"></a><span class="fu">summary</span>(matchoutput)</span></code></pre></div>
 <p>Experiment with the caliper, CommonSupport, BiasAdjust, and Exact
 parameters to the matching function. Do any of these alternative
 estimators change your results?</p>
 <p>What if you change the specification of your propensity score? Do
 your results change meaningfully, or not? What does this finding
 mean?</p>
-</div>
-<div id="problem-3-sensitivity-analysis" class="section level3">
-<h3>Problem 3: Sensitivity Analysis</h3>
-<p>Carry out a sensitivity analysis of your favorite matching result
-from the previous problem. How bad would uncontrolled confounding have
-to be in order to substantially change your conclusions?</p>
-</div>
-<div id="problem-4-other-matching-estimators" class="section level3">
-<h3>Problem 4: Other Matching Estimators</h3>
-<p>Try reanalyzing the data above using coarsened exact matching and
-optimal full matching. Compare your conclusions and discuss how you
-would select an estimator from among this set.</p>
 </div>
 </div>
 

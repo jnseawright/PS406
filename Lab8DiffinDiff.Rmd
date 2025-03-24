@@ -23,9 +23,9 @@ library(tidyverse)       # load libraries you always use here
 set.seed(27)             # make random results reproducible
 ```
 
-# Due Date: May 24, 2024
+# Due Date: May 30, 2025
 
-[Submit your lab here.](https://canvas.northwestern.edu/courses/211656/assignments/1392661)
+[Submit your lab here.](https://canvas.northwestern.edu/courses/230286/assignments/1562450)
 
 ### Problem 1: Democracy and Education
 
@@ -35,3 +35,12 @@ performance worldwide. The data are available as aclppanel.csv, and you can also
 Using these data, try to determine whether dictatorship/democracy (REG) has a positive or negative
 causal effect on average education levels (EDT). Structure the analysis as a difference-in-differences setup,
 and deal with any problems that arise. Describe your findings.
+
+The main contemporary R library we used that can accommodate treatments that happen at different points in time is fect, documented [here](https://cran.r-project.org/web/packages/fect/index.html). The command can be run as follows:
+
+```{r, echo=TRUE, eval=FALSE}
+output.ect <- fect(OUTCOME.VARIABLE ~ TREATMENT.VARIABLE, index = c("COUNTRY", "YEAR"), force = "two-way",
+               data = DATAFRAME, method="fe",min.T0=1, se=1)
+```
+
+It can be interesting to try different methods. gsynth instead of fe uses synthetic controls to estimate the diff-in-diff, for example, but only works when cases don't switch back to control after becoming treated. mc uses a matrix completion method, and polynomial allows nonlinear time trends.

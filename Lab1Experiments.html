@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2024-03-19" />
+<meta name="date" content="2025-03-24" />
 
 <title>Political Science 406 Lab 1: Experiments</title>
 
@@ -220,6 +220,107 @@ ul.task-list{list-style: none;}
 
 
 
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ background-color: #f8f8f8; }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ef2929; } 
+code span.an { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.at { color: #204a87; } 
+code span.bn { color: #0000cf; } 
+code span.cf { color: #204a87; font-weight: bold; } 
+code span.ch { color: #4e9a06; } 
+code span.cn { color: #8f5902; } 
+code span.co { color: #8f5902; font-style: italic; } 
+code span.cv { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.do { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.dt { color: #204a87; } 
+code span.dv { color: #0000cf; } 
+code span.er { color: #a40000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #0000cf; } 
+code span.fu { color: #204a87; font-weight: bold; } 
+code span.im { } 
+code span.in { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.kw { color: #204a87; font-weight: bold; } 
+code span.op { color: #ce5c00; font-weight: bold; } 
+code span.ot { color: #8f5902; } 
+code span.pp { color: #8f5902; font-style: italic; } 
+code span.sc { color: #ce5c00; font-weight: bold; } 
+code span.ss { color: #4e9a06; } 
+code span.st { color: #4e9a06; } 
+code span.va { color: #000000; } 
+code span.vs { color: #4e9a06; } 
+code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
 
 
 
@@ -322,14 +423,14 @@ display: none;
 
 <h1 class="title toc-ignore">Political Science 406 Lab 1:
 Experiments</h1>
-<h4 class="date">2024-03-19</h4>
+<h4 class="date">2025-03-24</h4>
 
 </div>
 
 
-<div id="due-date-april-5-2024" class="section level1">
-<h1>Due Date: April 5, 2024</h1>
-<p><a href="https://canvas.northwestern.edu/courses/211656/assignments/1391316">Submit
+<div id="due-date-april-11-2025" class="section level1">
+<h1>Due Date: April 11, 2025</h1>
+<p><a href="https://canvas.northwestern.edu/courses/230286/assignments/1562190">Submit
 your lab here.</a></p>
 <div id="problem-1-analyzing-experimental-data-difference-in-means" class="section level3">
 <h3>Problem 1: Analyzing Experimental Data: Difference in Means</h3>
@@ -342,35 +443,40 @@ subjects’ perception of the ethnicity of the politician and of whether a
 joking cousin relationship exists). Use randomization inference to find
 a P value for that difference. Discuss the results and any causal
 implications.</p>
+<p>The R library used in class for randomization inference is ri2, and
+you can find its documentation and a vignette <a href="https://cran.r-project.org/web/packages/ri2/index.html">here.</a></p>
+<p>One key step is to declare the research design for the randomization
+inference. This involves specifying the total sample size as well as the
+sample size per treatment group. You do this with the declare_ra()
+function, using the N parameter to set up the total sample size, the m
+parameter to specify the size of the treatment group in a two-group
+design, or the m_each parameter to provide a list of sample sizes for
+each treatment group in a multi-group design.</p>
+<p>Then, you can use the conduct_ri() function to combine that
+declaration with a formula that provides a model, some data, and a null
+hypothesis.</p>
 </div>
-<div id="problem-2-analyzing-experimental-data-multivariate-regression" class="section level3">
-<h3>Problem 2: Analyzing Experimental Data: Multivariate Regression</h3>
-<p>Now, fit a multivariate model. Choose the control variables that make
-sense to you; explain why, potentially using a DAG or other formal
-causal reasoning. Is your estimate of the main treatment effect
-consistent with the result from the difference in means? What does the
-regression teach us about the causal relationships, relative to the
-difference in means?</p>
-</div>
-<div id="problem-3-analyzing-experimental-data-mediation" class="section level3">
-<h3>Problem 3: Analyzing Experimental Data: Mediation</h3>
+<div id="problem-2-analyzing-experimental-data-mediation" class="section level3">
+<h3>Problem 2: Analyzing Experimental Data: Mediation</h3>
 <p>Estimate a mediation effect that helps clarify a hypothesis in the
 article, using what seems to you to be a reasonable set of control
 variables. Again, explain your model and assumptions using whatever form
 of reasoning makes sense for you. Are your results consistent with the
 arguments of the article?</p>
-</div>
-<div id="problem-4-analyzing-experimental-data-compliance" class="section level3">
-<h3>Problem 4: Analyzing Experimental Data: Compliance</h3>
-<p>A final major issue in experimentation involves compliance – the
-proportion of people who actually end up in the treatment group they are
-assigned to. What is the compliance rate in this experiment? Would it be
-a good idea to estimate the treatment effect using the treatment group
-that people thought they were in, instead of the treatment group people
-were assigned to, as the independent variable? Why or why not? Discuss
-this choice in terms of the potential outcomes framework or some other
-way that makes sense to you, and explain whether you think the
-experiment is a direct experiment or an encouragement design.</p>
+<p>The R library used for mediation in class is (intuitively enough)
+mediation, and you can find its documentation and a vignette <a href="https://cran.r-project.org/web/packages/mediation/index.html">here.</a></p>
+<p>The essential steps to this process are, first, to create a data
+frame containing the variables necessary for your mediation analysis and
+to run na.omit on that data frame, because this analysis is not friendly
+to missing data. Second, run a regression predicting your mediator based
+on the treatment variable and any control variables you find
+appropriate. Third, run a regression predicting your outcome based on
+the mediator, the treatment variable, and any control variables you find
+appropriate. Third, run a command like the following:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>mediator_output <span class="ot">&lt;-</span> <span class="fu">mediate</span>(REGRESSION_PREDICTING_MEDIATOR, REGRESSION_PREDICTING_OUTCOME, <span class="at">treat=</span><span class="st">&quot;TREATMENT_VARIABLE&quot;</span>, <span class="at">mediator =</span> <span class="st">&quot;MEDIATOR_VARIABLE&quot;</span>)</span></code></pre></div>
+<p>You will likely want to run the summary and plot commands on the
+output of this command. You may also want to run the medsens command to
+check how sensitive the model is to omitted variables.</p>
 </div>
 </div>
 

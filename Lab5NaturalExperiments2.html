@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2024-03-20" />
+<meta name="date" content="2025-03-24" />
 
 <title>Political Science 406 Lab 5: Natural Experiments, Part 2</title>
 
@@ -220,6 +220,107 @@ ul.task-list{list-style: none;}
 
 
 
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ background-color: #f8f8f8; }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ef2929; } 
+code span.an { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.at { color: #204a87; } 
+code span.bn { color: #0000cf; } 
+code span.cf { color: #204a87; font-weight: bold; } 
+code span.ch { color: #4e9a06; } 
+code span.cn { color: #8f5902; } 
+code span.co { color: #8f5902; font-style: italic; } 
+code span.cv { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.do { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.dt { color: #204a87; } 
+code span.dv { color: #0000cf; } 
+code span.er { color: #a40000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #0000cf; } 
+code span.fu { color: #204a87; font-weight: bold; } 
+code span.im { } 
+code span.in { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.kw { color: #204a87; font-weight: bold; } 
+code span.op { color: #ce5c00; font-weight: bold; } 
+code span.ot { color: #8f5902; } 
+code span.pp { color: #8f5902; font-style: italic; } 
+code span.sc { color: #ce5c00; font-weight: bold; } 
+code span.ss { color: #4e9a06; } 
+code span.st { color: #4e9a06; } 
+code span.va { color: #000000; } 
+code span.vs { color: #4e9a06; } 
+code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
 
 
 
@@ -322,14 +423,14 @@ display: none;
 
 <h1 class="title toc-ignore">Political Science 406 Lab 5: Natural
 Experiments, Part 2</h1>
-<h4 class="date">2024-03-20</h4>
+<h4 class="date">2025-03-24</h4>
 
 </div>
 
 
-<div id="due-date-may-3-2024" class="section level1">
-<h1>Due Date: May 3, 2024</h1>
-<p><a href="https://canvas.northwestern.edu/courses/211656/assignments/1392656">Submit
+<div id="due-date-may-9-2025" class="section level1">
+<h1>Due Date: May 9, 2025</h1>
+<p><a href="https://canvas.northwestern.edu/courses/230286/assignments/1562397">Submit
 your lab here.</a></p>
 <div id="problem-1-rainfall-economic-shocks-and-civil-conflict" class="section level3">
 <h3>Problem 1: Rainfall, Economic Shocks, and Civil Conflict</h3>
@@ -347,20 +448,8 @@ the estimate?</p>
 <p>Assume that the instrument is unproblematic. What is the causal
 meaning of the estimate?</p>
 </div>
-<div id="problem-2-making-a-change" class="section level3">
-<h3>Problem 2: Making a Change</h3>
-<p>Change the instrument in the Miguel et al. data by adding the 0.2
-times the outcome variable to the instrument. How do the coefficient
-estimates change, and what does this mean?</p>
-</div>
-<div id="problem-3-late-to-pate" class="section level3">
-<h3>Problem 3: LATE to PATE</h3>
-<p>Reestimate the Miguel et al. model, reweighting to get the PATE
-instead of the LATE. Describe your steps, and explain whether we learn
-anything new from this procedure.</p>
-</div>
-<div id="problem-4-regression-discontinuity-and-partisan-sheriffs" class="section level3">
-<h3>Problem 4: Regression Discontinuity and Partisan Sheriffs</h3>
+<div id="problem-2-regression-discontinuity-and-partisan-sheriffs" class="section level3">
+<h3>Problem 2: Regression Discontinuity and Partisan Sheriffs</h3>
 <p>Our <a href="https://doi.org/10.1017/S0003055419000613">original
 article</a> here is by Thompson.</p>
 <p>Replicate one of the key RDD analyses from the article as closely as
@@ -370,6 +459,13 @@ data</a>.</p>
 there ways you would have changed or improved the statistical analysis?
 Make those changes, and report the result, emphasizing any effects this
 would have on the substantive conclusions to be drawn.</p>
+<p>A good tool for carrying out regression-discontinuity analysis is the
+rdd library in R, which is documented <a href="https://cran.r-project.org/web/packages/rdd/">here</a>.</p>
+<p>A straightforward way to quickly analyze an RDD is like this:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>rdoutput <span class="ot">&lt;-</span> <span class="fu">RDestimate</span>(OUTCOME_VARIABLE <span class="sc">~</span> ASSIGNMENT_VARIABLE, <span class="at">cutpoint=</span><span class="fl">0.5</span>, <span class="at">data=</span>DATAFRAME)</span></code></pre></div>
+<p>Then, having run that, you can use summary and plot to get good,
+quick results. There may still be things you want to adjust, but this is
+the quickest starting point.</p>
 </div>
 </div>
 

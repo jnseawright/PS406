@@ -23,9 +23,9 @@ library(tidyverse)       # load libraries you always use here
 set.seed(27)             # make random results reproducible
 ```
 
-# Due Date: May 31, 2024
+# Due Date: June 6, 2025
 
-[Submit your lab here.](https://canvas.northwestern.edu/courses/211656/assignments/1392772)
+[Submit your lab here.](https://canvas.northwestern.edu/courses/230286/assignments/1562502)
 
 ### Problem 1: Machine Learning Causal Inference
 

@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2024-05-06" />
+<meta name="date" content="2025-03-24" />
 
 <title>Political Science 406 Lab 6: Missing Data</title>
 
@@ -229,6 +229,7 @@ overflow: visible;
 }
 </style>
 <style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
@@ -422,24 +423,28 @@ display: none;
 
 <h1 class="title toc-ignore">Political Science 406 Lab 6: Missing
 Data</h1>
-<h4 class="date">2024-05-06</h4>
+<h4 class="date">2025-03-24</h4>
 
 </div>
 
 
-<div id="due-date-may-10-2024" class="section level1">
-<h1>Due Date: May 10, 2024</h1>
-<p><a href="https://canvas.northwestern.edu/courses/211656/assignments/1392658">Submit
+<div id="due-date-may-16-2025" class="section level1">
+<h1>Due Date: May 16, 2025</h1>
+<p><a href="https://canvas.northwestern.edu/courses/230286/assignments/1562400">Submit
 your lab here.</a></p>
 <div id="problem-1-democracy-and-inequality" class="section level3">
 <h3>Problem 1: Democracy and Inequality</h3>
 <p>Return to the inequality data set from Lab 1. Repeat the following
-analysis using multiple imputation to handle missing data. How, if at
-all, do the results differ? What can we conclude?</p>
+analysis using multiple imputation to handle missing data.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>ineqlm3 <span class="ot">&lt;-</span> <span class="fu">lm</span>(Gini <span class="sc">~</span> Polity <span class="sc">+</span> <span class="fu">log</span>(GDP) <span class="sc">+</span> Polity<span class="sc">:</span><span class="fu">log</span>(GDP), <span class="at">data=</span>inequality)</span></code></pre></div>
-<p>Try to put together a Tobit-2 selection model instead, positing an
-explanation for missingness the best that you can with the available
-data. Describe your assumptions and explain your results.</p>
+<p>How, if at all, do the results differ? What can we conclude?</p>
+<p>The most widely used library in R for multiple imputation is mice,
+which is documented <a href="https://cran.r-project.org/web/packages/mice/index.html">here</a>.
+To run it in default settings, you just load the library and then call
+the command mice on your dataframe of interest. Then you will want to
+run your model in each of the imputed datasets and combine the results
+together with a command similar to this one:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">summary</span>(<span class="fu">pool</span>(<span class="fu">with</span>(perumice, <span class="fu">summary</span>(<span class="fu">lm</span>(outsidervote <span class="sc">~</span> simpletreat)))))</span></code></pre></div>
 </div>
 <div id="problem-2-colonial-mortality-expropriation-risk-and-economic-development" class="section level3">
 <h3>Problem 2: Colonial Mortality, Expropriation Risk, and Economic

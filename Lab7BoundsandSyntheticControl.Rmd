@@ -1,5 +1,5 @@
 ---
-title: "Political Science 406 Lab 7: Bounds and Synthetic Control"
+title: "Political Science 406 Lab 7: Synthetic Control"
 date: "`r Sys.Date()`"
 output:
   html_document:
@@ -23,27 +23,56 @@ library(tidyverse)       # load libraries you always use here
 set.seed(27)             # make random results reproducible
 ```
 
-# Due Date: May 17, 2024
+# Due Date: May 23, 2025
 
-[Submit your lab here.](https://canvas.northwestern.edu/courses/211656/assignments/1392659)
+[Submit your lab here.](https://canvas.northwestern.edu/courses/230286/assignments/1562447)
 
-### Problem 1: In-Your-Face Television
-
-Consider Mutz’s 2007 APSR article, “Effects of “in-your-face” television discourse on perceptions of a
-legitimate opposition.” The data for several of the analyses is available on the course website as mutz.csv.
-The treatment variable, treat is randomly assigned and reflects whether a research subject saw a civil or
-uncivil debate between a Democrat and a Republican. Outcome variables include mfvcanth for the feeling
-thermometer score for your own candidate; lfvcanth, for the feeling thermometer score for the other candidate;
-own, for the perceived legitimacy of policy arguments for the participant’s own issue stance; and other, for
-the perceived legitimacy of policy arguments for the opposite issue stance. 
-
-Look only at the bivariate relationship between treat and lfvcanth. How strong would omitted variables
-need to be in order to substantially affect the estimated relationship? Answer using both sensitivity analysis
-and extreme bounds analysis. (For the extreme bounds analysis, you may choose to dichotomize variables as helpful. This is artificial and probably shouldn't be done in real research, but can be useful in exercises.)
-
-### Problem 2: Trump and Immigration
+### Problem 1: Trump and Global Warming
 
 Can we use a synthetic controls strategy to come up with a statistical test of the effect of Trump’s
-election in 2016 on (legal and/or illegal) immigration to the U.S.? Provide a proposed research design complete with
+election in 2016 on carbon emissions by the U.S.? Provide a proposed research design complete with
 necessary data and estimator, explain the required assumptions, and discuss the strengths and weaknesses
 of your proposal. Then show your results if possible.
+
+The library for synthetic controls in R is Synth, documented [here](https://cran.r-project.org/web/packages/Synth/index.html).
+
+This library works in somewhat unusual ways relative to most other stuff in R. Most of the work is done inside the dataprep command:
+
+```{r, echo=TRUE, eval=FALSE}
+example.prep <- dataprep(
+    foo=DATAFRAME, 
+    predictors=c(
+      "BACKGROUND_VARIABLE_1",
+      "BACKGROUND_VARIABLE_2",
+      "BACKGROUND_VARIABLE_3",
+      "BACKGROUND_VARIABLE_4"
+    ),
+    dependent="OUTCOME_VARIABLE",
+    unit.variable="SEQUENTIAL_NUMBER_THAT_IDENTIFIES_CASES",
+    time.variable="SEQUENTIAL_NUMBER_THAT_IDENTIFIES_TIME_PERIODS", 
+    treatment.identifier="NAME_OF_TREATMENT_CASE", 
+    controls.identifier=LIST_OF_NAMES_OF_CONTROL_CASES,          
+    time.predictors.prior=c(1975:1990), #The first number should be the time 
+                          #period that the data starts, and the second
+                          #should be the time period before the treatment.
+    time.optimize.ssr=c(1975:1989), #Optimize over the period before the treatment.
+    time.plot=c(1975:2008), #Plot all the data.
+    unit.names.variable="ALPHABETICAL_VARIABLE_THAT_IDENTIFIES_CASES"
+)
+```
+
+Then, once you've set up the scenario, you can run the synthetic control:
+
+```{r, echo=TRUE, eval=FALSE}
+example.synth <- synth(example.prep)
+```
+
+Finally, we usually like to get graphs for this process:
+
+```{r, echo=TRUE, eval=FALSE}
+path.plot(synth.res=example.synth, dataprep.res=example.prep,
+           Ylab="OUTCOME_VARIABLE", Legend=NA, tr.intake=1991,
+           Ylim=c(6,8) , Main="NAME_OF_TREATMENT_CASE"
+)```
+
+You may need to change the tr.intake to match your treatment year, and you may need to change the Ylim to match the range of your outcome variable.

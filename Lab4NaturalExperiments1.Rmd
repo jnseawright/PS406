@@ -23,9 +23,9 @@ library(tidyverse)       # load libraries you always use here
 set.seed(27)             # make random results reproducible
 ```
 
-# Due Date: April 26, 2024
+# Due Date: May 2, 2025
 
-[Submit your lab here.](https://canvas.northwestern.edu/courses/211656/assignments/1392648)
+[Submit your lab here.](https://canvas.northwestern.edu/courses/230286/assignments/1562347)
 
 ### Problem 1: Evaluate a Natural Experiment
 

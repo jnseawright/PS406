@@ -23,9 +23,9 @@ library(tidyverse)       # load libraries you always use here
 set.seed(27)             # make random results reproducible
 ```
 
-# Due Date: April 19, 2024
+# Due Date: April 25, 2025
 
-[Submit your lab here.](https://canvas.northwestern.edu/courses/211656/assignments/1392641)
+[Submit your lab here.](https://canvas.northwestern.edu/courses/230286/assignments/1562275)
 
 ### Problem 1: Estimating a Propensity Score
 
@@ -35,12 +35,21 @@ we will compare self-identified Republicans with self-identified Independents an
 tisan preference in the [2016 American National Election Study data](https://electionstudies.org/
 data-center/2016-time-series-study/).
 
-Begin by recoding variable V161155 such that Republicans get a score of 1, independents/no preference
-respondents get a score of 0, and all others are missing.
+It's of course possible to directly download the ANES data from the website and load it manually, but it's also available through an R library for convenience:
 
-Potential confounding variables include education (V161270), social class (V083250X), race (V161310x),
+```{r, echo=TRUE, eval=FALSE}
+library(devtools)
+install_github("jamesmartherus/anesr")
+library(anesr)
+data("timeseries_2016")
+```
+
+Begin by recoding variable v161155 such that Republicans get a score of 1, independents/no preference
+respondents get a score of 0, and all others are missing. 
+
+Potential confounding variables include education (v161270), social class (v161307), race (V161310x),
 region of residence (V163003), and degree of attention to politics (V161003). Recode these variables in a
-suitable way.
+suitable way. Note that negative numbers should usually be missing, and numbers in the 90s are often error codes of some kind.
 
 First, estimate a propensity score for Republican identification conditional on these variables:
 
@@ -67,18 +76,20 @@ Using this cleaned data set, re-estimate your propensity score model and store f
 model in a new variable. With this propensity score, run a pairwise matching estimate of the effect of
 Republicanness on internet usage. What are your results? Check the quality of balance after matching.
 
+The main library we use for matching in class is called Matching, and you can find the R supporting materials [here](https://cran.r-project.org/web/packages/Matching/index.html). The core code isn't hard to use, once you've gotten rid of missing data and estimated a propensity score. Just do something like this:
+
+```{r, echo=TRUE, eval=FALSE}
+matchoutput <- with(DATA_WITHOUT_NAS ,Match(
+   Y=OUTCOME_VARIABLE, Tr=TREATMENT_VARIABLE, X=PROPENSITY_SCORE, est="ATT"))
+
+summary(matchoutput)
+```
+
 Experiment with the caliper, CommonSupport, BiasAdjust, and Exact parameters to the matching function.
 Do any of these alternative estimators change your results?
 
 What if you change the specification of your propensity score? Do your results change meaningfully, or
 not? What does this finding mean?
 
-### Problem 3: Sensitivity Analysis
 
-Carry out a sensitivity analysis of your favorite matching result from the previous problem. How bad
-would uncontrolled confounding have to be in order to substantially change your conclusions?
 
-### Problem 4: Other Matching Estimators
-
-Try reanalyzing the data above using coarsened exact matching and optimal full matching. Compare
-your conclusions and discuss how you would select an estimator from among this set.

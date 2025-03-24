@@ -23,22 +23,26 @@ library(tidyverse)       # load libraries you always use here
 set.seed(27)             # make random results reproducible
 ```
 
-# Due Date: May 10, 2024
+# Due Date: May 16, 2025
 
-[Submit your lab here.](https://canvas.northwestern.edu/courses/211656/assignments/1392658)
+[Submit your lab here.](https://canvas.northwestern.edu/courses/230286/assignments/1562400)
 
 ### Problem 1: Democracy and Inequality
 
 Return to the inequality data set from Lab 1. Repeat the following analysis using multiple imputation
-to handle missing data. How, if at all, do the results differ? What can we conclude?
+to handle missing data. 
 
 ```{r, echo=TRUE, eval=FALSE}
 ineqlm3 <- lm(Gini ~ Polity + log(GDP) + Polity:log(GDP), data=inequality)
 ```
 
-Try to put together a Tobit-2 selection model instead, positing an explanation for missingness the best
-that you can with the available data. Describe your assumptions and explain your results.
+How, if at all, do the results differ? What can we conclude?
 
+The most widely used library in R for multiple imputation is mice, which is documented [here](https://cran.r-project.org/web/packages/mice/index.html). To run it in default settings, you just load the library and then call the command mice on your dataframe of interest. Then you will want to run your model in each of the imputed datasets and combine the results together with a command similar to this one:
+
+```{r, echo=TRUE, eval=FALSE}
+summary(pool(with(perumice, summary(lm(outsidervote ~ simpletreat)))))
+```
 
 ### Problem 2: Colonial Mortality, Expropriation Risk, and Economic Development
 

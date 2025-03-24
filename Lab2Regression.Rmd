@@ -23,9 +23,9 @@ library(tidyverse)       # load libraries you always use here
 set.seed(27)             # make random results reproducible
 ```
 
-# Due Date: April 12, 2024
+# Due Date: April 18, 2025
 
-[Submit your lab here.](https://canvas.northwestern.edu/courses/211656/assignments/1391318)
+[Submit your lab here.](https://canvas.northwestern.edu/courses/230286/assignments/1562273)
 
 ### Problem 1: Bivariate Regression in R
 
@@ -74,4 +74,22 @@ Analyze and explain the results. Discuss the assumptions that would be involved 
 
 Calculate the multivariate regression from problem 2 using URI to determine the implied weights for each case. Are they relatively even, or are some cases far more important than others?
 
-To calculate an average treatment effect that weights every case equally, calcuate the effect using MRI. (It may be necessary to dichotomize the treatment; play this by ear.) Are the results substantively similar, or do the weights make a difference?
+To calculate an average treatment effect that weights every case equally, calculate the effect using MRI. Are the results substantively similar, or do the weights make a difference?
+
+The library we used to carry out these tasks in class was lmw; you can find its documentation [here.](https://cran.r-project.org/web/packages/lmw/index.html) 
+
+As is often the case, a first recommended step in using this package is to make a special dataframe that includes only the variables you plan to use and then to get rid of missing data. You should also calculate a dichotomous version of the Polity variable that is a 1 if and only if Polity is greater than 0. Use that dichotomous version as your treatment variable to set up an lmw command that looks something like the following:
+
+```{r, echo=TRUE, eval=FALSE}
+ineqlmw.uri <- lmw(~ TREATMENT_VARIABLE + CONTROL_VARIABLE(s) + INTERACTION_TERM(s), data=DATAFRAME,
+                estimand = "ATE", method = "URI", treat = "DICHOTOMOUS_POLITY")
+```
+
+You can then do a plot of the result to see the implied weights across cases.
+
+To calculate a regression using even weights, switch the method from URI to MRI. Then combine the weights with the outcome variable:
+
+```{r, echo=TRUE, eval=FALSE}
+ineqest.mri <- lmw_est(ineqlmw.mri, outcome = "OUTCOME_VARIABLE")
+```
+

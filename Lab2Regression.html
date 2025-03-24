@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2024-03-19" />
+<meta name="date" content="2025-03-24" />
 
 <title>Political Science 406 Lab 2: Regression</title>
 
@@ -229,6 +229,7 @@ overflow: visible;
 }
 </style>
 <style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
@@ -422,14 +423,14 @@ display: none;
 
 <h1 class="title toc-ignore">Political Science 406 Lab 2:
 Regression</h1>
-<h4 class="date">2024-03-19</h4>
+<h4 class="date">2025-03-24</h4>
 
 </div>
 
 
-<div id="due-date-april-12-2024" class="section level1">
-<h1>Due Date: April 12, 2024</h1>
-<p><a href="https://canvas.northwestern.edu/courses/211656/assignments/1391318">Submit
+<div id="due-date-april-18-2025" class="section level1">
+<h1>Due Date: April 18, 2025</h1>
+<p><a href="https://canvas.northwestern.edu/courses/230286/assignments/1562273">Submit
 your lab here.</a></p>
 <div id="problem-1-bivariate-regression-in-r" class="section level3">
 <h3>Problem 1: Bivariate Regression in R</h3>
@@ -441,15 +442,12 @@ command:</p>
 <p>Look at the names of the variables in the data set, to make sure your
 copy downloaded correctly:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">names</span>(inequality)</span></code></pre></div>
-<pre><code>##  [1] &quot;Code&quot;            &quot;Country&quot;         &quot;Year&quot;            &quot;Gini&quot;           
-##  [5] &quot;Polity&quot;          &quot;GDP&quot;             &quot;Industry&quot;        &quot;FuelExports&quot;    
-##  [9] &quot;CommunistLegacy&quot; &quot;Region&quot;          &quot;X&quot;               &quot;X.1&quot;            
-## [13] &quot;X.2&quot;             &quot;X.3&quot;             &quot;X.4&quot;             &quot;X.5&quot;            
-## [17] &quot;X.6&quot;             &quot;X.7&quot;             &quot;X.8&quot;             &quot;X.9&quot;            
-## [21] &quot;X.10&quot;            &quot;X.11&quot;            &quot;X.12&quot;            &quot;X.13&quot;           
-## [25] &quot;X.14&quot;            &quot;X.15&quot;            &quot;X.16&quot;            &quot;X.17&quot;           
-## [29] &quot;X.18&quot;            &quot;X.19&quot;            &quot;X.20&quot;            &quot;X.21&quot;           
-## [33] &quot;X.22&quot;            &quot;X.23&quot;</code></pre>
+<pre><code>##  [1] &quot;X&quot;                    &quot;Code&quot;                 &quot;Country&quot;             
+##  [4] &quot;Year&quot;                 &quot;Gini&quot;                 &quot;Polity&quot;              
+##  [7] &quot;GDP&quot;                  &quot;Industry&quot;             &quot;FuelExports&quot;         
+## [10] &quot;CommunistLegacy&quot;      &quot;Region&quot;               &quot;Expropriation&quot;       
+## [13] &quot;SettlerMortality&quot;     &quot;vdem_corr&quot;            &quot;militaryexpenditure&quot; 
+## [16] &quot;educationexpenditure&quot; &quot;electricityaccess&quot;    &quot;netmigration&quot;</code></pre>
 <p>Now carry out a bivariate regression, using the Gini coefficient (a
 measure of inequality) as the dependent variable and the Polity variable
 (a measure of democracy) as the independent variable. Suppose that the
@@ -485,9 +483,24 @@ be involved in treating these results as causal.</p>
 determine the implied weights for each case. Are they relatively even,
 or are some cases far more important than others?</p>
 <p>To calculate an average treatment effect that weights every case
-equally, calcuate the effect using MRI. (It may be necessary to
-dichotomize the treatment; play this by ear.) Are the results
-substantively similar, or do the weights make a difference?</p>
+equally, calculate the effect using MRI. Are the results substantively
+similar, or do the weights make a difference?</p>
+<p>The library we used to carry out these tasks in class was lmw; you
+can find its documentation <a href="https://cran.r-project.org/web/packages/lmw/index.html">here.</a></p>
+<p>As is often the case, a first recommended step in using this package
+is to make a special dataframe that includes only the variables you plan
+to use and then to get rid of missing data. You should also calculate a
+dichotomous version of the Polity variable that is a 1 if and only if
+Polity is greater than 0. Use that dichotomous version as your treatment
+variable to set up an lmw command that looks something like the
+following:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>ineqlmw.uri <span class="ot">&lt;-</span> <span class="fu">lmw</span>(<span class="sc">~</span> TREATMENT_VARIABLE <span class="sc">+</span> <span class="fu">CONTROL_VARIABLE</span>(s) <span class="sc">+</span> <span class="fu">INTERACTION_TERM</span>(s), <span class="at">data=</span>DATAFRAME,</span>
+<span id="cb6-2"><a href="#cb6-2"></a>                <span class="at">estimand =</span> <span class="st">&quot;ATE&quot;</span>, <span class="at">method =</span> <span class="st">&quot;URI&quot;</span>, <span class="at">treat =</span> <span class="st">&quot;DICHOTOMOUS_POLITY&quot;</span>)</span></code></pre></div>
+<p>You can then do a plot of the result to see the implied weights
+across cases.</p>
+<p>To calculate a regression using even weights, switch the method from
+URI to MRI. Then combine the weights with the outcome variable:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>ineqest.mri <span class="ot">&lt;-</span> <span class="fu">lmw_est</span>(ineqlmw.mri, <span class="at">outcome =</span> <span class="st">&quot;OUTCOME_VARIABLE&quot;</span>)</span></code></pre></div>
 </div>
 </div>
 
