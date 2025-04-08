@@ -36,6 +36,11 @@ class: center, middle
 
 
 ---
+### In-Seminar Presentation
+
+Sign up in teams of two for a pre-set list of topics and dates [here](https://docs.google.com/spreadsheets/d/13UnKiGDod1opceuVEmFPkc-3XliXoCGghpQWTeJ9nhA/edit?gid=0#gid=0).
+
+---
 ### Unconfounded Assignment
 
 1.  `\(Pr(\mathbb{W} | \mathbb{X}, \mathbb{Y}_{0}, \mathbb{Y}_{1}) = Pr(\mathbb{W} | \mathbb{X}, \mathbb{Y}^{'}_{0}, \mathbb{Y}^{'}_{1})\)`
@@ -603,13 +608,7 @@ If there is causal heterogeneity, the OLS weights are a biased estimator of ATE,
 
 ``` r
 library(lmw)
-```
 
-```
-## Warning: package 'lmw' was built under R version 4.4.3
-```
-
-``` r
 qog2000demsin2020clean &lt;- qog2000demsin2020 %&gt;% filter(!is.na(br_pres) &amp; !is.na(ccp_systyear) &amp; 
                                                          !is.na(ht_colonial) &amp; !is.na(br_pvote))
 ```

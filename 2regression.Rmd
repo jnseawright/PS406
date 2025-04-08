@@ -46,6 +46,11 @@ style_mono_accent(
 ```
 
 ---
+### In-Seminar Presentation
+
+Sign up in teams of two for a pre-set list of topics and dates [here](https://docs.google.com/spreadsheets/d/13UnKiGDod1opceuVEmFPkc-3XliXoCGghpQWTeJ9nhA/edit?gid=0#gid=0).
+
+---
 ### Unconfounded Assignment
 
 1.  $Pr(\mathbb{W} | \mathbb{X}, \mathbb{Y}_{0}, \mathbb{Y}_{1}) = Pr(\mathbb{W} | \mathbb{X}, \mathbb{Y}^{'}_{0}, \mathbb{Y}^{'}_{1})$

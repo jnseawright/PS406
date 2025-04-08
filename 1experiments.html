@@ -338,23 +338,11 @@ library(ri2)
 ```
 
 ```
-## Warning: package 'ri2' was built under R version 4.4.3
-```
-
-```
 ## Loading required package: randomizr
 ```
 
 ```
-## Warning: package 'randomizr' was built under R version 4.4.3
-```
-
-```
 ## Loading required package: estimatr
-```
-
-```
-## Warning: package 'estimatr' was built under R version 4.4.3
 ```
 
 ``` r
@@ -371,6 +359,8 @@ emotions_table &lt;- data_frame(Z = peruemotions$simpletreat,
 ## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
 ## generated.
 ```
+
+---
 
 ``` r
 ri2_emotionsresult &lt;- conduct_ri(
@@ -389,7 +379,7 @@ ri2_emotionsresult
 
 ```
 ##   term  estimate two_tailed_p_value
-## 1    Z 0.1176327              0.014
+## 1    Z 0.1176327              0.016
 ```
 
 ---
@@ -399,10 +389,6 @@ ri2_emotionsresult
 
 ``` r
 library(cobalt)
-```
-
-```
-## Warning: package 'cobalt' was built under R version 4.4.3
 ```
 
 ```
@@ -578,10 +564,6 @@ library(mediation)
 ```
 
 ```
-## Warning: package 'mediation' was built under R version 4.4.3
-```
-
-```
 ## Loading required package: MASS
 ```
 
@@ -602,10 +584,6 @@ library(mediation)
 
 ```
 ## Loading required package: mvtnorm
-```
-
-```
-## Warning: package 'mvtnorm' was built under R version 4.4.3
 ```
 
 ```
@@ -655,10 +633,10 @@ summary(perumed.out)
 ## Quasi-Bayesian Confidence Intervals
 ## 
 ##                Estimate 95% CI Lower 95% CI Upper p-value   
-## ACME             0.0819       0.0299         0.14   0.002 **
-## ADE              0.0228      -0.0709         0.11   0.612   
-## Total Effect     0.1047       0.0033         0.20   0.044 * 
-## Prop. Mediated   0.7581       0.1743         3.49   0.046 * 
+## ACME             0.0813       0.0299         0.13   0.002 **
+## ADE              0.0172      -0.0761         0.11   0.716   
+## Total Effect     0.0986      -0.0116         0.20   0.088 . 
+## Prop. Mediated   0.7696      -2.9748         4.26   0.090 . 
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
@@ -673,17 +651,21 @@ summary(perumed.out)
 plot(perumed.out)
 ```
 
-&lt;img src="1experiments_files/figure-html/unnamed-chunk-12-1.png" width="70%" /&gt;
+&lt;img src="1experiments_files/figure-html/unnamed-chunk-13-1.png" width="70%" /&gt;
 
 ---
 
 ``` r
 perumedsens.out &lt;- medsens(perumed.out, rho.by = 0.1, effect.type = "indirect", sims = 100)
+```
 
+---
+
+``` r
 plot(perumedsens.out)
 ```
 
-&lt;img src="1experiments_files/figure-html/unnamed-chunk-13-1.png" width="65%" /&gt;
+&lt;img src="1experiments_files/figure-html/unnamed-chunk-15-1.png" width="65%" /&gt;
 
 ---
 ### Heterogeneity
@@ -769,10 +751,6 @@ O'Muircheartaigh and Hedges propose:
 
 ``` r
 library(devtools)
-```
-
-```
-## Warning: package 'devtools' was built under R version 4.4.3
 ```
 
 ```

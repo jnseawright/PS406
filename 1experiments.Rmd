@@ -273,7 +273,10 @@ emotions_declaration <- declare_ra(N = 450, m = 151)
 
 emotions_table <- data_frame(Z = peruemotions$simpletreat,
                              Y = peruemotions$outsidervote)
+```
 
+---
+```{r, echo = TRUE, out.width="100%", fig.retina = 1}
 ri2_emotionsresult <- conduct_ri(
   formula = Y ~ Z,
   declaration = emotions_declaration,
@@ -403,7 +406,10 @@ plot(perumed.out)
 ---
 ```{r, echo = TRUE, out.width="65%", fig.retina = 1}
 perumedsens.out <- medsens(perumed.out, rho.by = 0.1, effect.type = "indirect", sims = 100)
+```
 
+---
+```{r, echo = TRUE, out.width="65%", fig.retina = 1}
 plot(perumedsens.out)
 ```
 
