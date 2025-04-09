@@ -142,7 +142,7 @@ summary(perueffects)
 
 ```
 ##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
-## -0.01081  0.06527  0.10402  0.10510  0.14240  0.24326
+## -0.02331  0.06615  0.11555  0.11105  0.14931  0.24679
 ```
 
 ``` r
@@ -150,7 +150,7 @@ sd(perueffects)
 ```
 
 ```
-## [1] 0.05123922
+## [1] 0.05301505
 ```
 
 ---
@@ -213,8 +213,8 @@ summary(perumareffects)
 ```
 
 ```
-##      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
-## 0.0004623 0.0496878 0.0753508 0.0717409 0.0958720 0.1353022
+##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+## 0.008418 0.049494 0.076314 0.072758 0.092965 0.130294
 ```
 
 ``` r
@@ -222,7 +222,7 @@ sd(perumareffects)
 ```
 
 ```
-## [1] 0.02980111
+## [1] 0.02802342
 ```
 
 ---
@@ -251,7 +251,7 @@ summary(perunonigeffects)
 
 ```
 ##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
-## -0.04230  0.01185  0.03083  0.03413  0.05822  0.11926
+## -0.05160  0.01440  0.03480  0.03550  0.05925  0.12098
 ```
 
 ``` r
@@ -259,7 +259,7 @@ sd(perunonigeffects)
 ```
 
 ```
-## [1] 0.03611283
+## [1] 0.03392615
 ```
 
 ---
@@ -306,8 +306,8 @@ summary(perumareffects2)
 ```
 
 ```
-##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-## 0.01354 0.05579 0.07244 0.07111 0.08925 0.13583
+##      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
+## -0.001014  0.056233  0.072094  0.075010  0.091306  0.156249
 ```
 
 ``` r
@@ -315,7 +315,7 @@ sd(perumareffects2)
 ```
 
 ```
-## [1] 0.02530328
+## [1] 0.02685671
 ```
 
 
@@ -3810,7 +3810,7 @@ summary(perumieffects)
 
 ```
 ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-## 0.03244 0.06965 0.08631 0.08848 0.10844 0.16011
+## 0.03196 0.07251 0.08477 0.08509 0.09756 0.14161
 ```
 
 ``` r
@@ -3818,7 +3818,7 @@ sd(perumieffects)
 ```
 
 ```
-## [1] 0.02503659
+## [1] 0.01968412
 ```
 
 ---
@@ -3873,13 +3873,7 @@ mice defaults to 5, because of the older received wisdom of the literature.
 
 ``` r
 library(superMICE)
-```
 
-```
-## Warning: package 'superMICE' was built under R version 4.4.3
-```
-
-``` r
 perusupermieffects &lt;- 1:10
 
 missing.prob &lt;- inv.logit(-2.3 + -.5*peruemotions$edlevel + -.2*peruemotions$classid + peruemotions$leftright)
@@ -4262,7 +4256,7 @@ summary(perusupermieffects)
 
 ```
 ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-## 0.04584 0.06917 0.08015 0.07585 0.08419 0.09300
+## 0.02872 0.06317 0.06984 0.06763 0.07694 0.08578
 ```
 
 ``` r
@@ -4270,7 +4264,7 @@ sd(perusupermieffects)
 ```
 
 ```
-## [1] 0.01466376
+## [1] 0.01652262
 ```
 
 
@@ -4325,10 +4319,6 @@ dat &lt;- read.csv(
      "https://stats.idre.ucla.edu/stat/data/tobit.csv")
 
 library(VGAM)
-```
-
-```
-## Warning: package 'VGAM' was built under R version 4.4.3
 ```
 
 ```
@@ -4492,23 +4482,11 @@ library(sampleSelection)
 ```
 
 ```
-## Warning: package 'sampleSelection' was built under R version 4.4.3
-```
-
-```
 ## Loading required package: maxLik
 ```
 
 ```
-## Warning: package 'maxLik' was built under R version 4.4.3
-```
-
-```
 ## Loading required package: miscTools
-```
-
-```
-## Warning: package 'miscTools' was built under R version 4.4.3
 ```
 
 ```
