@@ -360,19 +360,19 @@ If the RDD is a success, then the groups just above and below the cutpoint on $Z
 ---
 
 ```{r, echo = FALSE, out.width="85%", fig.retina = 1, fig.align='center'}
-include_graphics("images/Angrist2019title.png")
+include_graphics("images/Angrist2019title.PNG")
 ```
 
 ---
 
 ```{r, echo = FALSE, out.width="85%", fig.retina = 1, fig.align='center'}
-include_graphics("images/Angrist2019-1.png")
+include_graphics("images/Angrist2019-1.PNG")
 ```
 
 ---
 
 ```{r, echo = FALSE, out.width="85%", fig.retina = 1, fig.align='center'}
-include_graphics("images/Angrist2019-2.png")
+include_graphics("images/Angrist2019-2.PNG")
 ```
 
 ---
