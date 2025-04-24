@@ -349,6 +349,33 @@ include_graphics("images/maimonmath.jpeg")
 ```
 
 ---
+### Example: Maimonides' Rule
+
+If the RDD is a success, then the groups just above and below the cutpoint on $Z$ should be balanced, both in terms of the number of cases and in terms of any measured background variables.
+
+1. It may be a good idea to do a balance test between treatment and control cases within a bandwidth around the cutpoint.
+
+2. At the very least, look at a histogram of cases to check that there are about the same number of cases just above and just below the threshold.
+
+---
+
+```{r, echo = FALSE, out.width="85%", fig.retina = 1, fig.align='center'}
+include_graphics("images/Angrist2019title.png")
+```
+
+---
+
+```{r, echo = FALSE, out.width="85%", fig.retina = 1, fig.align='center'}
+include_graphics("images/Angrist2019-1.png")
+```
+
+---
+
+```{r, echo = FALSE, out.width="85%", fig.retina = 1, fig.align='center'}
+include_graphics("images/Angrist2019-2.png")
+```
+
+---
 ```{r, echo = FALSE, out.width="65%", fig.retina = 1, fig.align='center'}
 include_graphics("images/Broockman.JPG")
 ```
