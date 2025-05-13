@@ -355,27 +355,27 @@ include_graphics("images/pepinsky2.jpg")
 
 ---
 ```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
-include_graphics("images/LaqueurTitle.png")
+include_graphics("images/LaqueurTitle.PNG")
 ```
 
 ---
 ```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
-include_graphics("images/Laqueur1.png")
+include_graphics("images/Laqueur1.PNG")
 ```
 
 ---
 ```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
-include_graphics("images/Laqueur2.png")
+include_graphics("images/Laqueur2.PNG")
 ```
 
 ---
 ```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
-include_graphics("images/crossvalidatedrisk.png")
+include_graphics("images/crossvalidatedrisk.PNG")
 ```
 
 ---
 ```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
-include_graphics("images/Laqueur3.png")
+include_graphics("images/Laqueur3.PNG")
 ```
 
 ---
@@ -431,6 +431,12 @@ For non-ignorable missingness, the two main solutions are:
 $$y^{*} = \mathbf{x} \beta + \epsilon$$
 
 $$\epsilon \sim N(0, \sigma^{2})$$
+---
+### Tobit
+```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+include_graphics("images/tobit_broken_equation.PNG")
+```
+
 ---
 ### Tobit
 
