@@ -3,7 +3,7 @@ title: "1: Potential Outcomes and Experiments"
 subtitle: "Quantitative Causal Inference"
 author: "<large>J. Seawright</large>"
 institute: "<small>Northwestern Political Science</small>" 
-date: "April 3, 2025"
+date: "April 2 and 7, 2026"
 output: 
   xaringan::moon_reader:
     css: xaringan-themer.css
@@ -471,13 +471,26 @@ O'Muircheartaigh and Hedges propose:
 library(devtools)
 if (!require("generalize")) devtools::install_github('benjamin-ackerman/generalize')
 library(generalize)
-?assess
 ```
 
 ---
-```{r, echo = TRUE, out.width="100%", fig.retina = 1}
-?generalize
-```
+
+```{r, echo = F}
+helpfile <- utils:::.getHelpFile(help(assess))
+outfile <- tempfile(fileext = ".html")
+tools:::Rd2HTML(helpfile, out =outfile)
+rawHTML <- paste(readLines(outfile), collapse="\n")
+knitr::asis_output(htmltools::htmlPreserve(rawHTML))
+```    
+
+---
+```{r, echo = F}
+helpfile <- utils:::.getHelpFile(help(generalize))
+outfile <- tempfile(fileext = ".html")
+tools:::Rd2HTML(helpfile, out =outfile)
+rawHTML <- paste(readLines(outfile), collapse="\n")
+knitr::asis_output(htmltools::htmlPreserve(rawHTML))
+```    
 
 ---
 ```{r, echo = FALSE, out.width="90%", fig.retina = 1}

@@ -4,8 +4,7 @@
     <title>1: Potential Outcomes and Experiments</title>
     <meta charset="utf-8" />
     <meta name="author" content="J. Seawright" />
-    <meta name="date" content="2025-04-03" />
-    <script src="1experiments_files/header-attrs-2.29/header-attrs.js"></script>
+    <script src="1experiments_files/header-attrs-2.30/header-attrs.js"></script>
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
   </head>
   <body>
@@ -25,7 +24,7 @@ class: center, middle, inverse, title-slide
 ### <small>Northwestern Political Science</small>
 ]
 .date[
-### April 3, 2025
+### April 2 and 7, 2026
 ]
 
 ---
@@ -355,7 +354,7 @@ emotions_table &lt;- data_frame(Z = peruemotions$simpletreat,
 ```
 ## Warning: `data_frame()` was deprecated in tibble 1.1.0.
 ## ℹ Please use `tibble()` instead.
-## This warning is displayed once every 8 hours.
+## This warning is displayed once per session.
 ## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
 ## generated.
 ```
@@ -379,7 +378,7 @@ ri2_emotionsresult
 
 ```
 ##   term  estimate two_tailed_p_value
-## 1    Z 0.1176327              0.016
+## 1    Z 0.1176327              0.028
 ```
 
 ---
@@ -392,7 +391,7 @@ library(cobalt)
 ```
 
 ```
-##  cobalt (Version 4.5.5, Build Date: 2024-04-02)
+##  cobalt (Version 4.6.2, Build Date: 2026-01-29)
 ```
 
 ``` r
@@ -603,7 +602,7 @@ library(mediation)
 
 ```
 ## mediation: Causal Mediation Analysis
-## Version: 4.5.0
+## Version: 4.5.1
 ```
 
 ---
@@ -632,11 +631,11 @@ summary(perumed.out)
 ## 
 ## Quasi-Bayesian Confidence Intervals
 ## 
-##                Estimate 95% CI Lower 95% CI Upper p-value   
-## ACME             0.0813       0.0299         0.13   0.002 **
-## ADE              0.0172      -0.0761         0.11   0.716   
-## Total Effect     0.0986      -0.0116         0.20   0.088 . 
-## Prop. Mediated   0.7696      -2.9748         4.26   0.090 . 
+##                   Estimate 95% CI Lower 95% CI Upper p-value    
+## ACME            0.08212975   0.03093674   0.14015426  &lt;2e-16 ***
+## ADE             0.02359715  -0.06282169   0.11383771   0.590    
+## Total Effect    0.10572690   0.00030454   0.20684253   0.046 *  
+## Prop. Mediated  0.75959879   0.17190334   3.79885125   0.046 *  
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
@@ -767,22 +766,233 @@ if (!require("generalize")) devtools::install_github('benjamin-ackerman/generali
 
 ``` r
 library(generalize)
-?assess
-```
-
-```
-## starting httpd help server ...
-```
-
-```
-##  done
 ```
 
 ---
 
-``` r
-?generalize
-```
+<!DOCTYPE html><html><head><title>R: Assess Generalizability of Randomized Trial to Population</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.css">
+<script>
+const macros = { "\\R": "\\textsf{R}", "\\mbox": "\\text", "\\code": "\\texttt"};
+function processMathHTML() {
+    var l = document.getElementsByClassName('reqn');
+    for (let e of l) { katex.render(e.textContent, e, { throwOnError: false, macros }); }
+    return;
+}</script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.js"
+    onload="processMathHTML();"></script>
+<link rel="stylesheet" type="text/css" href="R.css">
+</head><body><div class="container"><main>
+
+<table style="width: 100%;"><tr><td>assess</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Assess Generalizability of Randomized Trial to Population</h2>
+
+<h3>Description</h3>
+
+<p>Assess Generalizability of Randomized Trial to Population
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class='language-R'>assess(
+  trial,
+  selection_covariates,
+  data,
+  selection_method = "lr",
+  sl_library = NULL,
+  survey_weights = FALSE,
+  trim_weights = FALSE,
+  trim_pctile = 0.97,
+  is_data_disjoint = TRUE,
+  trimpop = FALSE,
+  seed
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table role = "presentation">
+<tr><td><code id="trial">trial</code></td>
+<td>
+<p>variable name denoting binary trial participation (1 = trial participant, 0 = not trial participant)</p>
+</td></tr>
+<tr><td><code id="selection_covariates">selection_covariates</code></td>
+<td>
+<p>vector of covariate names in data set that predict trial participation</p>
+</td></tr>
+<tr><td><code id="data">data</code></td>
+<td>
+<p>data frame comprised of &quot;stacked&quot; trial and target population data</p>
+</td></tr>
+<tr><td><code id="selection_method">selection_method</code></td>
+<td>
+<p>method to estimate the probability of trial participation.  Default is logistic regression (&quot;lr&quot;).  Other methods supported are Random Forests (&quot;rf&quot;) and Lasso (&quot;lasso&quot;)</p>
+</td></tr>
+<tr><td><code id="sl_library">sl_library</code></td>
+<td>
+<p>vector of SuperLearner library methods. If &lsquo;selection_method' = &rsquo;super', specify names of methods to include in library. Default is NULL.</p>
+</td></tr>
+<tr><td><code id="survey_weights">survey_weights</code></td>
+<td>
+<p>variable name of population data's complex survey weights. Default is FALSE: if FALSE, then population data do not come a complex survey and weights do not need to be incorporated in estimation.</p>
+</td></tr>
+<tr><td><code id="trim_weights">trim_weights</code></td>
+<td>
+<p>logical. If TRUE, then trim the weights to the value specified in 'trim_pctile'. Default is FALSE.</p>
+</td></tr>
+<tr><td><code id="trim_pctile">trim_pctile</code></td>
+<td>
+<p>numeric. If 'trim_weights' is TRUE, then specify what percentile weights should be trimmed to. Default is 0.97.</p>
+</td></tr>
+<tr><td><code id="is_data_disjoint">is_data_disjoint</code></td>
+<td>
+<p>logical. If TRUE, then trial and population data are considered independent.  This affects calculation of the weights - see details for more information.</p>
+</td></tr>
+<tr><td><code id="trimpop">trimpop</code></td>
+<td>
+<p>logical. If TRUE, then population data are subset to exclude individuals with covariates outside bounds of trial covariates.</p>
+</td></tr>
+<tr><td><code id="seed">seed</code></td>
+<td>
+<p>numeric. By default, the seed is set to 13783, otherwise can be specified (such as for simulation purposes).</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p><code>assess</code> returns an object of the class &quot;generalize_assess&quot;
+</p>
+
+</main>
+
+</div>
+</body></html>
+
+---
+<!DOCTYPE html><html><head><title>R: Generalize Average Treatment Effect from Randomized Trial to...</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.css">
+<script>
+const macros = { "\\R": "\\textsf{R}", "\\mbox": "\\text", "\\code": "\\texttt"};
+function processMathHTML() {
+    var l = document.getElementsByClassName('reqn');
+    for (let e of l) { katex.render(e.textContent, e, { throwOnError: false, macros }); }
+    return;
+}</script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.js"
+    onload="processMathHTML();"></script>
+<link rel="stylesheet" type="text/css" href="R.css">
+</head><body><div class="container"><main>
+
+<table style="width: 100%;"><tr><td>generalize</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Generalize Average Treatment Effect from Randomized Trial to Population</h2>
+
+<h3>Description</h3>
+
+<p>Generalize Average Treatment Effect from Randomized Trial to Population
+</p>
+
+
+<h3>Usage</h3>
+
+<pre><code class='language-R'>generalize(
+  outcome,
+  treatment,
+  trial,
+  selection_covariates,
+  data,
+  method = "weighting",
+  selection_method = "lr",
+  sl_library = NULL,
+  survey_weights = FALSE,
+  trim_weights = FALSE,
+  trim_pctile = 0.97,
+  is_data_disjoint = TRUE,
+  trimpop = FALSE,
+  seed
+)
+</code></pre>
+
+
+<h3>Arguments</h3>
+
+<table role = "presentation">
+<tr><td><code id="outcome">outcome</code></td>
+<td>
+<p>variable name denoting outcome</p>
+</td></tr>
+<tr><td><code id="treatment">treatment</code></td>
+<td>
+<p>variable name denoting binary treatment assignment (ok if only available in trial, not population)</p>
+</td></tr>
+<tr><td><code id="trial">trial</code></td>
+<td>
+<p>variable name denoting binary trial participation (1 = trial participant, 0 = not trial participant)</p>
+</td></tr>
+<tr><td><code id="selection_covariates">selection_covariates</code></td>
+<td>
+<p>vector of covariate names in data set that predict trial participation</p>
+</td></tr>
+<tr><td><code id="data">data</code></td>
+<td>
+<p>data frame comprised of &quot;stacked&quot; trial and target population data</p>
+</td></tr>
+<tr><td><code id="method">method</code></td>
+<td>
+<p>method to generalize average treatment effect to the target population.  Default is &quot;weighting&quot; (weighting by participation probability).  Other methods supported are &quot;BART&quot; (Bayesian Additive Regression Trees - NOT READY YET) and &quot;TMLE&quot; (Targeted Maximum Likelihood Estimation)</p>
+</td></tr>
+<tr><td><code id="selection_method">selection_method</code></td>
+<td>
+<p>method to estimate the probability of trial participation.  Default is logistic regression (&quot;lr&quot;).  Other methods supported are Random Forests (&quot;rf&quot;) and Lasso (&quot;lasso&quot;)</p>
+</td></tr>
+<tr><td><code id="sl_library">sl_library</code></td>
+<td>
+<p>vector of SuperLearner library methods. If &lsquo;selection_method' = &rsquo;super', specify names of methods to include in library. Default is NULL.</p>
+</td></tr>
+<tr><td><code id="survey_weights">survey_weights</code></td>
+<td>
+<p>variable name of population data's complex survey weights. Default is FALSE: if FALSE, then population data do not come a complex survey and weights do not need to be incorporated in estimation.</p>
+</td></tr>
+<tr><td><code id="trim_weights">trim_weights</code></td>
+<td>
+<p>logical. If TRUE, then trim the weights to the value specified in 'trim_pctile'. Default is FALSE.</p>
+</td></tr>
+<tr><td><code id="trim_pctile">trim_pctile</code></td>
+<td>
+<p>numeric. If 'trim_weights' is TRUE, then specify what percentile weights should be trimmed to. Default is 0.97.</p>
+</td></tr>
+<tr><td><code id="is_data_disjoint">is_data_disjoint</code></td>
+<td>
+<p>logical. If TRUE, then trial and population data are considered independent.  This affects calculation of the weights - see details for more information.</p>
+</td></tr>
+<tr><td><code id="trimpop">trimpop</code></td>
+<td>
+<p>logical. If TRUE, then population data are subset to exclude individuals with covariates outside bounds of trial covariates.</p>
+</td></tr>
+<tr><td><code id="seed">seed</code></td>
+<td>
+<p>numeric. By default, the seed is set to 13783, otherwise can be specified (such as for simulation purposes).</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p><code>generalize</code> returns an object of the class &quot;generalize&quot;
+</p>
+
+</main>
+
+</div>
+</body></html>
 
 ---
 &lt;img src="images/Bush1.png" width="90%" /&gt;
