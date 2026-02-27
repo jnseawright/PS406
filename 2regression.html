@@ -3,7 +3,7 @@
   <head>
     <title>2: Regression for Causal Inference</title>
     <meta charset="utf-8" />
-    <meta name="author" content="J. Seawright" />
+    <meta name="author" content="Jaye Seawright" />
     <script src="2regression_files/header-attrs-2.30/header-attrs.js"></script>
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
   </head>
@@ -18,7 +18,7 @@ class: center, middle, inverse, title-slide
 ## Quantitative Causal Inference
 ]
 .author[
-### <large>J. Seawright</large>
+### <large>Jaye Seawright</large>
 ]
 .institute[
 ### <small>Northwestern Political Science</small>
@@ -35,129 +35,181 @@ class: center, middle
 
 
 ---
-### Unconfounded Assignment
+### Why Regression? From Experiments to Observational Studies
 
-1.  `\(Pr(\mathbb{W} | \mathbb{X}, \mathbb{Y}_{0}, \mathbb{Y}_{1}) = Pr(\mathbb{W} | \mathbb{X}, \mathbb{Y}^{'}_{0}, \mathbb{Y}^{'}_{1})\)`
-
----
-### Regression for Causal Inference
-
-`$$\begin{aligned}
-Y_{i} &amp; = E(Y_{i,c}) + D_{i} \{E(Y_{i,t}) - E(Y_{i,c})\} + \\
-     &amp; [Y_{i,c} - E(Y_{i,c})] + \\
-     &amp; D_{i} ([Y_{i,t} - E(Y_{i,t})] - [Y_{i,c} - E(Y_{i,c})]) \\
-     &amp; = \mu_{0} + D_{i} (\mu_{1} - \mu_{0}) + \{\nu_{0} + D_{i} (\nu_{1} - \nu_{0})\}\end{aligned}$$`
+- In an experiment, random assignment ensures that treatment is independent of potential outcomes.
+- In observational data, we worry that treated and control units differ on other characteristics (confounders).
+- Regression attempts to **adjust for those differences** by holding confounders constant.
 
 ---
-### Regression for Causal Inference
+### The Intuition: Adjusting for a Confounder
 
-Imagine that there is a single confounding variable, `\(X\)`, which is
-dichotomous.
+
+``` r
+lm_biased &lt;- lm(Stateterrorism ~ TrumpShare, data = election2016)
+coef(lm_biased)["TrumpShare"]
+```
+
+```
+## TrumpShare 
+## -0.2110919
+```
+
+``` r
+# Adjust for past election and Turnout
+lm_adjusted &lt;- lm(Stateterrorism ~ TrumpShare + Turnout16 + Turnout12 + D12Margin, data = election2016)
+coef(lm_adjusted)["TrumpShare"]
+```
+
+```
+## TrumpShare 
+## 0.02730885
+```
+---
+
+- The coefficient changes because we are now comparing treated and control units having subtracted off the estimated effects of turnout and electoral history.
+- This is the core idea: **control for confounders to mimic randomization**.
 
 ---
-### Regression for Causal Inference
+### When Does This Work? The Key Assumption
 
-What can we say about a bivariate regression of `\(Y\)` on `\(D\)` only for
-cases with `\(X=0\)`?
-
----
-### Regression for Causal Inference
-
-`$$\begin{aligned}
-(Y_{i}| X_{i}=0) = \\
-(\mu_{0} + D_{i} (\mu_{1} - \mu_{0}) + \{\nu_{0} + D_{i} (\nu_{1} - \nu_{0})\}|X_{i}=0)\end{aligned}$$`
+**Unconfoundedness (selection on observables)**  
+\[
+D_i \perp (Y_i(0), Y_i(1)) \mid X_i
+\]
 
 ---
-### Regression for Causal Inference
 
-What about this regression?
-
-`$$\begin{aligned}
-Y_{i} &amp; = \beta_{0} + D_{i} \beta_{1} + X_{i} \beta_{2} + X_{i} D_{i} \beta_{3} + \epsilon_{i}\end{aligned}$$`
+- Conditional on observed covariates \(X\), treatment is as good as randomly assigned.
+- This means: no unmeasured confounders that affect both treatment and outcome.
 
 ---
-### Regression for Causal Inference
 
-`$$\begin{aligned}
-        Y_{i: X_{i} = 0} &amp; = \beta_{0} + D_{i: X_{i} = 0} \beta_{1} + \epsilon_{i: X_{i} = 0}
-        \end{aligned}$$`
+**Overlap / Common Support**  
+For every value of \(X\), there must be both treated and control units.
 
 ---
-### Regression for Causal Inference
+### Visualizing Confounding with DAGs
 
-`$$\begin{aligned}
-        Y_{i: X_{i} = 1} &amp; = \beta_{2} + D_{i: X_{i} = 1} \beta_{3} + \delta_{i: X_{i} = 1}
-        \end{aligned}$$`
+![](2regression_files/figure-html/confounder_dag-1.png)&lt;!-- --&gt;
 
 ---
-### Regression for Causal Inference
 
-`$$\begin{aligned}
-        Y_{i} = &amp; (X_{i}) (\beta_{2} + D_{i} \beta_{3} + \delta_{i}) + \\
-              &amp; (1 - X_{i})(\beta_{0} + D_{i} \beta_{1} + \epsilon_{i})
-        \end{aligned}$$`
+- \(X\) is a confounder: it affects both treatment \(D\) and outcome \(Y\).
+- Controlling for \(X\) blocks the backdoor path \(D \leftarrow X \rightarrow Y\).
+- This gives us the causal effect of \(D\) on \(Y\).
 
----
-### Regression for Causal Inference
-
-`$$\begin{aligned}
-        Y_{i} = &amp; \beta_{0} + D_{i} \beta_{1} + (X_{i} \beta_{2} - X_{i} \beta_{0}) + \\
-                  &amp; X_{i} (D_{i} \beta_{3} - D_{i} \beta_{1}) + \\
-        &amp; \epsilon_{i} + X_{i} (\delta_{i} - \epsilon_{i})
-                \end{aligned}$$`
 
 ---
-### Regression for Causal Inference
+### What Does "Controlling For" Mean?
 
--   A collection of control variables `\(\mathbb{X}\)` will allow regression
-    to produce an unbiased estimate of `\((\mu_{1} - \mu_{0})\)` when:
+- Intuitively: we are asking what the relationship between treatment and outcome would be if age were held constant.
+- Mathematically: regression uses the variation in treatment that is **not explained by age** to estimate the effect.
 
-    1.  `\(D\)` is uncorrelated with
-        `\(\{\nu_{0} + D_{i} (\nu_{1} - \nu_{0})\}\)` within each group
-        defined by `\(\mathbb{X}\)`, and
-
-    2.  the residual causal effect is not correlated with `\(\mathbb{X}\)`,
-        and
-
-    3.  a fully flexible parameterization of `\(\mathbb{X}\)` and `\(D\)` is used.
+**Key idea**: Including a confounder removes its influence from both treatment and outcome, reducing bias.
 
 ---
-### Regression for Causal Inference
+### When Is a Variable a Confounder?
 
--   These conditions imply that:
+A confounder is a variable that:
+1.  Affects the treatment,
+2.  Affects the outcome,
+3.  Is not itself affected by the treatment.
 
-    1.  No element of `\(\mathbb{X}\)` is on any causal path from
-        `\(\mathbf{D}\)` to `\(\mathbf{y}\)`, and
-
-    2.  no element of `\(\mathbb{X}\)` is caused by `\(\mathbf{D}\)` or any of
-        its unmeasured causes *and* `\(\mathbf{y}\)` or some other cause of it, 
-
-    3.  all causes of `\(\mathbf{D}\)` that are also causes of `\(\mathbf{y}\)`
-        have some element of `\(\mathbb{X}\)` somewhere on the causal path
-        from the unmeasured initial cause to either `\(\mathbf{D}\)` or
-        `\(\mathbf{y}\)`,
+We can represent this with a **Directed Acyclic Graph (DAG)**.
 
 ---
-### Regression for Causal Inference
+### DAG: A Simple Confounder
 
--   These conditions imply that:
-
-    4\.  no element of `\(\mathbb{X}\)` causes `\(\mathbf{D}\)` without also having an independent causal pathway to `\(\mathbf{y}\)`.
+![](2regression_files/figure-html/confounder_dag_2-1.png)&lt;!-- --&gt;
 
 ---
-&lt;img src="images/goodcontrol.jpg" width="90%" /&gt;
+
+- `\(X\)` (age) influences both treatment `\(D\)` and outcome `\(Y\)`.
+- This opens a **backdoor path** `\(D \leftarrow X \rightarrow Y\)`.
+- Controlling for `\(X\)` **blocks** this path, giving us the direct effect `\(D \rightarrow Y\)`.
 
 ---
-&lt;img src="images/irrelevantcontrol1.jpg" width="90%" /&gt;
+### Good Controls: Block Backdoor Paths
+
+Any variable that lies on a backdoor path from `\(D\)` to `\(Y\)` and is not itself a descendant of `\(D\)` is a **good control**.
+
+Example from the terrorism study: `past turnout` and `voting history` are plausible confounders – they might affect both vote choice in 2016 and subsequent terrorism.
 
 ---
-&lt;img src="images/harmfulcontrol1.jpg" width="90%" /&gt;
+### Bad Controls: Mediators
+
+![](2regression_files/figure-html/mediator_dag-1.png)&lt;!-- --&gt;
 
 ---
-&lt;img src="images/harmfulcontrol2.jpg" width="90%" /&gt;
+
+- `\(M\)` is a **mediator**: it lies on the causal path from `\(D\)` to `\(Y\)`.
+- Controlling for `\(M\)` would **block part of the causal effect** we want to estimate.
+- This is a form of **overcontrol bias**.
+
+In the Peru study, if `enojado` (anger) is a mediator, we should **not** control for it when estimating the total effect of `simpletreat` on voting.
 
 ---
-&lt;img src="images/harmfulcontrol3.jpg" width="90%" /&gt;
+### Bad Controls: Colliders
+
+![](2regression_files/figure-html/collider_dag-1.png)&lt;!-- --&gt;
+
+---
+
+- `\(C\)` is a **collider**: it is caused by both `\(D\)` and `\(Y\)`.
+- Conditioning on a collider **opens a non‑causal path** `\(D \rightarrow C \leftarrow Y\)`, creating **selection bias**.
+
+---
+
+Example: if we control for a variable that is itself affected by treatment and outcome (e.g., turnout in 2020 in the terrorism example), we can introduce bias.
+
+---
+### Bad Controls: Post‑Treatment Variables
+
+Any variable that is caused by the treatment is **post‑treatment**.  
+Controlling for such a variable can:
+
+- Block part of the causal effect (if it is a mediator),
+- Create collider bias (if it is also affected by other factors),
+- Generally lead to incorrect estimates.
+
+---
+
+**Rule of thumb**: Only control for variables measured **before** treatment.
+
+---
+### Translating DAGs to Regression Practice
+
+When building a regression model for causal inference:
+
+1.  **List all potential confounders** – variables that affect both treatment and outcome.
+2.  **Draw a DAG** (even informally) to check for backdoor paths.
+3.  **Do not control for mediators or colliders**.
+4.  **Do not control for post‑treatment variables**.
+5.  **Include interactions if you suspect heterogeneous effects** (more on this later).
+
+---
+### The Problem of Unobserved Confounders
+
+We can only control for variables we have measured.  
+If an important confounder is unmeasured, our estimate may still be biased.
+
+This is why **sensitivity analysis** is crucial – we need to ask: how strong would an unmeasured confounder have to be to overturn our conclusion?
+
+(We will return to this in later weeks.)
+
+---
+### Summary: Regression for Causal Inference
+
+- Regression can reduce bias by adjusting for confounders.
+- Use DAGs to decide which variables to control for.
+- Avoid bad controls: mediators, colliders, post‑treatment variables.
+- Unobserved confounders remain a threat – be humble.
+- Heterogeneous effects mean the regression coefficient is a weighted average; explore variation.
+
+---
+
+Let's see how this works in practice in an excellent application.
 
 ---
 &lt;img src="images/luputitleauthor.JPG" width="90%" /&gt;
@@ -182,6 +234,10 @@ library(dagitty)
 
 ---
 
+Let's assemble a DAG that captures what appears to be the theoretical intuition behind Lupu and Peisahkin's analysis.
+
+---
+
 ``` r
 LupuPeisahkinDAG1 &lt;- dagitty( "dag {Dekulakized -&gt; Victimization PreSovietWealth -&gt; Victimization SovietOpposition -&gt; Victimization PreSovietReligiosity -&gt; Victimization PriorRegion -&gt; Victimization DeportationRegion -&gt; Victimization DeportationRegion -&gt; Religiosity PriorRegion -&gt; Religiosity PreSovietReligiosity -&gt; Religiosity SovietOpposition -&gt; Religiosity PreSovietWealth -&gt; Religiosity Victimization -&gt; Religiosity Dekulakized -&gt; Religiosity}" )
 ```
@@ -196,7 +252,14 @@ plot( LupuPeisahkinDAG1 )
 ## Plot coordinates for graph not supplied! Generating coordinates, see ?coordinates for how to set your own.
 ```
 
-&lt;img src="2regression_files/figure-html/unnamed-chunk-13-1.png" width="50%" /&gt;
+&lt;img src="2regression_files/figure-html/unnamed-chunk-8-1.png" width="50%" /&gt;
+
+
+---
+
+*   In this initial setup, there are a lot of variables that are confounders for the main relationship of interest, between Victimization and Religiosity. Nothing is post-treatment, etc.
+
+*   Is this the only plausible causal framework? What about...
 
 ---
 
@@ -214,7 +277,11 @@ plot( LupuPeisahkinDAG2 )
 ## Plot coordinates for graph not supplied! Generating coordinates, see ?coordinates for how to set your own.
 ```
 
-&lt;img src="2regression_files/figure-html/unnamed-chunk-15-1.png" width="50%" /&gt;
+&lt;img src="2regression_files/figure-html/unnamed-chunk-10-1.png" width="50%" /&gt;
+
+---
+
+*   Here, Victimization causes DeportationRegion and Dekulakized. How does this change the appropriate set of congrol variables?
 
 ---
 
@@ -234,14 +301,6 @@ adjustmentSets(LupuPeisahkinDAG2, exposure = "Victimization", outcome = "Religio
 ```
 ## { PreSovietReligiosity, PreSovietWealth, PriorRegion, SovietOpposition
 ##   }
-```
-
----
-
-``` r
-instrumentalVariables(LupuPeisahkinDAG1, exposure = "Victimization", outcome = "Religiosity")
-
-instrumentalVariables(LupuPeisahkinDAG2, exposure = "Victimization", outcome = "Religiosity")
 ```
 
 ---
@@ -268,23 +327,31 @@ impliedConditionalIndependencies(LupuPeisahkinDAG1)
 ## PrrR _||_ SvtO
 ```
 
+
+---
+
+Are presidential regimes especially vulnerable to democratic backsliding? Let's try to get a regression-based answer as an application of what we've learned.
+
+---
+
+
+```
+## 
+## Attaching package: 'ggdag'
+```
+
+```
+## The following object is masked from 'package:stats':
+## 
+##     filter
+```
+
+&lt;img src="2regression_files/figure-html/unnamed-chunk-13-1.png" width="50%" /&gt;
+
 ---
 
 ``` r
 library(tidyverse)
-```
-
-```
-## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-## ✔ forcats   1.0.1     ✔ stringr   1.6.0
-## ✔ lubridate 1.9.4     ✔ tibble    3.3.0
-## ✔ purrr     1.2.0     ✔ tidyr     1.3.1
-## ✔ readr     2.1.6     
-## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-## ✖ nlme::collapse() masks dplyr::collapse()
-## ✖ dplyr::filter()  masks stats::filter()
-## ✖ dplyr::lag()     masks stats::lag()
-## ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors
 ```
 
 ---
@@ -517,38 +584,46 @@ summ(preslm2)
 &lt;/table&gt;
 
 ---
+### Is it better to include all but one control variable, or have fewer?
+
+It turns out, maybe surprisingly, that there isn't just one answer to this question.
+
+* Sometimes, you will get an estimate with less bias by leaving out valid control variables from an incomplete model.
+
+* Sometimes you will do better by including as many control variables as you can even if you don't know them all.
+
+* We don't know which scenario is which in general.
+
+---
 ### How Much Does It Hurt to Be Wrong?
 
-Suppose we know we can get a good causal inference from:
+Suppose we know we can get a good causal inference from a regression with two control variables and our treatment, but we don't have access to any way of measuring one of those control variables. We have two options:
 
-`$$Y_{i}=\beta_{1}+\beta_{2}D_{i}+\beta_{3}X_{i}+\beta_{4}W_{i}+\epsilon_{i}$$`
----
+1.  Estimate a regression including the treatment and one control variable.
 
-But instead we estimate:
-
-`$$Y_{i}=\beta^{*}_{1}+\beta^{*}_{2}D_{i}+\beta^{*}_{3}X_{i}+\epsilon^{*}_{i}$$`
----
-
-`$$E[\hat{\beta^*}_{2}]=\beta_{2}+\beta_{4} b_{4,2}$$`
-`$$b_{4,2} = \frac{(r_{4,2}−r_{3,2}r_{4,3})}{1-r_{3,2}^2}\sqrt{\frac{V_{4}}{V_{2}}}$$`
+2.  Estimate a bivariate regression including only the treatment.
 
 ---
 
-What if we estimate:
+Both of these options will have omitted variable bias. 
 
-`$$Y_{i}=\beta^{+}_{1}+\beta^{+}_{2}D_{i}+\epsilon^{+}_{i}$$`
+1.  The first option will have the bias due to leaving out the unmeasurable variable.
+
+2.  The second option will have the bias due to leaving out the unmeasurable variable, and the bias due to leaving out the measured control variable.
+
 ---
 
-`$$E[\hat{\beta^+}_{2}]=\beta_{2}+\beta_{3} r_{2,3}\sqrt{\frac{V_{4}}{V_{2}}} + \beta_{4} r_{2,4}\sqrt{\frac{V_{4}}{V_{3}}}$$`
----
-
-Is `$$E[\hat{\beta^+}_{2}]$$` closer to zero or further away than `$$E[\hat{\beta^*}_{2}]$$`?
+These two sources of bias can point in the same direction, in which scenario the second option will usually be worse than the first. Or the two sources of bias can point in opposite directions, in which scenario the second option can often be better than the first.
 
 ---
 &lt;img src="images/Clarke1.png" width="90%" /&gt;
 
 ---
 &lt;img src="images/Clarke2.png" width="90%" /&gt;
+
+---
+
+As we can see, there are in principle about as many situations where leaving out partial sets of control variables is the right choice as there are situations where including them is the right choice.
 
 ---
 ### Regression for Causal Inference
@@ -558,6 +633,10 @@ Is `$$E[\hat{\beta^+}_{2}]$$` closer to zero or further away than `$$E[\hat{\bet
 
 -   Instead, it estimates a covariance-adjusted weighted average of
     cases' treatment effects.
+
+---
+
+Part of our goal in this seminar is to explore advanced techniques. You don't always have to implement each of these, but learning about them can give you good ideas and broaden your skill set!
 
 ---
 ### Aronow and Samii 2016
@@ -676,138 +755,8 @@ summary(preslmw.mrifit)
 plot(preslmw.mri)
 ```
 
-&lt;img src="2regression_files/figure-html/unnamed-chunk-33-1.png" width="60%" /&gt;
+&lt;img src="2regression_files/figure-html/unnamed-chunk-28-1.png" width="60%" /&gt;
 
----
-
-``` r
- plot(preslmw.mri, type="extrapolation", variables=~ht_colonial)
-```
-
-&lt;img src="2regression_files/figure-html/unnamed-chunk-34-1.png" width="60%" /&gt;
-
----
-
-``` r
-plot(preslmw.mri, type="influence", outcome="vdem_libdem")
-```
-
-&lt;img src="2regression_files/figure-html/unnamed-chunk-35-1.png" width="60%" /&gt;
-
----
-
-``` r
-qog2000demsin2020clean$cname[47]
-```
-
-```
-## [1] "Poland"
-```
-
-``` r
-qog2000demsin2020clean$br_pres[47]
-```
-
-```
-## [1] 1
-```
-
-``` r
-qog2000demsin2020clean$ht_colonial[47]
-```
-
-```
-## [1] 0
-```
-
-``` r
-qog2000demsin2020clean$ccp_systyear[47]
-```
-
-```
-## [1] 1997
-```
-
-``` r
-qog2000demsin2020clean$br_pvote[47]
-```
-
-```
-## [1] 1
-```
-
----
-
-``` r
-qog2000demsin2020clean$vdem_libdem[47]
-```
-
-```
-## [1] 0.487
-```
-
----
-
-``` r
-hist(qog2000demsin2020clean$vdem_libdem[qog2000demsin2020clean$ht_colonial==0])
-```
-
-&lt;img src="2regression_files/figure-html/unnamed-chunk-38-1.png" width="60%" /&gt;
-
----
-
-``` r
-with(qog2000demsin2020clean, table(ht_colonial, br_pres))
-```
-
-```
-##            br_pres
-## ht_colonial  0  1
-##           0 24 11
-##           1  0  1
-##           2  0  6
-##           5  5  5
-##           6  0  2
-##           7  1  2
-##           9  1  0
-```
-
----
-&lt;img src="images/htcolonial.png" width="90%" /&gt;
-
----
-
-``` r
-qog2000demsin2020nopoland &lt;- qog2000demsin2020clean %&gt;% filter(cname != "Poland")
-
-preslmw.mrinopoland &lt;- lmw(~ br_pres + as.factor(ht_colonial) +  
-                           br_pvote, 
-                         data = qog2000demsin2020nopoland,
-                   estimand = "ATT", method = "MRI", treat = "br_pres")
-
-preslmw.mrifitnopoland &lt;- lmw_est(preslmw.mrinopoland, outcome = "vdem_libdem")
-```
-
-```
-## Warning in meatHC(x, type = type, omega = omega): HC3 covariances are
-## numerically unstable for hat values close to 1 (and undefined if exactly 1) as
-## for observation(s) 11, 29, 44
-```
-
-``` r
-summary(preslmw.mrifitnopoland)
-```
-
-```
-## 
-## Effect estimates:
-##      Estimate Std. Error 95% CI L 95% CI U t value Pr(&gt;|t|)
-## 
-## Residual standard error: 0.1336 on 45 degrees of freedom
-## 
-## Potential outcome means:
-##      Estimate Std. Error 95% CI L 95% CI U t value Pr(&gt;|t|)
-```
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

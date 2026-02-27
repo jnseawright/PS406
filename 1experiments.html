@@ -122,39 +122,130 @@ What helps us estimate the average treatment effect well?
 ---
 ### Assignment Mechanisms
 
--   `\(\mathbb{W}\)` has a probability distribution.
-
-&lt;!-- --&gt;
-
--   `\(Pr(\mathbb{W} | \mathbb{X}, \mathbb{Y}_{0}, \mathbb{Y}_{1})\)`
-
-`$$p_{i}(\mathbb{X}, \mathbb{Y}_{0}, \mathbb{Y}_{1}) = \sum_{\mathbb{W}: W_{i} = 1} Pr(\mathbb{W} | \mathbb{X}, \mathbb{Y}_{0}, \mathbb{Y}_{1})$$`
-
-`\(\mathbb{W}\)`, `\(\mathbb{X}\)`, `\(\mathbb{Y}_{0}\)`, and `\(\mathbb{Y}_{1}\)` take
-on joint values that are drawn from some describable set of
-possibilities.
+- The **assignment mechanism** is the probability distribution that determines who gets treatment.
+- Formally:  
+  `$$Pr(\mathbf{W} \mid \mathbf{X}, \mathbf{Y}_0, \mathbf{Y}_1)$$`
+  where  
+  - `\(\mathbf{W}\)` = vector of treatment assignments,  
+  - `\(\mathbf{X}\)` = covariates,  
+  - `\(\mathbf{Y}_0, \mathbf{Y}_1\)` = vectors of potential outcomes.
 
 ---
-### Individualistic Assignment
 
-1.  There exists a function `\(q()\)` that is bounded between 0 and 1, such
-    that
-    `\(p_{i}(\mathbb{X}, \mathbb{Y}_{0}, \mathbb{Y}_{1}) = q(X_{i}, Y_{0,i}, Y_{1,i})\)`
-
-2.  `\(Pr(\mathbb{W} | \mathbb{X}, \mathbb{Y}_{0}, \mathbb{Y}_{1})\)` is the
-    product of those individual probabilities.
+- Three key properties make an assignment mechanism **ideal** for causal inference.
 
 ---
-### Probabilistic Assignment
+### 1. Individualistic Assignment
 
-1.  For all permissible values of `\(\mathbb{X}\)`, `\(\mathbb{Y}_{0}\)`, and
-    `\(\mathbb{Y}_{1}\)`,
-    `\(0 &lt; p_{i}(\mathbb{X}, \mathbb{Y}_{0}, \mathbb{Y}_{1}) &lt; 1\)`.
+**Definition**:  
+There exists a function `\(q(\cdot)\)` bounded between 0 and 1 such that  
+`$$p_i(\mathbf{X}, \mathbf{Y}_0, \mathbf{Y}_1) = q(X_i, Y_{0,i}, Y_{1,i})$$`  
+and the joint probability of `\(\mathbf{W}\)` is the product of these individual probabilities.
 
 ---
-### Unconfounded Assignment
 
-1.  `\(Pr(\mathbb{W} | \mathbb{X}, \mathbb{Y}_{0}, \mathbb{Y}_{1}) = Pr(\mathbb{W} | \mathbb{X}, \mathbb{Y}^{'}_{0}, \mathbb{Y}^{'}_{1})\)`
+**In words**:  
+Each unit’s chance of treatment depends **only on its own** covariates and potential outcomes, **not** on those of other units. Assignments are independent across units.
+
+---
+
+**Example – coin flip**:  
+- For each person `\(i\)`, flip a fair coin.  
+- `\(q(X_i, Y_{0,i}, Y_{1,i}) = 0.5\)` for everyone (same for all `\(i\)`).  
+- Assignments are independent because each coin flip ignores everyone else.
+
+---
+### 2. Probabilistic Assignment
+
+**Definition**:  
+For all permissible values of `\(\mathbf{X}, \mathbf{Y}_0, \mathbf{Y}_1\)`,  
+`$$0 &lt; p_i(\mathbf{X}, \mathbf{Y}_0, \mathbf{Y}_1) &lt; 1$$`
+
+---
+
+**In words**:  
+Every unit has a **strictly positive but not certain** chance of receiving treatment **and** of receiving control. No one is forced into either condition.
+
+---
+
+**Simple example**:  
+- Fair coin: `\(p_i = 0.5\)` (satisfies `\(0 &lt; 0.5 &lt; 1\)`).  
+- Unfair coin: `\(p_i = 0.9\)` still satisfies `\(0 &lt; 0.9 &lt; 1\)`.  
+- Deterministic assignment (e.g., all grad students get treatment) would violate this because some units have `\(p_i = 0\)` or `\(1\)`.
+
+---
+### 3. Unconfounded Assignment
+
+**Definition**:  
+`$$Pr(\mathbf{W} \mid \mathbf{X}, \mathbf{Y}_0, \mathbf{Y}_1) = Pr(\mathbf{W} \mid \mathbf{X}, \mathbf{Y}'_0, \mathbf{Y}'_1)$$`  
+for any vectors `\(\mathbf{Y}'_0, \mathbf{Y}'_1\)`.
+
+---
+
+**In words**:  
+Given the covariates `\(\mathbf{X}\)`, the assignment mechanism does **not** depend on the potential outcomes. It is “ignorable” once we condition on `\(\mathbf{X}\)`.
+
+---
+
+**Simple example**:  
+- Fair coin flip: assignment depends only on the coin, **not** on whether `\(Y_{i,1} - Y_{i,0}\)` is large or small.  
+- Confounded assignment: if we somehow gave treatment to those who would benefit most (based on their `\(Y_1\)`), then assignment would depend on potential outcomes – **not** allowed.
+
+---
+### Putting It All Together: A Tiny Simulation
+
+A simple randomized experiment satisfies all three properties:
+- Individualistic (each person’s coin flip is independent).
+- Probabilistic (everyone has chance `\(p\)` between 0 and 1).
+- Unconfounded (the coin does not look at potential outcomes).
+
+Let’s see this in action with a small R simulation:
+
+---
+
+
+``` r
+set.seed(123)
+n &lt;- 1000
+# Generate potential outcomes (correlated)
+Y0 &lt;- rnorm(n, mean = 0, sd = 1)
+Y1 &lt;- Y0 + 0.5  # constant treatment effect = 0.5
+
+# Individualistic, probabilistic, unconfounded assignment: fair coin
+W &lt;- rbinom(n, 1, 0.5)
+
+# Observed outcome
+Y_obs &lt;- ifelse(W == 1, Y1, Y0)
+
+# Difference in means
+ATE_hat &lt;- mean(Y_obs[W == 1]) - mean(Y_obs[W == 0])
+ATE_hat
+```
+
+```
+## [1] 0.5644382
+```
+
+``` r
+# True ATE = 0.5; our estimate should be close (sampling error)
+```
+
+---
+
+**Key takeaway**: Because the assignment mechanism has these three properties, the simple difference in means is an unbiased estimator of the average treatment effect.
+
+---
+### Why These Properties Matter for Experiments
+
+When assignment is **individualistic**, **probabilistic**, and **unconfounded**:
+
+- The treatment group is a random sample of the `\(Y_1\)` distribution.
+- The control group is a random sample of the `\(Y_0\)` distribution.
+- Therefore:  
+  `$$\small E[Y_i \mid W_i = 1] = E[Y_{i,1}], \quad E[Y_i \mid W_i = 0] = E[Y_{i,0}]$$`  
+  and the difference in sample means estimates the ATE without bias.
+
+In the next slides, we’ll see how these ideas translate into the analysis of real experiments.
 
 ---
 ### Experiments and Causal Inference
@@ -331,6 +422,109 @@ to assume that:
 -   Experimental/psychological realism holds.
 
 ---
+### SUTVA: Stable Unit Treatment Value Assumption
+
+**Definition**:  
+SUTVA consists of two key components:
+
+1. **No interference**: One unit's treatment assignment does not affect another unit's outcomes.
+2. **No hidden variations of treatment**: The treatment is the same for all treated units; there are no hidden versions of treatment that might produce different effects.
+
+Formally:
+`$$Y_i(W_i, \mathbf{W}_{-i}) = Y_i(W_i)$$`
+where `\(\mathbf{W}_{-i}\)` represents the treatment assignments of all other units.
+
+---
+### SUTVA in Plain Language
+
+**No interference** means:
+- My outcome depends only on whether *I* got the treatment, not on whether my neighbor, coworker, or friend got it.
+- Example violation: In a voter mobilization experiment, if I get a GOTV mailer and my spouse does not, we might discuss it – affecting their turnout even though they were in the control group.
+
+---
+### SUTVA in Plain Language
+
+**No hidden variations** means:
+- "Treatment" means the same thing for everyone who receives it.
+- Example violation: In a job training program, some trainers are excellent and others are terrible – the "treatment" varies in quality across units, potentially causing different effects.
+
+---
+### Why SUTVA Matters for Experiments
+
+If SUTVA is violated:
+
+- The potential outcomes framework breaks down – we can no longer define a unique `\(Y_{i,t}\)` and `\(Y_{i,c}\)` for each unit.
+- Treatment and control groups may not be comparable even with perfect randomization.
+- Estimated effects may be biased or uninterpretable.
+
+---
+
+**In experiments, we typically *design* for SUTVA**:
+- Keep units isolated from each other (e.g., no communication between subjects).
+- Standardize treatment delivery (same script, same materials, same protocol).
+
+---
+### Experimental Realism
+
+**Definition**:  
+The extent to which the treatment in an experiment **mirrors the real‑world intervention** it is meant to represent.
+
+Also called **psychological realism** or **mundane realism** (though these have slightly different connotations).
+
+**Key question**: Does the experience of treatment in the lab correspond to how the intervention would be experienced in the real world?
+
+---
+### Experimental Realism vs. Internal Validity
+
+- A study can have high internal validity (clean randomization, no confounding) but low experimental realism.
+- Example: Showing participants a 2‑minute video clip of a political ad to study persuasion effects.
+  - **Internal validity**: High – random assignment, controlled setting.
+  - **Experimental realism**: Questionable – In the real world, people watch ads while distracted, with friends, during commercial breaks, etc.
+
+---
+### Why Experimental Realism Matters
+
+If experimental realism is low:
+
+- The treatment may not engage the same psychological processes as the real intervention.
+- Effect sizes may be attenuated or inflated compared to real‑world settings.
+- Policy recommendations based on lab findings may fail when implemented.
+
+---
+
+**Example**: A lab study on voter mobilization finds that showing people a 5‑minute video about civic duty increases turnout by 10 percentage points. But in the real world, people don't watch such videos – they get mailers, phone calls, or door knocks. The lab treatment lacks realism, so the effect may not generalize.
+
+---
+### Assessing Experimental Realism in Your Study
+
+Ask these questions:
+
+1\. **Is the treatment delivered in a way that resembles real‑world exposure?**
+   - Same medium? Same duration? Same context?
+
+2\. **Do participants perceive the treatment as intended?**
+   - Manipulation checks can help assess this.
+
+---
+### Assessing Experimental Realism in Your Study
+
+
+3\. **Are there artificial constraints that don't exist in the real world?**
+   - Forced attention, no distractions, immediate outcome measurement.
+
+4\. **Would the real‑world version of this treatment include additional components?**
+   - In the Peruvian study: Does watching emotion‑inducing videos in a lab capture how emotions from real political events affect voting?
+
+---
+### Practical Tips for Enhancing Experimental Realism
+
+- Use realistic materials (actual news clips, real campaign mailers).
+- Create naturalistic settings (online studies, field experiments).
+- Allow for distraction or delay (don't measure outcomes immediately).
+- Consider **field experiments** as the gold standard for realism.
+- Acknowledge limitations and discuss how they might affect generalizability.
+
+---
 
 ``` r
 library(ri2)
@@ -378,7 +572,7 @@ ri2_emotionsresult
 
 ```
 ##   term  estimate two_tailed_p_value
-## 1    Z 0.1176327              0.028
+## 1    Z 0.1176327              0.019
 ```
 
 ---
@@ -438,8 +632,86 @@ bal.tab(peruemotionscovs, treat=peruemotions$simpletreat,
 ##     Control Treated
 ## All     299     151
 ```
+
 ---
-### Encouragement Designs
+### Encouragement Designs: Motivation
+
+- In many real‑world settings, we **cannot force** units to take the treatment.
+  - Example: a get‑out‑the‑vote drive can mail reminders, but cannot compel voting.
+- Random assignment of *encouragement* to take the treatment is still possible.
+  - Encouragement might be a mailer, a financial incentive, a reminder, etc.
+- This creates a situation with **noncompliance**:
+  - Some encouraged units will not take treatment (never‑takers).
+  - Some not encouraged may take treatment anyway (always‑takers).
+
+---
+### Key Quantities in Encouragement Designs
+
+- **Intention‑to‑treat (ITT) effect**  
+  $$ \text{ITT} = E[Y_i | Z_i = 1] - E[Y_i | Z_i = 0] $$
+  where `\(Z_i\)` is the random encouragement assignment.
+
+---
+### Key Quantities in Encouragement Designs
+
+- **Complier Average Causal Effect (CACE)** / **Local Average Treatment Effect (LATE)**  
+  The average treatment effect for the subpopulation of *compliers* – those who take treatment if and only if encouraged.
+
+- In ideal situations (exclusion restriction, monotonicity, etc.),  
+  $$ \text{CACE} = \frac{\text{ITT}}{\text{ITT on treatment uptake}} $$
+
+---
+### Example: GOTV Experiment
+
+- Units: registered voters.
+- `\(Z_i = 1\)`: received a mailer encouraging them to vote; `\(Z_i = 0\)`: no mailer.
+- `\(D_i = 1\)`: actually voted; `\(D_i = 0\)`: did not vote.
+- Outcome `\(Y_i\)`: some subsequent political behavior (e.g., turnout in next election).
+
+---
+### Example: GOTV Experiment
+
+- **ITT** = difference in mean `\(Y\)` between those mailed and those not.
+- **First stage** = difference in voting rates between those mailed and those not.
+- CACE = ITT / first stage (if no always‑takers and exclusion holds).
+
+---
+### Estimation via Instrumental Variables
+
+- The encouragement `\(Z\)` is an **instrument** for the treatment `\(D\)`.
+- Two‑stage least squares (2SLS) is commonly used:
+
+  1. Regress `\(D\)` on `\(Z\)` (and covariates) → predicted `\(\hat{D}\)`.
+  2. Regress `\(Y\)` on `\(\hat{D}\)` (and covariates).
+
+- We will talk about these estimators in weeks 3 and 4, but you can implement them in R using the `AER` package or `fixest`.
+
+---
+
+
+``` r
+library(AER)
+iv_model &lt;- ivreg(Y ~ D + X | Z + X, data = mydata)
+summary(iv_model)
+```
+
+---
+
+- Key identifying assumptions:
+  - Relevance: `\(Z\)` predicts `\(D\)`.
+  - Exclusion restriction: `\(Z\)` affects `\(Y\)` only through `\(D\)`.
+  - Monotonicity (no defiers).
+  - Independence of instrument.
+
+---
+### Assumptions in Plain Language
+
+- **Relevance**: The encouragement actually changes behavior.
+- **Exclusion**: No direct effect of encouragement on outcome (only via treatment).
+- **Monotonicity**: No one does the opposite of their encouragement (no defiers).
+- **Independence**: Random assignment ensures `\(Z\)` is as good as randomized.
+
+These assumptions are **untestable** in most cases, so sensitivity analysis is advised.
 
 ---
 ### Regression in Experiments
@@ -543,18 +815,107 @@ The two causal mediation effects for each case are:
 \delta_{i,c} = Y_{i}(c,M_{i,t}) - Y_{i}(c,M_{i,c})\end{aligned}$$`
 
 ---
-### Causal Mediation
+### Causal Mediation: What Must We Assume?
 
-To make inferences, we need the assumptions:
+- In an experiment, the treatment `\(W\)` is randomly assigned, so its effect on the mediator `\(M\)` and outcome `\(Y\)` is unconfounded **given** `\(W\)` alone.
+- But the mediator `\(M\)` is **not** randomly assigned – it is chosen by units in response to treatment.
+- To interpret the mediation effects `\(\delta_{i,t}\)` and `\(\delta_{i,c}\)` as causal, we need additional assumptions.
+
+These assumptions are often called **sequential ignorability** (Imai et al. 2010).
+
+---
+### A Causal Diagram (DAG) for Mediation
+
+
+```
+## 
+## Attaching package: 'ggdag'
+```
+
+```
+## The following object is masked from 'package:stats':
+## 
+##     filter
+```
+
+&lt;img src="1experiments_files/figure-html/unnamed-chunk-12-1.png" width="70%" /&gt;
+
+---
+
+- `\(W\)` (treatment) → `\(M\)` (mediator) → `\(Y\)` (outcome)
+- `\(W\)` also has a **direct effect** on `\(Y\)` (the dashed arrow).
+- The DAG implicitly assumes **no unmeasured confounders** of the `\(M \rightarrow Y\)` relationship and no `\(W \leftarrow U \rightarrow M\)` or `\(W \leftarrow U \rightarrow Y\)` (already satisfied by randomization).
+
+---
+### Assumption 1: No Unmeasured Confounding of Treatment → Outcome
 
 `$$\begin{aligned}
-Y_{i}(t,M_{i,t}) \perp\!\!\!\perp W_{i} | X_{i} = x\end{aligned}$$`
+Y_{i}(t,M_{i,t}) \perp\!\!\!\perp W_{i} \mid X_{i}
+\end{aligned}$$`
+
+---
+
+**In words**:  
+Given covariates `\(X_i\)`, the potential outcome under treatment (with the mediator set to either its treatment or its control value) is independent of actual treatment assignment.
+
+- Because `\(W\)` is randomized (or unconfounded given `\(X\)`), this holds automatically if `\(X\)` includes everything needed for unconfoundedness.
+- In our example: we assume that `Cuzco` and `age` are sufficient to make treatment unconfounded with `outsidervote` (though randomization already does this).
+
+---
+### Assumption 2: No Unmeasured Confounding of Treatment → Mediator
 
 `$$\begin{aligned}
-M_{i,t} \perp\!\!\!\perp W_{i} | X_{i} = x\end{aligned}$$`
+M_{i,t} \perp\!\!\!\perp W_{i} \mid X_{i}
+\end{aligned}$$`
+
+---
+
+**In words**:  
+Given covariates, the potential mediator outcomes under treatment or control are independent of actual treatment.
+
+- Again, randomization (or unconfoundedness given `\(X\)`) guarantees this.
+- In the Peruvian study: `simpletreat` is randomized, so it is independent of `risk` (the mediator) under the null; we only need `\(X\)` if randomization was conditional.
+
+---
+### Assumption 3: No Unmeasured Confounding of Mediator → Outcome
 
 `$$\begin{aligned}
-Y_{i}(t^{'},m) \perp\!\!\!\perp M_{i,t} | (W_{i} = t, X_{i} = x) \end{aligned}$$`
+Y_{i}(t',m) \perp\!\!\!\perp M_{i,t} \mid (W_{i} = t, X_{i} = x)
+\end{aligned}$$`
+
+---
+
+**In words**:  
+Among units that received a particular treatment level `\(t\)`, the potential outcome (for any treatment `\(t'\)` and mediator value `\(m\)`) is independent of the actual mediator value, **given covariates**.
+
+- This is the **strongest** assumption. It says there is no unmeasured variable that affects both the mediator and the outcome **after** treatment is assigned.
+- In the DAG, this means no arrow from an unmeasured `\(U\)` into both `\(M\)` and `\(Y\)`.
+- In the Peruvian example: we must believe that, among those who got the treatment (or control), their `risk` level is not correlated with `outsidervote` due to some omitted variable (e.g., personality, news exposure) – after adjusting for `Cuzco` and `age`.
+
+---
+### What Does This Mean in Practice?
+
+- The first two assumptions are usually plausible if treatment is randomized.
+- The third assumption is **untestable** from data alone. It requires subject‑matter knowledge.
+- The `mediation` package in R performs sensitivity analysis to assess how Violations of Assumption 3 might affect conclusions.
+- In the next slides, we’ll run the mediation analysis and then examine sensitivity.
+
+---
+### Connecting to the Peruvian Emotions Data
+
+- Treatment `\(W\)` = `simpletreat` (randomized)
+- Mediator `\(M\)` = `risk` (attitudes toward risk)
+- Outcome `\(Y\)` = `outsidervote` (voting for an outsider party)
+- Covariates `\(X\)` = `Cuzco` (region) and `age`
+
+---
+
+We assume:
+
+1. Random assignment ensures `\(W\)` is independent of potential outcomes and potential mediators given `\(X\)`.
+2. No unmeasured confounders of the mediator–outcome relationship after conditioning on `\(W\)` and `\(X\)` (e.g., no omitted variable like ideology that affects both risk attitudes and outsider voting).
+
+Let’s proceed with the analysis.
 
 ---
 
@@ -631,11 +992,11 @@ summary(perumed.out)
 ## 
 ## Quasi-Bayesian Confidence Intervals
 ## 
-##                   Estimate 95% CI Lower 95% CI Upper p-value    
-## ACME            0.08212975   0.03093674   0.14015426  &lt;2e-16 ***
-## ADE             0.02359715  -0.06282169   0.11383771   0.590    
-## Total Effect    0.10572690   0.00030454   0.20684253   0.046 *  
-## Prop. Mediated  0.75959879   0.17190334   3.79885125   0.046 *  
+##                  Estimate 95% CI Lower 95% CI Upper p-value   
+## ACME            0.0817498    0.0278269    0.1417596   0.004 **
+## ADE             0.0231181   -0.0713387    0.1132155   0.626   
+## Total Effect    0.1048680   -0.0039584    0.2126080   0.058 . 
+## Prop. Mediated  0.7607258   -0.5563163    3.5508543   0.062 . 
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
@@ -650,7 +1011,7 @@ summary(perumed.out)
 plot(perumed.out)
 ```
 
-&lt;img src="1experiments_files/figure-html/unnamed-chunk-13-1.png" width="70%" /&gt;
+&lt;img src="1experiments_files/figure-html/unnamed-chunk-16-1.png" width="70%" /&gt;
 
 ---
 
@@ -664,10 +1025,314 @@ perumedsens.out &lt;- medsens(perumed.out, rho.by = 0.1, effect.type = "indirect
 plot(perumedsens.out)
 ```
 
-&lt;img src="1experiments_files/figure-html/unnamed-chunk-15-1.png" width="65%" /&gt;
+&lt;img src="1experiments_files/figure-html/unnamed-chunk-18-1.png" width="65%" /&gt;
 
 ---
-### Heterogeneity
+### Heterogeneous Treatment Effects: Why They Matter
+
+- The average treatment effect (ATE) tells us the **average** impact, but hides variation across individuals.
+- **Heterogeneous treatment effects** (HTEs) occur when the treatment effect differs across subgroups defined by observable characteristics or by unobserved latent traits.
+
+---
+### From ATE to HTE: Key Questions
+
+Instead of asking only *"What is the average effect?"*, we ask:
+
+- Does the effect vary by **baseline characteristics** (age, gender, prior attitudes)?
+- Does it vary by **context** (region, time, setting)?
+- Can we identify **who responds** and **who does not**?
+
+---
+
+In the Peruvian emotions study:
+- Does the emotion induction affect outsider voting differently for younger vs. older voters?
+- Are there unobserved types (e.g., emotionally responsive vs. unresponsive) that matter?
+
+---
+### Approaches to Exploring Heterogeneity
+
+| Method | Strengths | Weaknesses |
+|--------|-----------|------------|
+| **Interactions** (linear) | Simple, interpretable | Assumes linearity, limited to a few variables |
+| **Subgroup analysis** | Transparent, policy‑relevant | Multiple testing issues, low power |
+| **Non‑parametric smoothing** | Flexible, visual | Hard to quantify uncertainty |
+| **Machine learning (CATE)** | Handles many variables, detects complex patterns | "Black box", requires large samples |
+| **Generic machine learning (Causal Forests, BART)** | Built‑in inference, variable importance | Computationally intensive |
+
+---
+### Revisiting the Linear Interaction Model
+
+
+``` r
+# Original interaction model from the slide
+summary(lm(outsidervote ~ simpletreat + Cuzco + simpletreat:Cuzco + 
+           age + simpletreat:age, data = peruemotions))
+```
+
+```
+## 
+## Call:
+## lm(formula = outsidervote ~ simpletreat + Cuzco + simpletreat:Cuzco + 
+##     age + simpletreat:age, data = peruemotions)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -0.6325 -0.5234  0.3705  0.4750  0.5903 
+## 
+## Coefficients:
+##                     Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)        0.5045928  0.0875077   5.766 1.55e-08 ***
+## simpletreat        0.1957848  0.1525120   1.284   0.1999    
+## Cuzco             -0.1121455  0.0639902  -1.753   0.0804 .  
+## age                0.0007842  0.0027246   0.288   0.7736    
+## simpletreat:Cuzco  0.0924688  0.1065091   0.868   0.3858    
+## simpletreat:age   -0.0038673  0.0045507  -0.850   0.3959    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.4981 on 432 degrees of freedom
+##   (12 observations deleted due to missingness)
+## Multiple R-squared:  0.01819,	Adjusted R-squared:  0.006829 
+## F-statistic: 1.601 on 5 and 432 DF,  p-value: 0.1585
+```
+
+---
+
+- This model assumes that treatment effect heterogeneity is **linear** in age and constant within Cuzco strata.
+- It's a good **start**, but may miss non‑linearities (e.g., effect only for young *and* old, not middle‑aged).
+
+---
+### Visualising Heterogeneity: Scatterplot Smoothing
+
+
+``` r
+# Create treatment and control subsets
+treated &lt;- peruemotions[peruemotions$simpletreat == 1, ]
+control &lt;- peruemotions[peruemotions$simpletreat == 0, ]
+
+# Plot smoothed outcomes by age for each group
+library(ggplot2)
+scattersmooth &lt;- ggplot(peruemotions, aes(x = age, y = outsidervote, color = factor(simpletreat))) +
+  geom_smooth(method = "loess", se = TRUE) +
+  labs(color = "Treatment", 
+       title = "Outcome by Age and Treatment Status",
+       x = "Age", y = "Outsider Vote") +
+  theme_minimal()
+```
+
+---
+
+
+```
+## `geom_smooth()` using formula = 'y ~ x'
+```
+
+```
+## Warning: Removed 12 rows containing non-finite outside the scale range
+## (`stat_smooth()`).
+```
+
+&lt;img src="1experiments_files/figure-html/unnamed-chunk-21-1.png" width="100%" /&gt;
+
+---
+
+- This plot shows how the relationship between age and voting differs between treatment and control.
+- The **vertical distance** between the two curves at each age is the estimated treatment effect for that age.
+
+---
+### Extracting and Plotting the Treatment Effect by Age
+
+
+``` r
+# Fit separate loess models and predict at a grid of ages
+age_grid &lt;- seq(min(peruemotions$age, na.rm = TRUE), 
+                max(peruemotions$age, na.rm = TRUE), length.out = 100)
+
+loess_treated &lt;- loess(outsidervote ~ age, data = treated)
+loess_control &lt;- loess(outsidervote ~ age, data = control)
+
+pred_treated &lt;- predict(loess_treated, newdata = data.frame(age = age_grid))
+pred_control &lt;- predict(loess_control, newdata = data.frame(age = age_grid))
+
+effect &lt;- pred_treated - pred_control
+effect_df &lt;- data.frame(age = age_grid, effect = effect)
+
+ageeffect &lt;- ggplot(effect_df, aes(x = age, y = effect)) +
+  geom_line(color = "darkred", size = 1.2) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  labs(title = "Estimated Treatment Effect by Age (Loess)",
+       x = "Age", y = "Treatment Effect on Outsider Vote") +
+  theme_minimal()
+```
+
+```
+## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+## ℹ Please use `linewidth` instead.
+## This warning is displayed once per session.
+## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+## generated.
+```
+
+---
+
+
+```
+## Warning: Removed 6 rows containing missing values or values outside the scale range
+## (`geom_line()`).
+```
+
+&lt;img src="1experiments_files/figure-html/unnamed-chunk-23-1.png" width="100%" /&gt;
+
+---
+
+- This directly visualises how the treatment effect varies continuously with age.
+- We can see **where** the effect is largest, smallest, or even changes sign.
+
+---
+### Subgroup Analysis: Practical Considerations
+
+**Approach**: Estimate effects within pre‑specified subgroups (e.g., by region, age tertiles, gender).
+
+---
+
+
+``` r
+# Create age groups
+peruemotions$age_group &lt;- cut(peruemotions$age, 
+                               breaks = quantile(peruemotions$age, 
+                                                 c(0, 0.33, 0.67, 1), 
+                                                 na.rm = TRUE),
+                               include.lowest = TRUE,
+                               labels = c("Young", "Middle", "Old"))
+
+# Estimate ATE within each age group
+library(dplyr)
+subgroup_effects &lt;- peruemotions %&gt;%
+  group_by(age_group) %&gt;%
+  summarise(
+    ATE = mean(outsidervote[simpletreat == 1], na.rm = TRUE) - 
+          mean(outsidervote[simpletreat == 0], na.rm = TRUE),
+    n_treat = sum(simpletreat == 1, na.rm = TRUE),
+    n_control = sum(simpletreat == 0, na.rm = TRUE)
+  )
+
+subgroup_effects
+```
+
+```
+## # A tibble: 4 × 4
+##   age_group    ATE n_treat n_control
+##   &lt;fct&gt;      &lt;dbl&gt;   &lt;int&gt;     &lt;int&gt;
+## 1 Young     0.223       49       120
+## 2 Middle    0.0277      51        80
+## 3 Old       0.0652      46        92
+## 4 &lt;NA&gt;      0.571        5         7
+```
+
+---
+
+**Caution**: Multiple testing inflates Type I error. Consider adjusting p‑values or pre‑registering subgroups.
+
+---
+### Machine Learning for CATE: Causal Forests
+
+- **Causal forests** (Athey, Tibshirani, Wager) estimate **conditional average treatment effects** (CATE):
+  `$$\tau(x) = E[Y_{i,1} - Y_{i,0} | X_i = x]$$`
+
+- They adaptively partition the covariate space to maximise heterogeneity.
+- Provide valid confidence intervals via "honest" estimation.
+
+---
+
+
+``` r
+library(grf)
+
+# Prepare data
+X &lt;- peruemotions[, c("age", "Cuzco")]  # covariates
+W &lt;- peruemotions$simpletreat            # treatment
+Y &lt;- peruemotions$outsidervote            # outcome
+
+# Drop missing values
+complete &lt;- complete.cases(X, W, Y)
+X &lt;- X[complete, ]
+W &lt;- W[complete]
+Y &lt;- Y[complete]
+
+# Fit causal forest
+cf &lt;- causal_forest(X = X, Y = Y, W = W)
+
+# Get CATE estimates
+cate &lt;- predict(cf, estimate.variance = TRUE)
+
+# Variable importance
+variable_importance(cf)
+```
+
+```
+##           [,1]
+## [1,] 0.7553234
+## [2,] 0.2446766
+```
+
+---
+### Interpreting Causal Forest Output
+
+
+``` r
+# Plot distribution of CATE estimates
+hist(cate$predictions, breaks = 30, 
+     main = "Distribution of Estimated CATEs",
+     xlab = "Treatment Effect", col = "lightblue")
+```
+
+![](1experiments_files/figure-html/unnamed-chunk-26-1.png)&lt;!-- --&gt;
+
+---
+### Interpreting Causal Forest Output
+
+
+``` r
+# Check for heterogeneity
+var_imp &lt;- variable_importance(cf)
+barplot(t(var_imp), names.arg = colnames(X), 
+        main = "Variable Importance for Heterogeneity",
+        ylab = "Importance")
+```
+
+![](1experiments_files/figure-html/unnamed-chunk-27-1.png)&lt;!-- --&gt;
+
+---
+
+- The histogram shows the spread of estimated treatment effects across individuals.
+- Variable importance tells us which covariates drive heterogeneity.
+
+---
+### Best Practices for Exploring Heterogeneity
+
+1. **Pre‑specify** hypotheses about heterogeneity when possible (reduces fishing).
+2. **Use multiple methods** and look for convergence.
+3. **Adjust for multiple comparisons** when testing many subgroups.
+4. **Visualise** effects rather than just reporting tables.
+5. **Be transparent** about exploratory vs. confirmatory analyses.
+6. **Consider power** – detecting heterogeneity requires larger samples than detecting main effects.
+
+---
+### Heterogeneity in the Peruvian Emotions Study: What Have We Learned?
+
+- Linear interactions suggested possible moderation by age and region.
+- Visual smoothing revealed the effect might be **concentrated among younger voters**.
+- Subgroup analysis supports this inference.
+- Causal forests confirm the relative importance of age.
+
+**Key takeaway**: The ATE of ~0.07 masks potentially important variation. Understanding this variation could inform theory and targeting.
+
+---
+### Next Steps: From Heterogeneity to Population Inference
+
+- If treatment effects are heterogeneous, the **composition** of your sample matters.
+- The sample ATE (SATE) may differ from the population ATE (PATE) if your sample over‑ or under‑represents certain subgroups.
+- This connects directly to the **population inference** methods we'll discuss next.
 
 ---
 

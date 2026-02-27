@@ -5,6 +5,8 @@
     <meta charset="utf-8" />
     <meta name="author" content="J. Seawright" />
     <script src="5regressiondiscontinuitydesigns_files/header-attrs-2.30/header-attrs.js"></script>
+    <script src="5regressiondiscontinuitydesigns_files/kePrint-0.0.1/kePrint.js"></script>
+    <link href="5regressiondiscontinuitydesigns_files/lightable-0.0.1/lightable.css" rel="stylesheet" />
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
   </head>
   <body>
@@ -367,6 +369,9 @@ summary(lm_final)
     `$$\lim_{x \downarrow c} P(D=1|X=x) \neq \lim_{x \uparrow c} P(D=1|X=x)$$`
     but neither limit is necessarily 0 or 1.
 
+---
+### Sharp vs. Fuzzy Regression Discontinuity
+
 -   Fuzzy designs arise naturally:
     - Imperfect compliance with treatment assignment.
     - Multiple treatments or program eligibility vs. take-up.
@@ -377,12 +382,22 @@ summary(lm_final)
 
 -   Example: A scholarship program awards aid to students with test scores above 70.  
     *But* some students with scores below 70 appeal and receive aid; some with scores above 70 decline it.  
-    → Treatment (receiving aid) is not perfectly determined by the cutoff.
+    * Treatment (receiving aid) is not perfectly determined by the cutoff.
+
+---
+### Why Fuzzy RDD?
 
 -   Example: Incumbency advantage (Lee 2008) is sharp if we define treatment as "winning the election."  
     But if we define treatment as "serving as incumbent," and some winners resign or die, it becomes fuzzy.
 
--   Fuzzy RDD still identifies a causal effect—but for a specific subpopulation (compliers at the cutoff).
+---
+### Why Fuzzy RDD?
+
+-   Fuzzy RDD can still identify a causal effect, but for a specific subpopulation (compliers at the cutoff).
+
+---
+
+&lt;img src="images/Bertanha.png" width="70%" style="display: block; margin: auto;" /&gt;
 
 ---
 ### Identification in Fuzzy RDD
@@ -393,11 +408,17 @@ summary(lm_final)
     - **Outcome** `\(Y_i\)`
     - **Running variable** `\(X_i\)` (controls, often including polynomials)
 
+---
+### Identification in Fuzzy RDD
+
 -   Key assumptions (similar to IV):
     1.  **Relevance**: The cutoff strongly predicts treatment (first stage).
     2.  **Exclusion**: Crossing the cutoff affects `\(Y\)` only through `\(D\)` (no direct effect).
     3.  **Independence**: Potential outcomes are continuous at `\(c\)` (no manipulation).
     4.  **Monotonicity**: No defiers (compliance is one-sided or uniform).
+
+---
+### Identification in Fuzzy RDD
 
 -   Under these, the fuzzy RD estimand identifies the **LATE for compliers at the cutoff**:
     `$$\tau_{fuzzy} = \frac{\lim_{x\downarrow c} E[Y|X=x] - \lim_{x\uparrow c} E[Y|X=x]}{\lim_{x\downarrow c} E[D|X=x] - \lim_{x\uparrow c} E[D|X=x]}$$`
@@ -405,56 +426,104 @@ summary(lm_final)
 ---
 ### Estimation Approaches for Fuzzy RDD
 
-1.  **Two-Stage Least Squares (2SLS)**:
-    - First stage: `\(D_i = \gamma_0 + \gamma_1 Z_i + f(X_i) + \eta_i\)`
-    - Second stage: `\(Y_i = \beta_0 + \beta_1 \hat{D}_i + g(X_i) + \epsilon_i\)`
-    - `\(f(X_i)\)` and `\(g(X_i)\)` are flexible functions of `\(X\)` (e.g., polynomials, local linear).
-
-2.  **Local Linear Wald Estimator** (preferred in modern RDD packages):
-    - Estimate numerator and denominator using local linear regression on each side.
-    - Bandwidth selection can be separate for outcome and treatment.
-
-3.  **`rdrobust` with fuzzy option**:
-    - The `rdrobust` package allows fuzzy estimation by supplying a treatment variable.
+1\.  **Two-Stage Least Squares (2SLS)**:
+    
+- First stage: `\(D_i = \gamma_0 + \gamma_1 Z_i + f(X_i) + \eta_i\)`
+- Second stage: `\(Y_i = \beta_0 + \beta_1 \hat{D}_i + g(X_i) + \epsilon_i\)`
+- `\(f(X_i)\)` and `\(g(X_i)\)` are flexible functions of `\(X\)` (e.g., polynomials, local linear).
 
 ---
-### Simulated Example: Fuzzy RDD
+### Estimation Approaches for Fuzzy RDD
+
+2\.  **Local Linear Wald Estimator** (preferred in modern RDD packages):
+
+- Estimate numerator and denominator using local linear regression on each side.
+- Bandwidth selection can be separate for outcome and treatment.
+
+---
+### Estimation Approaches for Fuzzy RDD
+
+3\.  **`rdrobust` with fuzzy option**:
+
+- The `rdrobust` package allows fuzzy estimation by supplying a treatment variable.
+
+---
+### Example: Coppock and Green, Voting Habits
 
 
 ``` r
-# Simulate fuzzy RDD data
-set.seed(2026)
-n &lt;- 2000
-X &lt;- runif(n, -1, 1)                # running variable
-Z &lt;- as.numeric(X &gt;= 0)              # instrument (cutoff)
-
-# Treatment assignment probability jumps from 0.2 to 0.8 at cutoff
-p_treat &lt;- 0.2 + 0.6 * Z
-D &lt;- rbinom(n, 1, p_treat)
-
-# Potential outcomes: Y = 0.5*D + 0.2*X + error
-Y &lt;- 0.5 * D + 0.2 * X + rnorm(n)
+df_colorado &lt;- read_csv("https://raw.githubusercontent.com/jnseawright/PS406/refs/heads/main/data/df_colorado.csv")
 
 # Visualize
 library(ggplot2)
-data_fuzzy &lt;- data.frame(X, D, Y, Z)
-ggplot(data_fuzzy, aes(x = X, y = Y, color = factor(D))) +
+df_colorado %&gt;% ggplot(aes(x = days_04, y = voted08, color = voted04)) +
   geom_point(alpha = 0.2) +
   geom_vline(xintercept = 0, linetype = "dashed") +
-  labs(title = "Fuzzy RDD: Outcome vs. Running Variable",
-       color = "Treatment")
+  labs(title = "Fuzzy RDD: Birthday in 2004 vs. Turnout in 2008",
+       color = "Turnout in 2004")
 ```
 
-![](5regressiondiscontinuitydesigns_files/figure-html/fuzzy_sim-1.png)&lt;!-- --&gt;
+![](5regressiondiscontinuitydesigns_files/figure-html/fuzzy_graph-1.png)&lt;!-- --&gt;
+
+
+
+``` r
+df_colorado$voted08_meandev &lt;- df_colorado$voted08 - mean(df_colorado$voted08)
+
+df_colorado$voted04_meandev &lt;- df_colorado$voted04 - mean(df_colorado$voted04)
+
+
+with(df_colorado, rdrobust(y = voted08_meandev, x = voted04_meandev,
+         c = 0, fuzzy = days_04)) %&gt;%
+  summary()
+```
+
+```
+## Fuzzy RD estimates using local polynomial regression.
+## 
+## Number of Obs.                 7958
+## BW type                       mserd
+## Kernel                   Triangular
+## VCE method                       NN
+## 
+## Number of Obs.                 2424         5534
+## Eff. Number of Obs.             586         2124
+## Order est. (p)                    1            1
+## Order bias  (q)                   2            2
+## BW est. (h)                  13.318       13.318
+## BW bias (b)                  18.708       18.708
+## rho (h/b)                     0.712        0.712
+## Unique Obs.                      25           74
+## 
+## First-stage estimates.
+## 
+## =====================================================================
+##                    Point    Robust Inference
+##                 Estimate         z     P&gt;|z|      [ 95% C.I. ]       
+## =====================================================================
+##      Rd Effect  -167.963    -1.479     0.139  [-555.248 , 77.578]    
+## =====================================================================
+## 
+## Treatment effect estimates.
+## 
+## =====================================================================
+##                    Point    Robust Inference
+##                 Estimate         z     P&gt;|z|      [ 95% C.I. ]       
+## ---------------------------------------------------------------------
+##      RD Effect     0.008     0.457     0.648    [-0.017 , 0.027]     
+## =====================================================================
+```
 
 ---
 ### Visualizing RDD: Why Graphics Matter
 
 -   Graphical presentation is **essential** in RDD:
-    -   Provides直观 evidence of a discontinuity.
+    -   Provides easy-to-communicate evidence of a discontinuity.
     -   Reveals the functional form (linear, quadratic, etc.).
     -   Helps detect anomalies (outliers, heaping, manipulation).
-    -   Allows readers to assess model fit and bandwidth choices.
+
+---
+### Visualizing RDD: Choices
 
 -   Key elements of an RDD plot:
     1.  **Binned averages** of the outcome (to reduce noise).
@@ -464,11 +533,14 @@ ggplot(data_fuzzy, aes(x = X, y = Y, color = factor(D))) +
 -   Always show the raw data (or binned means) *and* the fitted lines.
 
 ---
-### Constructing Bins: The Right Way
+### Constructing Bins: Why?
 
 -   Plotting every observation often results in overplotting and obscures the pattern.
 
 -   Solution: group the running variable into bins and plot the **mean outcome** within each bin.
+
+---
+### Constructing Bins: Choosing Size
 
 -   How many bins? Too few → miss curvature; too many → noisy.
 
@@ -496,6 +568,18 @@ rdplot(y = lmb_data$score,
 
 &lt;img src="5regressiondiscontinuitydesigns_files/figure-html/rdplot_example-1.png" width="90%" /&gt;
 
+---
+
+```
+## [1] "Mass points detected in the running variable."
+```
+
+&lt;img src="5regressiondiscontinuitydesigns_files/figure-html/rdplot_example2-1.png" width="90%" /&gt;
+
+
+---
+### Constructing Bins: Automation
+
 * rdplot automatically chooses bin widths to balance precision and flexibility.
 
 * The plot shows binned means (dots) and a polynomial fit (lines) on each side.
@@ -506,6 +590,8 @@ rdplot(y = lmb_data$score,
 ### Customizing Bins: Manual Control
 
 * Sometimes you may want to experiment with bin sizes to check sensitivity.
+
+---
 
 
 ``` r
@@ -521,7 +607,7 @@ bin_means &lt;- lmb_data %&gt;%
     .groups = "drop"
   )
 
-ggplot(bin_means, aes(x = x, y = y)) +
+quadfitplot &lt;- ggplot(bin_means, aes(x = x, y = y)) +
   geom_point() +
   geom_vline(xintercept = 0.5, linetype = "dashed") +
   stat_smooth(data = subset(lmb_data, lagdemvoteshare &lt; 0.5),
@@ -532,7 +618,11 @@ ggplot(bin_means, aes(x = x, y = y)) +
        title = "Manual Bins with Quadratic Fits")
 ```
 
-&lt;img src="5regressiondiscontinuitydesigns_files/figure-html/customizing_bins_example-1.png" width="90%" /&gt;
+---
+&lt;img src="5regressiondiscontinuitydesigns_files/figure-html/quadfitplot-1.png" width="90%" /&gt;
+
+---
+### Customizing Bins: Conclusions
 
 * Here we use 50 bins and overlay separate quadratic fits.
 
@@ -549,6 +639,9 @@ ggplot(bin_means, aes(x = x, y = y)) +
 
 * Boundary behavior: Are there outliers or gaps right at the cutoff? (Could indicate manipulation.)
 
+---
+### What to Look For in an RDD Plot
+
 * Consistency across bin widths: Does the jump persist if you change bin size?
 
 * Comparison with global fit: Does a global polynomial (e.g., quadratic) match the local pattern?
@@ -564,6 +657,9 @@ ggplot(bin_means, aes(x = x, y = y)) +
 
 * Ignoring binning: Raw data scatterplots are uninterpretable with large N.
 
+---
+### Common Pitfalls in RD Graphics
+
 * Overfitting: Using high-order polynomials that wiggle unrealistically.
 
 * Not showing confidence intervals: Binned means have sampling error; consider adding error bars (though often omitted for clarity).
@@ -575,20 +671,17 @@ ggplot(bin_means, aes(x = x, y = y)) +
 rdplot(..., ci = 95)
 ```
 
-
-Below are RMarkdown slides covering the three estimation approaches in detail, with code and interpretation.
-
 ---
 ### Estimation Methods in RDD: Three Approaches
 
-1.  **Local Randomization View**: Treatment is "as good as randomly assigned" in a narrow window around the cutoff.  
-    → Simple difference in means.
+1.  **Local Randomization View**: Treatment is "as good as randomly assigned" in a narrow window around the cutoff. *Simple difference in means*.
 
-2.  **Global Polynomials**: Fit a flexible function (e.g., quadratic, cubic) to all data, with a discontinuity indicator.  
-    → Flexible but sensitive to polynomial order and data far from cutoff.
+2.  **Global Polynomials**: Fit a flexible function (e.g., quadratic, cubic) to all data, with a discontinuity indicator. *Flexible but sensitive*.
 
-3.  **Local Linear Regression**: Fit separate linear regressions on each side of the cutoff, weighting observations near the cutoff.  
-    → Preferred method (Imbens &amp; Lemieux 2008); reduces boundary bias.
+3.  **Local Linear Regression**: Fit separate linear regressions on each side of the cutoff, weighting observations near the cutoff. *Preferred method (Imbens &amp; Lemieux 2008); reduces boundary bias*.
+
+---
+### Estimation Methods in RDD: Three Approaches
 
 We'll illustrate each using the Lee (2008) incumbency data.
 
@@ -600,6 +693,9 @@ We'll illustrate each using the Lee (2008) incumbency data.
 -   This mimics a randomized experiment: for units with `\(X \in [c-h, c+h]\)`, treatment is "as good as randomly assigned."
 
 -   Estimator: simple difference in means (or regression with no polynomial).
+
+---
+### 1. Local Randomization View
 
 
 ``` r
@@ -630,9 +726,12 @@ summary(lm_narrow)
 ## F-statistic:   119 on 1 and 913 DF,  p-value: &lt; 2.2e-16
 ```
 
+---
+### 1. Local Randomization View
+
 -   Estimate: 21.284 with SE 1.951.
 -   This is intuitive but:
-    -   Very small sample (915 observations).
+    -   Comparatively small sample (915 observations).
     -   Sensitive to exact window choice.
     -   May still have bias if the true function has slope within the window.
 
@@ -641,9 +740,13 @@ summary(lm_narrow)
 
 -   Use all data, fit a polynomial in the running variable separately on each side of the cutoff:
 
-    `$$Y_i = \alpha + \tau D_i + \beta_1 X_i + \beta_2 X_i^2 + \cdots + \gamma_1 D_i X_i + \gamma_2 D_i X_i^2 + \cdots + \epsilon_i$$`
+    `$$\tiny Y_i = \alpha + \tau D_i + \beta_1 X_i + \beta_2 X_i^2 + \cdots + \gamma_1 D_i X_i + \gamma_2 D_i X_i^2 + \cdots + \epsilon_i$$`
 
 -   `\(\tau\)` is the treatment effect (discontinuity).
+
+---
+### 2. Global Polynomial Regression
+
 
 -   Advantages: uses all data, simple to implement.
 -   Disadvantages:
@@ -657,136 +760,80 @@ summary(lm_narrow)
 # Compare different polynomial orders
 library(modelsummary)
 
+lmb_data$centeredlagdem &lt;- lmb_data$lagdemvoteshare - 0.5
+
 # Linear (order 1)
-rd_linear &lt;- lm(score ~ lagdemocrat * lagdemvoteshare, data = lmb_data)
+rd_linear &lt;- lm(score ~ lagdemocrat * centeredlagdem, data = lmb_data)
 
 # Quadratic (order 2)
-rd_quad &lt;- lm(score ~ lagdemocrat * (lagdemvoteshare + I(lagdemvoteshare^2)), 
+rd_quad &lt;- lm(score ~ lagdemocrat * (centeredlagdem + I(centeredlagdem^2)), 
               data = lmb_data)
 
 # Cubic (order 3)
-rd_cubic &lt;- lm(score ~ lagdemocrat * (lagdemvoteshare + I(lagdemvoteshare^2) + I(lagdemvoteshare^3)), 
+rd_cubic &lt;- lm(score ~ lagdemocrat * (centeredlagdem + I(centeredlagdem^2) + I(centeredlagdem^3)), 
                data = lmb_data)
 
 # Compare coefficients on lagdemocrat (the treatment effect)
 models &lt;- list("Linear" = rd_linear, "Quadratic" = rd_quad, "Cubic" = rd_cubic)
+```
+
+---
+
+``` r
 modelsummary(models, coef_map = c("lagdemocrat" = "Treatment Effect"), 
-             gof_map = c("nobs", "r.squared"))
+             gof_map = c("nobs", "r.squared"), output = "kableExtra")
 ```
 
-```{=html}
-&lt;!-- preamble start --&gt;
+&lt;table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Linear &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Quadratic &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Cubic &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Treatment Effect &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 37.695 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 18.072 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 21.428 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;box-shadow: 0px 1.5px"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;box-shadow: 0px 1.5px"&gt; (0.803) &lt;/td&gt;
+   &lt;td style="text-align:center;box-shadow: 0px 1.5px"&gt; (1.133) &lt;/td&gt;
+   &lt;td style="text-align:center;box-shadow: 0px 1.5px"&gt; (1.538) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Num.Obs. &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 13577 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 13577 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 13577 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; R2 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.268 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.306 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.310 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
 
-    &lt;script src="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.js"&gt;&lt;/script&gt;
+---
+### 2. Global Polynomial Regression
 
-    &lt;script&gt;
-      // Create table-specific functions using external factory
-      const tableFns_d51ldj5704mwyahd5j9q = TinyTable.createTableFunctions("tinytable_d51ldj5704mwyahd5j9q");
-      // tinytable span after
-      window.addEventListener('load', function () {
-          var cellsToStyle = [
-            // tinytable style arrays after
-          { positions: [ { i: '4', j: 2 }, { i: '4', j: 3 }, { i: '4', j: 4 } ], css_id: 'tinytable_css_74s3gngagmfnxurt07ub',}, 
-          { positions: [ { i: '2', j: 2 }, { i: '2', j: 3 }, { i: '2', j: 4 } ], css_id: 'tinytable_css_cup6wrst6hvapfwilap9',}, 
-          { positions: [ { i: '1', j: 2 }, { i: '3', j: 2 }, { i: '1', j: 3 }, { i: '3', j: 3 }, { i: '1', j: 4 }, { i: '3', j: 4 } ], css_id: 'tinytable_css_95t9iv63bksqrsqksck9',}, 
-          { positions: [ { i: '0', j: 2 }, { i: '0', j: 3 }, { i: '0', j: 4 } ], css_id: 'tinytable_css_p06xsxe97jomentuvije',}, 
-          { positions: [ { i: '4', j: 1 } ], css_id: 'tinytable_css_8yea6rwc7wbl6ks8sn0i',}, 
-          { positions: [ { i: '2', j: 1 } ], css_id: 'tinytable_css_yforvbj6tign3oc1630j',}, 
-          { positions: [ { i: '1', j: 1 }, { i: '3', j: 1 } ], css_id: 'tinytable_css_oajj2qxd37ycj2ybg9yk',}, 
-          { positions: [ { i: '0', j: 1 } ], css_id: 'tinytable_css_7uchmmpl2exlacf9dxsi',}, 
-          ];
-
-          // Loop over the arrays to style the cells
-          cellsToStyle.forEach(function (group) {
-              group.positions.forEach(function (cell) {
-                  tableFns_d51ldj5704mwyahd5j9q.styleCell(cell.i, cell.j, group.css_id);
-              });
-          });
-      });
-    &lt;/script&gt;
-
-    &lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.css"&gt;
-    &lt;style&gt;
-    /* tinytable css entries after */
-    #tinytable_d51ldj5704mwyahd5j9q td.tinytable_css_74s3gngagmfnxurt07ub, #tinytable_d51ldj5704mwyahd5j9q th.tinytable_css_74s3gngagmfnxurt07ub {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.1em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
-    #tinytable_d51ldj5704mwyahd5j9q td.tinytable_css_cup6wrst6hvapfwilap9, #tinytable_d51ldj5704mwyahd5j9q th.tinytable_css_cup6wrst6hvapfwilap9 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
-    #tinytable_d51ldj5704mwyahd5j9q td.tinytable_css_95t9iv63bksqrsqksck9, #tinytable_d51ldj5704mwyahd5j9q th.tinytable_css_95t9iv63bksqrsqksck9 { text-align: center }
-    #tinytable_d51ldj5704mwyahd5j9q td.tinytable_css_p06xsxe97jomentuvije, #tinytable_d51ldj5704mwyahd5j9q th.tinytable_css_p06xsxe97jomentuvije {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
-    #tinytable_d51ldj5704mwyahd5j9q td.tinytable_css_8yea6rwc7wbl6ks8sn0i, #tinytable_d51ldj5704mwyahd5j9q th.tinytable_css_8yea6rwc7wbl6ks8sn0i {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.1em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
-    #tinytable_d51ldj5704mwyahd5j9q td.tinytable_css_yforvbj6tign3oc1630j, #tinytable_d51ldj5704mwyahd5j9q th.tinytable_css_yforvbj6tign3oc1630j {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
-    #tinytable_d51ldj5704mwyahd5j9q td.tinytable_css_oajj2qxd37ycj2ybg9yk, #tinytable_d51ldj5704mwyahd5j9q th.tinytable_css_oajj2qxd37ycj2ybg9yk { text-align: left }
-    #tinytable_d51ldj5704mwyahd5j9q td.tinytable_css_7uchmmpl2exlacf9dxsi, #tinytable_d51ldj5704mwyahd5j9q th.tinytable_css_7uchmmpl2exlacf9dxsi {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
-    &lt;/style&gt;
-    &lt;div class="container"&gt;
-      &lt;table class="tinytable" id="tinytable_d51ldj5704mwyahd5j9q" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing='true'&gt;
-        
-        &lt;thead&gt;
-              &lt;tr&gt;
-                &lt;th scope="col" data-row="0" data-col="1"&gt; &lt;/th&gt;
-                &lt;th scope="col" data-row="0" data-col="2"&gt;Linear&lt;/th&gt;
-                &lt;th scope="col" data-row="0" data-col="3"&gt;Quadratic&lt;/th&gt;
-                &lt;th scope="col" data-row="0" data-col="4"&gt;Cubic&lt;/th&gt;
-              &lt;/tr&gt;
-        &lt;/thead&gt;
-        
-        &lt;tbody&gt;
-                &lt;tr&gt;
-                  &lt;td data-row="1" data-col="1"&gt;Treatment Effect&lt;/td&gt;
-                  &lt;td data-row="1" data-col="2"&gt;79.490&lt;/td&gt;
-                  &lt;td data-row="1" data-col="3"&gt;-132.982&lt;/td&gt;
-                  &lt;td data-row="1" data-col="4"&gt;261.914&lt;/td&gt;
-                &lt;/tr&gt;
-                &lt;tr&gt;
-                  &lt;td data-row="2" data-col="1"&gt;&lt;/td&gt;
-                  &lt;td data-row="2" data-col="2"&gt;(1.988)&lt;/td&gt;
-                  &lt;td data-row="2" data-col="3"&gt;(7.997)&lt;/td&gt;
-                  &lt;td data-row="2" data-col="4"&gt;(51.246)&lt;/td&gt;
-                &lt;/tr&gt;
-                &lt;tr&gt;
-                  &lt;td data-row="3" data-col="1"&gt;Num.Obs.&lt;/td&gt;
-                  &lt;td data-row="3" data-col="2"&gt;13577&lt;/td&gt;
-                  &lt;td data-row="3" data-col="3"&gt;13577&lt;/td&gt;
-                  &lt;td data-row="3" data-col="4"&gt;13577&lt;/td&gt;
-                &lt;/tr&gt;
-                &lt;tr&gt;
-                  &lt;td data-row="4" data-col="1"&gt;R2&lt;/td&gt;
-                  &lt;td data-row="4" data-col="2"&gt;0.268&lt;/td&gt;
-                  &lt;td data-row="4" data-col="3"&gt;0.306&lt;/td&gt;
-                  &lt;td data-row="4" data-col="4"&gt;0.310&lt;/td&gt;
-                &lt;/tr&gt;
-        &lt;/tbody&gt;
-      &lt;/table&gt;
-    &lt;/div&gt;
-&lt;!-- hack to avoid NA insertion in last line --&gt;
-```
-
--   The treatment effect estimate varies: 79.49 (linear), -132.982 (quadratic), 261.914 (cubic).
+-   The treatment effect estimate varies: 37.695 (linear), 18.072 (quadratic), 21.428 (cubic).
 -   Which is correct? We don't know—this sensitivity is concerning.
 
 ---
 ### Why Global Polynomials Can Mislead
 
-
-``` r
-# Visualize the fits near cutoff
-lmb_data %&gt;% 
-  filter(lagdemvoteshare &gt; 0.3 &amp; lagdemvoteshare &lt; 0.7) %&gt;%
-  ggplot(aes(x = lagdemvoteshare, y = score)) +
-  geom_point(alpha = 0.1) +
-  geom_vline(xintercept = 0.5, linetype = "dashed") +
-  geom_smooth(data = . %&gt;% filter(lagdemvoteshare &lt; 0.5), 
-              method = "lm", formula = y ~ x, se = FALSE, color = "blue") +
-  geom_smooth(data = . %&gt;% filter(lagdemvoteshare &gt;= 0.5), 
-              method = "lm", formula = y ~ x, se = FALSE, color = "blue") +
-  geom_smooth(data = . %&gt;% filter(lagdemvoteshare &lt; 0.5), 
-              method = "lm", formula = y ~ poly(x, 2), se = FALSE, color = "red", linetype = "dashed") +
-  geom_smooth(data = . %&gt;% filter(lagdemvoteshare &gt;= 0.5), 
-              method = "lm", formula = y ~ poly(x, 2), se = FALSE, color = "red", linetype = "dashed") +
-  labs(title = "Linear (blue) vs. Quadratic (red) Fits",
-       x = "Lag Democrat Vote Share", y = "Next Election Score")
-```
-
 &lt;img src="5regressiondiscontinuitydesigns_files/figure-html/poly_plot-1.png" width="90%" /&gt;
+
+---
+### Why Global Polynomials Can Mislead
 
 -   Notice how the quadratic fit curves away from the data near the cutoff? That's because it's influenced by points far away.
 -   The linear fit may be too rigid if the true relationship is curved.
@@ -797,6 +844,9 @@ lmb_data %&gt;%
 -   Idea: Use only data within a bandwidth `\(h\)` of the cutoff, but fit a **linear** regression on each side, weighting observations by their distance from the cutoff (kernel weighting).
 
 -   This reduces **boundary bias**: near the cutoff, a local linear model approximates the true function better than a global polynomial.
+
+---
+### What Local Linear Regression Is
 
 -   Estimator (for a given bandwidth `\(h\)`):
     1.  For observations with `\(X_i \in [c-h, c+h]\)`, fit:
@@ -818,8 +868,10 @@ rd_ll &lt;- rdrobust(y = lmb_data$score,
                   x = lmb_data$lagdemvoteshare, 
                   c = 0.5,
                   kernel = "triangular")
-summary(rd_ll)
 ```
+
+---
+
 
 ```
 ## Sharp RD estimates using local polynomial regression.
@@ -846,35 +898,29 @@ summary(rd_ll)
 ## =====================================================================
 ```
 
+---
+
 -   The output shows:
     -   **Conventional** estimates (uncorrected for bias).
     -   **Bias-corrected** estimates (adjusts for remaining bias within bandwidth).
     -   **Robust** confidence intervals (valid even with bias correction).
 
+---
+
 -   Key numbers:
     -   Optimal bandwidth (left/right): 0.086 / 0.086
-    -   Treatment effect (robust): 1.692 [CI: 14.455, 22.443]
+    -   Treatment effect (robust): 18.666 [CI: 14.455, 22.443]
 
 ---
 ### Why Local Linear is Preferred: Boundary Bias
 
 &lt;img src="5regressiondiscontinuitydesigns_files/figure-html/boundary_bias-1.png" width="80%" /&gt;
 
+---
+### Why Local Linear is Preferred: Boundary Bias
+
 -   At the boundary (cutoff), a global linear fit (red) can be badly biased if the true function (black) is curved.
 -   Local linear (not shown) fits only near the cutoff and adapts to local curvature.
-
----
-### Summary: Estimation Methods Compared
-
-| Method | Strengths | Weaknesses | When to Use |
-|--------|-----------|------------|-------------|
-| **Local Randomization** | Simple, transparent | Very small sample, sensitive to window | Robustness check, very dense data near cutoff |
-| **Global Polynomial** | Uses all data, easy | Sensitive to polynomial order, influenced by distant points | Never preferred for main results |
-| **Local Linear (with optimal bandwidth)** | Reduces boundary bias, data-driven, robust inference | More complex, requires specialized software | **Preferred method** for main analysis |
-
--   **Recommendation**: Use local linear regression with `rdrobust` as your main specification.
--   Always check sensitivity to bandwidth and polynomial order (local linear is order 1).
--   Report robust confidence intervals from `rdrobust`.
 
 ---
 ### Next Steps: Diagnostics
@@ -884,6 +930,9 @@ summary(rd_ll)
     -   **Manipulation testing**: Is there evidence of sorting around the cutoff?
     -   **Placebo cutoffs**: Do we see effects at other points?
     -   **Bandwidth sensitivity**: Do results hold for different bandwidths?
+
+---
+### Next Steps: Diagnostics
 
 Below are RMarkdown slides covering the essential diagnostics for RDD, designed to follow the estimation methods section. They use the Lee (2008) data and modern R packages (`rdrobust`, `rddensity`, `rdd`) to implement each test, with clear interpretation.
 
@@ -898,18 +947,18 @@ Below are RMarkdown slides covering the essential diagnostics for RDD, designed 
     3.  **Placebo cutoffs**: Do we see effects at other (fake) thresholds?
     4.  **Bandwidth sensitivity**: Are results robust to different bandwidth choices?
 
--   Each addresses a potential threat to the continuity assumption.
-
 ---
-### 1. Covariate Balance Tests
+### Next Steps: Diagnostics
 
 -   If the RDD is valid, covariates that were determined **before** the treatment should not jump at the cutoff.
 
 -   Idea: Run the same RD analysis on each covariate as the outcome.
 
+---
+### Next Steps: Diagnostics
+
 -   Covariates in the Lee data:
     -   `lagdemocrat`: whether Democrat won previous election (the treatment itself—should jump! Not a balance test.)
-    -   `democrat`: same as treatment?
     -   `score`: outcome (should jump)
     -   Need other covariates: We have lags of tons of other variables. We will use an arbitrary one ("collegeattend") for this example.
 
@@ -1048,6 +1097,83 @@ rdplotdensity(density_test, lmb_data$lagdemvoteshare)
 
 ![](5regressiondiscontinuitydesigns_files/figure-html/rddensity_example-2.png)&lt;!-- --&gt;
 
+---
+
+```
+## 
+## Manipulation testing using local polynomial density estimation.
+## 
+## Number of obs =       13577
+## Model =               unrestricted
+## Kernel =              triangular
+## BW method =           estimated
+## VCE method =          jackknife
+## 
+## c = 0.5               Left of c           Right of c          
+## Number of obs         5670                7907                
+## Eff. Number of obs    1856                2161                
+## Order est. (p)        2                   2                   
+## Order bias (q)        3                   3                   
+## BW est. (h)           0.073               0.096               
+## 
+## Method                T                   P &gt; |T|             
+## Robust                0.6834              0.4944
+```
+
+```
+## 
+## P-values of binomial tests (H0: p=0.5).
+## 
+## Window Length / 2          &lt;c     &gt;=c    P&gt;|T|
+## 0.001                      21      23    0.8804
+## 0.002                      55      49    0.6241
+## 0.004                      72      80    0.5703
+## 0.005                      89     100    0.4671
+## 0.006                     112     124    0.4740
+## 0.007                     141     156    0.4166
+## 0.008                     166     195    0.1405
+## 0.009                     192     223    0.1408
+## 0.011                     228     231    0.9256
+## 0.012                     276     255    0.3855
+```
+
+---
+![](5regressiondiscontinuitydesigns_files/figure-html/rddensity_example3-1.png)&lt;!-- --&gt;
+
+```
+## $Estl
+## Call: lpdensity
+## 
+## Sample size                                      5670
+## Polynomial order for point estimation    (p=)    2
+## Order of derivative estimated            (v=)    1
+## Polynomial order for confidence interval (q=)    3
+## Kernel function                                  triangular
+## Scaling factor                                   0.417648791985857
+## Bandwidth method                                 user provided
+## 
+## Use summary(...) to show estimates.
+## 
+## $Estr
+## Call: lpdensity
+## 
+## Sample size                                      7907
+## Polynomial order for point estimation    (p=)    2
+## Order of derivative estimated            (v=)    1
+## Polynomial order for confidence interval (q=)    3
+## Kernel function                                  triangular
+## Scaling factor                                   0.582424867413082
+## Bandwidth method                                 user provided
+## 
+## Use summary(...) to show estimates.
+## 
+## $Estplot
+```
+
+![](5regressiondiscontinuitydesigns_files/figure-html/rddensity_example3-2.png)&lt;!-- --&gt;
+
+---
+
 -   The test statistic is 0.683 with p-value 0.4944.
 -   A non-significant p-value (p &gt; 0.05) suggests no evidence of manipulation.
 
@@ -1093,6 +1219,9 @@ data.frame(Placebo_Cutoff = c(0.4, 0.6), Robust_p = c(p_0.4, p_0.6))
 
 -   Common approach: estimate the treatment effect for a range of bandwidths (e.g., from 0.5× to 2× the optimal bandwidth) and plot the estimates with confidence intervals.
 
+---
+
+
 
 ``` r
 # Get optimal bandwidth from rdrobust
@@ -1105,13 +1234,13 @@ results &lt;- data.frame(mult = mult, est = NA, ci_low = NA, ci_high = NA)
 for (i in seq_along(mult)) {
   rd_tmp &lt;- rdrobust(lmb_data$score, lmb_data$lagdemvoteshare, c = 0.5, 
                      h = bw_opt * mult[i])
-  results[i, "est"] &lt;- rd_tmp$Estimate[3]   # robust estimate
+  results[i, "est"] &lt;- rd_tmp$Estimate[1]   # robust estimate
   results[i, "ci_low"] &lt;- rd_tmp$ci[3, 1]
   results[i, "ci_high"] &lt;- rd_tmp$ci[3, 2]
 }
 
 # Plot
-ggplot(results, aes(x = mult, y = est)) +
+bwsensplot &lt;- ggplot(results, aes(x = mult, y = est)) +
   geom_hline(yintercept = 0, linetype = "dotted") +
   geom_ribbon(aes(ymin = ci_low, ymax = ci_high), alpha = 0.2) +
   geom_line() +
@@ -1121,26 +1250,15 @@ ggplot(results, aes(x = mult, y = est)) +
        title = "Bandwidth Sensitivity Analysis")
 ```
 
-&lt;img src="5regressiondiscontinuitydesigns_files/figure-html/bw_sensitivity-1.png" width="90%" /&gt;
+---
+
+&lt;img src="5regressiondiscontinuitydesigns_files/figure-html/bw_sensplot-1.png" width="90%" /&gt;
+
+---
 
 -   The plot shows how the estimate changes with bandwidth.
 -   Ideally, the estimate remains relatively stable across a reasonable range, and confidence intervals overlap.
 -   If the estimate flips sign or changes dramatically, the results are fragile.
-
----
-### Summary: RDD Diagnostics Checklist
-
-| Diagnostic | Purpose | R Implementation | Interpretation |
-|------------|---------|------------------|----------------|
-| **Covariate balance** | Check if pre-treatment characteristics jump | `rdrobust(y = covariate, x = running, c = cutoff)` | No significant jumps |
-| **Manipulation test** | Detect sorting around cutoff | `rddensity::rddensity()` | p &gt; 0.05 |
-| **Placebo cutoffs** | Test for effects at fake thresholds | `rdrobust()` at other cutoffs | No significant effects |
-| **Bandwidth sensitivity** | Check robustness to bandwidth choice | Loop over bandwidths, plot estimates | Stable estimates |
-
--   Always include these diagnostics in any RDD paper.
--   If any diagnostic fails, the design may be invalid, or results should be interpreted with extreme caution.
-
-Below are RMarkdown slides for presenting RDD results effectively, covering both tables and figures. They build on the Lee (2008) data and provide templates that students can adapt for their own work.
 
 ---
 ### Reporting RDD Results: Tables and Figures
@@ -1152,8 +1270,6 @@ Below are RMarkdown slides for presenting RDD results effectively, covering both
     2.  **Main results table** – estimates with different specifications.
     3.  **Robustness tables/figures** – bandwidth sensitivity, placebo cutoffs.
     4.  **Diagnostics table** – covariate balance, density test.
-
--   We'll create each using the Lee (2008) data and modern R packages.
 
 ---
 ### 1. The Main RD Plot (Review)
@@ -1180,8 +1296,14 @@ rdplot(y = lmb_data$score,
 
 &lt;img src="5regressiondiscontinuitydesigns_files/figure-html/main_plot-1.png" width="90%" /&gt;
 
--   Show binned means, polynomial fits, and a vertical line at the cutoff.
--   Caption should describe what to see: "A clear discontinuity at 0.5 suggests incumbency advantage."
+---
+
+
+```
+## [1] "Mass points detected in the running variable."
+```
+
+&lt;img src="5regressiondiscontinuitydesigns_files/figure-html/main_plot2-1.png" width="90%" /&gt;
 
 ---
 ### 2. Main Results Table: Multiple Specifications
@@ -1192,6 +1314,8 @@ rdplot(y = lmb_data$score,
     - With and without covariates.
 
 -   Use `rdrobust` to obtain estimates, then combine into a table.
+
+---
 
 
 ``` r
@@ -1219,7 +1343,11 @@ results_df &lt;- data.frame(
   N_left = c(rd_opt$N[1], rd_half$N[1], rd_double$N[1], rd_quad$N[1]),
   N_right = c(rd_opt$N[2], rd_half$N[2], rd_double$N[2], rd_quad$N[2])
 )
+```
 
+---
+
+``` r
 knitr::kable(results_df, caption = "RDD Estimates of Incumbency Advantage")
 ```
 
@@ -1234,213 +1362,15 @@ Table: RDD Estimates of Incumbency Advantage
 |Double BW              |    1.171| 1.753| 14.252|  21.123|   5670|    7907|
 |Optimal BW (quadratic) |    2.614| 2.794| 19.070|  30.021|   5670|    7907|
 
+---
+
 -   Always report robust (bias-corrected) estimates and confidence intervals.
 -   Include effective sample sizes on each side.
 
 ---
-### 3. Formatting Tables for Publication
+### 3. Include Diagnostic Results
 
--   Use `modelsummary` or `stargazer` to create LaTeX/HTML tables.
-
-
-``` r
-library(modelsummary)
-
-# Create a list of rdrobust results (but modelsummary doesn't directly support rdrobust)
-# Alternative: extract coefficients and create a custom table.
-
-# A simple approach: use `texreg` with custom extraction.
-# For brevity, we'll just show the data frame above; in practice, format with kableExtra or xtable.
-```
-
--   If you have multiple models (e.g., with covariates), you can run separate regressions and combine.
--   Example with covariates: add a pre-treatment covariate (simulated) to the model using `rdrobust` with `covs` option.
-
-
-``` r
-# Add a fake covariate
-lmb_data$fake_cov &lt;- rnorm(nrow(lmb_data), 0.5, 0.1)
-
-# Estimate with covariate adjustment
-rd_cov &lt;- rdrobust(lmb_data$score, lmb_data$lagdemvoteshare, c = 0.5,
-                   covs = lmb_data$fake_cov)
-summary(rd_cov)
-```
-
-```
-## Covariate-adjusted Sharp RD estimates using local polynomial regression.
-## 
-## Number of Obs.                13577
-## BW type                       mserd
-## Kernel                   Triangular
-## VCE method                       NN
-## 
-## Number of Obs.                 5670         7907
-## Eff. Number of Obs.            2207         1938
-## Order est. (p)                    1            1
-## Order bias  (q)                   2            2
-## BW est. (h)                   0.086        0.086
-## BW bias (b)                   0.133        0.133
-## rho (h/b)                     0.647        0.647
-## Unique Obs.                    2878         3279
-## 
-## =====================================================================
-##                    Point    Robust Inference
-##                 Estimate         z     P&gt;|z|      [ 95% C.I. ]       
-## ---------------------------------------------------------------------
-##      RD Effect    18.661     9.051     0.000    [14.451 , 22.440]    
-## =====================================================================
-```
-
--   Covariate-adjusted estimates should be similar if design is valid; include in a robustness column.
-
----
-### 4. Bandwidth Sensitivity Plot (Already Shown)
-
--   The plot from the diagnostics section is an excellent way to show robustness.
-
-
-``` r
-# Re-create bandwidth sensitivity plot (simplified)
-bw_opt &lt;- rd_opt$bws[1,1]
-mult &lt;- seq(0.5, 2, by = 0.1)
-ests &lt;- sapply(mult, function(m) {
-  rd &lt;- rdrobust(lmb_data$score, lmb_data$lagdemvoteshare, c = 0.5, h = bw_opt * m)
-  rd$Estimate[3]
-})
-ci_low &lt;- sapply(mult, function(m) {
-  rd &lt;- rdrobust(lmb_data$score, lmb_data$lagdemvoteshare, c = 0.5, h = bw_opt * m)
-  rd$ci[3,1]
-})
-ci_high &lt;- sapply(mult, function(m) {
-  rd &lt;- rdrobust(lmb_data$score, lmb_data$lagdemvoteshare, c = 0.5, h = bw_opt * m)
-  rd$ci[3,2]
-})
-
-df &lt;- data.frame(mult, ests, ci_low, ci_high)
-ggplot(df, aes(x = mult, y = ests)) +
-  geom_hline(yintercept = 0, linetype = "dashed") +
-  geom_ribbon(aes(ymin = ci_low, ymax = ci_high), alpha = 0.2) +
-  geom_line() + geom_point() +
-  labs(x = "Bandwidth Multiplier (× optimal)", y = "Treatment Effect",
-       title = "Sensitivity to Bandwidth Choice")
-```
-
-&lt;img src="5regressiondiscontinuitydesigns_files/figure-html/bw_plot_again-1.png" width="80%" /&gt;
-
--   Include this figure in the paper or supplement.
-
----
-### 5. Placebo Cutoffs Table/Figure
-
--   Test multiple fake cutoffs and display results.
-
-
-``` r
-placebo_cutoffs &lt;- seq(0.3, 0.7, by = 0.05)
-placebo_cutoffs &lt;- placebo_cutoffs[placebo_cutoffs != 0.5]  # exclude true cutoff
-
-placebo_results &lt;- data.frame(
-  cutoff = placebo_cutoffs,
-  estimate = NA,
-  p_value = NA
-)
-
-for (i in seq_along(placebo_cutoffs)) {
-  rd &lt;- rdrobust(lmb_data$score, lmb_data$lagdemvoteshare, c = placebo_cutoffs[i])
-  placebo_results[i, "estimate"] &lt;- rd$Estimate[3]
-  placebo_results[i, "p_value"] &lt;- rd$pv[3]
-}
-
-knitr::kable(placebo_results, digits = 3, caption = "Placebo Cutoff Tests")
-```
-
-
-
-Table: Placebo Cutoff Tests
-
-| cutoff| estimate| p_value|
-|------:|--------:|-------:|
-|   0.30|    2.278|   0.745|
-|   0.35|    1.614|   0.222|
-|   0.40|    1.345|   0.470|
-|   0.45|    1.596|   0.352|
-|   0.55|    1.636|   0.366|
-|   0.60|    2.080|   0.157|
-|   0.65|    1.998|   0.817|
-|   0.70|    2.220|   0.590|
-
--   Ideally, all p-values &gt; 0.05 (no significant effects at fake cutoffs).
--   Can also plot estimates with CIs.
-
----
-### 6. Diagnostics Summary Table
-
--   Combine covariate balance, density test, and placebo results into one table.
-
-
-``` r
-# Density test p-value
-density_p &lt;- rddensity(lmb_data$lagdemvoteshare, c = 0.5)$test$p_jk
-
-# Covariate balance for fake_cov (p-value)
-balance_p &lt;- rdrobust(lmb_data$fake_cov, lmb_data$lagdemvoteshare, c = 0.5)$pv[3]
-
-# Placebo test: proportion significant at 0.05 level (for illustration)
-placebo_sig &lt;- mean(placebo_results$p_value &lt; 0.05, na.rm = TRUE)
-
-diag_df &lt;- data.frame(
-  Test = c("McCrary density p-value", "Covariate balance p-value (fake_cov)", 
-           "Proportion of placebos significant (α=0.05)"),
-  Result = c(round(density_p, 3), round(balance_p, 3), round(placebo_sig, 3))
-)
-
-knitr::kable(diag_df, caption = "RDD Diagnostic Tests")
-```
-
-
-
-Table: RDD Diagnostic Tests
-
-|Test                                        | Result|
-|:-------------------------------------------|------:|
-|McCrary density p-value                     |  0.494|
-|Covariate balance p-value (fake_cov)        |  0.338|
-|Proportion of placebos significant (α=0.05) |  0.000|
-
--   In practice, test multiple covariates and report all p-values (perhaps in a supplementary appendix).
-
----
-### 7. A Complete RDD Results Table Template
-
-| Specification | Bandwidth | Polynomial | Estimate | Robust SE | Robust CI | N left | N right |
-|---------------|-----------|------------|----------|-----------|-----------|--------|---------|
-| (1) Optimal   | 0.18      | Linear     | 0.072    | 0.021     | [0.031, 0.113] | 245 | 267 |
-| (2) Half      | 0.09      | Linear     | 0.069    | 0.027     | [0.016, 0.122] | 112 | 130 |
-| (3) Double    | 0.36      | Linear     | 0.074    | 0.018     | [0.039, 0.109] | 412 | 438 |
-| (4) Optimal   | 0.18      | Quadratic  | 0.068    | 0.023     | [0.023, 0.113] | 245 | 267 |
-| (5) + Covariates | 0.18   | Linear     | 0.071    | 0.020     | [0.032, 0.110] | 245 | 267 |
-
--   Add a note: "Estimates from local linear/polynomial regression with triangular kernel and MSE-optimal bandwidth (Imbens–Kalyanaraman). Robust bias-corrected confidence intervals reported."
-
----
-### 8. Summary: What to Include in an RDD Paper
-
--   **Figure 1**: RD plot with binned means and polynomial fits.
--   **Table 1**: Main RD estimates (as above).
--   **Table 2**: Covariate balance tests (p-values for all pre-treatment covariates).
--   **Table 3**: Placebo cutoff tests.
--   **Figure 2**: Bandwidth sensitivity plot.
--   **Appendix**: Density test plot, alternative bandwidth choices, robustness to kernel choice.
-
--   Always discuss the magnitude and interpret the LATE: "For elections decided by a narrow margin, incumbency increases the probability of winning the next election by about 7 percentage points."
-
----
-### 9. Software and Replication
-
--   Use `rdrobust` for estimation and `rddensity` for manipulation testing.
--   Provide replication code that reproduces all tables and figures.
--   State the chosen bandwidth selector (e.g., MSE-optimal, CCT) and kernel (usually triangular).
+-   The plots from the diagnostics section should be included in your paper or appendix.
 
 ---
 ### Example: Is US Elite Polarization Symmetric?
@@ -1448,6 +1378,25 @@ Table: RDD Diagnostic Tests
 Is ideological polarization in the US happening equally on both sides of the party system, or do the parties behave differently in terms of their distance from the ideological middle? Let's try to get an answer to this that cleans up some of the background noise by using a regression-discontinuity design. We'll compare close elections that Republicans just barely win to close elections that Democrats just barely win and look at the absolute value of the resulting ideological distance from the middle of the elected representatives.
 
 Use [this resource sheet](https://jnseawright.github.io/PS312/InClass/Regression_Discontinuity_Designs.html) to find data and for some coding hints.
+
+---
+### How Reliable Are RDD Applications?
+
+&lt;img src="images/Stommes1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="images/Stommes2.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="images/Stommes3.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+-   If most RDD applications in political sciene have very low power, what does this mean for the credibility of effect estimates?
+-   What does it mean that p values are clustered just above 0.05?
+-   What do these findings imply for our potential use of RDD in our own research?
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

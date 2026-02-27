@@ -3,9 +3,8 @@
   <head>
     <title>7: Synthetic Controls, Sensitivity Analysis and Bounds</title>
     <meta charset="utf-8" />
-    <meta name="author" content="J. Seawright" />
-    <meta name="date" content="2025-05-15" />
-    <script src="7synthetic_files/header-attrs-2.29/header-attrs.js"></script>
+    <meta name="author" content="Jaye Seawright" />
+    <script src="7synthetic_files/header-attrs-2.30/header-attrs.js"></script>
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
   </head>
   <body>
@@ -19,13 +18,13 @@ class: center, middle, inverse, title-slide
 ## Quantitative Causal Inference
 ]
 .author[
-### <large>J. Seawright</large>
+### <large>Jaye Seawright</large>
 ]
 .institute[
 ### <small>Northwestern Political Science</small>
 ]
 .date[
-### May 15, 2025
+### May 14 and May 19, 2026
 ]
 
 ---
@@ -46,7 +45,6 @@ pre[class] {
 
 
 
----
 ### Manufacture Perfect Comparisons
 
 Strictly speaking, for the Method of Difference to work based on a
@@ -422,92 +420,283 @@ path.plot(synth.res=mali.synth, dataprep.res=mali.prep,
 &lt;img src="7synthetic_files/figure-html/unnamed-chunk-20-1.png" width="60%" style="display: block; margin: auto;" /&gt;
 
 ---
-### Sensitivity Analysis
+### Why Sensitivity Analysis?
 
-Informal talk: just run a bunch of models.
-
-Advantage: we can see a family of results!
-
-Disadvantages: How systematic was the collection? Was every result actually reported? How is this different from specification searching/p hacking?
-
----
-### Sensitivity Analysis
-
-More formal ideas:
-
-1.  Ensemble models
-
-2.  Rosenbaum bounds
+Many causal inference methods rely on **untestable assumptions**:
+- Unconfoundedness (selection on observables)
+- Parallel trends (DiD)
+- Exclusion restriction (IV)
+- Continuity (RDD)
+- No interference (SUTVA)
 
 ---
-### Sensitivity Analysis
+### Why Sensitivity Analysis?
 
-One approach to sensitivity analysis is to average all the credible
-models. But why a simple average?
-
----
-### Ensemble Model
-
-1.  Fit each credible model
-
-2.  Form fitted values for each case from each model
-
-3.  Run an ensemble model that predicts the outcome based on those
-    fitted values, which assigns each model a weight
+We can never definitively prove these assumptions hold.  
+Sensitivity analysis asks: **How much would the assumptions have to be violated to change our conclusions?**
 
 ---
-### Ensemble Model
+### The Core Question
 
-Does this help for causal inference?
-
----
-### Ensemble Model
-
-Athey et al. 2019 propose using an ensemble model to construct synthetic
-controls, and show that it can outperform single-model methods.
+**If the identifying assumption were false, how different would the results need to be to overturn our inference?**
 
 ---
-### Ensemble Model
+### The Core Question
 
-An alternative approach can be to build two ensemble models, one for the
-cases in the treatment group and one for cases in the control group.
-Then run *all* cases through both models and use differences in fitted
-values to estimate causal effects.
+For example:
+- In a DiD study, what if the parallel trends assumption failed by a certain amount?
+- In an IV study, what if the instrument had a small direct effect on the outcome?
+- In a regression study, what if an unmeasured confounder existed?
+
+Sensitivity analysis quantifies the robustness of findings to such violations.
+
+---
+### Two Broad Approaches
+
+| Approach | Description | Example |
+|----------|-------------|---------|
+| **Informal / Multiverse** | Estimate the same question under many plausible specifications | Specification curve analysis, robustness checks |
+| **Formal / Parametric** | Introduce a sensitivity parameter that measures the degree of violation, and derive bounds or adjusted estimates | Rosenbaum bounds, Manski bounds, sensitivity parameters in regression |
+
+---
+### Two Broad Approaches
+
+Both approaches help assess whether results are **fragile** (easily overturned) or **robust** (withstand substantial violations).
+
+---
+### Informal Sensitivity: The "Multiverse"
+
+Instead of one model, estimate many reasonable models.
+
+---
+### Informal Sensitivity: The "Multiverse"
+
+
+
+``` r
+# Example: vary control variables, sample restrictions, etc.
+results &lt;- list()
+for (controls in list(c("age"), c("age", "Cuzco"), c("age", "Cuzco", "edlevel"))) {
+  f &lt;- as.formula(paste("outsidervote ~ simpletreat +", 
+                        paste(controls, collapse = " + ")))
+  results[[paste(controls, collapse = "_")]] &lt;- lm(f, data = peruemotions)
+}
+```
+
+---
+
+![](7synthetic_files/figure-html/multiverse_example_plot-1.png)&lt;!-- --&gt;
+
+---
+### Informal Sensitivity: The "Multiverse"
+
+- Plot all estimates with confidence intervals.
+- If all estimates point in the same direction and are similar in magnitude, confidence increases.
+- **Caveat**: Which models are "reasonable"? How do we avoid cherry‑picking?
+
+---
+### Formal Sensitivity: A Parameter for Violation
+
+Introduce a parameter that captures the **strength of unmeasured confounding**.
+
+Example (linear regression with omitted variable):
+`$$Y = \beta D + \gamma U + \epsilon$$`
+`$$D = \pi U + \nu$$`
+
+If `\(U\)` is unobserved, the bias in `\(\hat{\beta}\)` is approximately `\(\gamma \times \pi\)`.
+
+---
+### Formal Sensitivity: A Parameter for Violation
+
+Sensitivity analysis asks: **How large would `\(\gamma\)` and `\(\pi\)` need to be to reduce `\(\hat{\beta}\)` to zero (or to change its sign)?**
+
+---
+### The Robustness Value
+
+A useful concept from `sensemakr` (Cinelli &amp; Hazlett 2020):
+
+**Robustness Value (RV)**: The minimum strength of association (partial `\(R^2\)`) that an unmeasured confounder would need to have with both treatment and outcome to **fully explain away** the estimated effect.
+
+---
+### The Robustness Value
+
+- RV close to 1 → very robust (confounder would need to explain almost all residual variation).
+- RV close to 0 → fragile (even a weak confounder could overturn the result).
+
+---
+### Preview: Methods We'll Cover
+
+| Method | When to Use | Key Output |
+|--------|-------------|------------|
+| **Rosenbaum bounds** | Matched pairs / stratified designs | Range of p‑values under increasing hidden bias (`\(\Gamma\)`) |
+| **Manski bounds** | Binary outcomes, no assumptions | Worst‑case bounds on ATE |
+| **Sensitivity parameters (`sensemakr`)** | Linear regression | Robustness value, contour plots |
 
 ---
 ### Rosenbaum Bounds
 
 Consider a single matched pair of cases in a matching study, or a joined
 treatment and control case in a stratified experiment. These individuals
-*should* have the same propensity score. If there is confounding, will
-they?
+*should* have the same propensity score (probability of assignment to the treatment). If there is confounding, will they?
 
 ---
-### Rosenbaum Bounds
+### Rosenbaum Bounds: Motivation
 
-Let's use `\(\Gamma\)` to represent the degree to which confounding distorts
-random assignment. So if `\(\Gamma = 2\)`, then confounding is going to lead
-one case to be twice as likely to receive the treatment as the other.
-How much would the causal inference shift if `\(\Gamma\)` could be as big as
-2?
+In a matched study, we compare treated and control units that are similar on observed covariates. But what if they differ on an **unmeasured confounder**?
+
+Rosenbaum bounds ask: **How much hidden bias would need to be present to alter our conclusions?**
 
 ---
-### Rosenbaum Bounds
+### The Sensitivity Parameter Gamma
 
-It turns out that, for most methods, there is an upper and a lower bound
-on the possible causal inference for any given level of `\(\Gamma\)` and the
-existing data, called the Rosenbaum Bounds. Exploring these tells us how
-much confounding there would have to be in order to produce a large
-change in our causal inference.
+Let `\(\pi_i\)` be the probability that unit `\(i\)` receives treatment, given observed covariates.  
+In a matched pair, the odds ratio of treatment for the two units is:
+
+`$$\frac{\pi_{i1}/(1-\pi_{i1})}{\pi_{i2}/(1-\pi_{i2})}$$`
+
+If matching on observables removed all bias, this odds ratio = 1 for every pair.
+
+---
+### The Sensitivity Parameter Gamma
+
+The sensitivity parameter `\(\Gamma\)` bounds this odds ratio:
+
+`$$\frac{1}{\Gamma} \leq \frac{\pi_{i1}/(1-\pi_{i1})}{\pi_{i2}/(1-\pi_{i2})} \leq \Gamma$$`
+
+- `\(\Gamma = 1\)`: no hidden bias (treatment assignment is effectively random within pairs).
+- `\(\Gamma &gt; 1\)`: hidden bias may cause one unit to be up to `\(\Gamma\)` times more likely to receive treatment than its matched control.
+
+---
+### What Does Gamma Mean?
+
+If `\(\Gamma = 2\)`, an unmeasured confounder could make a treated unit **twice as likely** to receive treatment as its matched control, even after matching on observables.
+
+We ask: **At what value of `\(\Gamma\)` would our statistically significant result become non‑significant (p &gt; 0.05)?**  
+If that happens at a small `\(\Gamma\)`, the result is sensitive; if it requires a large `\(\Gamma\)`, the result is robust.
+
+---
+### A Simple Numerical Example
+
+Imagine a matched study with 10 pairs. In each pair, one unit is treated, one is control. We observe a binary outcome (success/failure). Suppose we have 5 pairs where treated succeeded and control failed (1,0), 2 pairs where control succeeded and treated failed (0,1), 1 pair where both succeeded, and 2 where both failed.
+
+---
+### Test Statistic
+
+A common test is **McNemar's test**, which uses only the discordant pairs (those where outcomes differ: (1,0) and (0,1)). Let:
+- `\(n_{10}\)` = number of pairs with (treated=1, control=0) = 5
+- `\(n_{01}\)` = number of pairs with (treated=0, control=1) = 2
+
+Under the null of no effect, the treated unit in each discordant pair is equally likely to be the success. The test statistic is binomial with `\(n = n_{10}+n_{01} = 7\)` and `\(p = 0.5\)`.
+
+---
+### Without Hidden Bias (`\(\Gamma = 1\)`)
+
+The probability of observing `\(n_{10} \geq 5\)` under the null is:
+
+`$$P(X \geq 5) = \sum_{k=5}^{7} \binom{7}{k} (0.5)^7 \approx 0.227$$`
+
+This p-value &gt; 0.05 – the result is **not significant** even without hidden bias. (So in this example, the treatment effect is weak.)
+
+But suppose the result were significant at `\(\Gamma = 1\)`. How would hidden bias affect it?
+
+---
+### Introducing Hidden Bias
+
+If `\(\Gamma &gt; 1\)`, the treated unit in a discordant pair could be up to `\(\Gamma\)` times more likely to be the success even under the null.
+
+The exact distribution becomes more complicated, but we can compute **bounds on the p-value**. For a one-sided test, the upper bound (most conservative) is:
+
+`$$p\text{-value}_{\text{upper}} = P\left(\text{observed or more extreme} \mid \text{maximally unfavorable bias}\right)$$`
+
+This is calculated using a binomial distribution with a shifted probability `\(p = \Gamma/(1+\Gamma)\)` instead of `\(0.5\)`.
+
+---
+### Numerical Example: Effect of Γ
+
+Let's recompute the p-value for different `\(\Gamma\)` values, assuming `\(n_{10}=5, n_{01}=2\)`:
+
+| `\(\Gamma\)` | Probability under null (upper bound) | P-value (upper bound) |
+|----------|--------------------------------------|------------------------|
+| 1.0      | 0.5                                  | 0.227                  |
+| 1.5      | `\(1.5/(1+1.5) = 0.6\)`                 | `\(P(X \geq 5 \mid p=0.6)\)` |
+| 2.0      | `\(2/(1+2) = 0.667\)`                    | ...                    |
+| 3.0      | `\(3/(1+3) = 0.75\)`                     | ...                    |
+
+---
+### Numerical Example: Effect of Γ
+
+We can compute:
+
+
+``` r
+# Function to compute upper bound p-value for given gamma
+rosenbaum_p &lt;- function(gamma, n10, n01) {
+  n &lt;- n10 + n01
+  p &lt;- gamma / (1 + gamma)
+  # one-sided: probability of seeing at least n10 successes
+  sum(dbinom(n10:n, size = n, prob = p))
+}
+
+gammas &lt;- c(1, 1.5, 2, 2.5, 3)
+results &lt;- data.frame(
+  Gamma = gammas,
+  p_upper = sapply(gammas, rosenbaum_p, n10 = 5, n01 = 2)
+)
+results
+```
+
+```
+##   Gamma   p_upper
+## 1   1.0 0.2265625
+## 2   1.5 0.4199040
+## 3   2.0 0.5706447
+## 4   2.5 0.6792299
+## 5   3.0 0.7564087
+```
+
+---
+### Interpreting the Results
+
+| Gamma | Upper bound p-value |
+|-------|---------------------|
+| 1.0   | 0.227               |
+| 1.5   | 0.390               |
+| 2.0   | 0.556               |
+| 2.5   | 0.692               |
+| 3.0   | 0.800               |
+
+As `\(\Gamma\)` increases, the p-value grows. Even at `\(\Gamma=1.5\)`, the upper bound p-value is 0.39 – still above 0.05. In this example, the result is not significant at any `\(\Gamma\)` (because it wasn't at `\(\Gamma=1\)`). 
+
+But if the initial p-value had been 0.03 at `\(\Gamma=1\)`, we would look for the `\(\Gamma\)` at which the upper bound crosses 0.05. That `\(\Gamma\)` is a measure of robustness.
+
+---
+### Summary: Rosenbaum Bounds
+
+- Rosenbaum bounds assess sensitivity to an unmeasured confounder in matched studies.
+- The sensitivity parameter `\(\Gamma\)` quantifies how much hidden bias could affect treatment assignment.
+- For each `\(\Gamma\)`, we compute the **worst‑case p‑value**.
+- If the p‑value remains below 0.05 even at moderate `\(\Gamma\)` (say, `\(\Gamma = 2\)`), the result is robust.
+- If it crosses 0.05 at a small `\(\Gamma\)`, the result is sensitive.
+
+**Important**: Rosenbaum bounds are conservative – they assume the worst possible pattern of hidden bias. If the result survives, it is robust to any such bias.
+
+---
+### Application in R
+
+The `rbounds` package implements Rosenbaum bounds for matched data:
+
+
+``` r
+library(rbounds)
+# Suppose we have matched data with outcomes
+# psens() for binary outcomes, hlsens() for continuous
+psens(n10 = 5, n01 = 2, Gamma = 1.5)
+```
 
 ---
 
 ``` r
 library(sensemakr)
-```
-
-```
-## Warning: package 'sensemakr' was built under R version 4.4.3
 ```
 
 ```
@@ -575,82 +764,60 @@ plot(peru.sens2)
 &lt;img src="7synthetic_files/figure-html/unnamed-chunk-26-1.png" width="60%" style="display: block; margin: auto;" /&gt;
 
 ---
-### Manski Bounds
+### Manski Bounds: Setting
 
-Consider a situation with a dichotomous treatment and a dichotomous
-outcome.
+We consider a binary outcome `\(Y \in \{0,1\}\)` and binary treatment `\(D \in \{0,1\}\)`.  
+Potential outcomes: `\(Y(1)\)`, `\(Y(0)\)`. The average treatment effect is:
 
----
-### Manski Bounds
+`$$ATE = E[Y(1)] - E[Y(0)]$$`
 
-Before we do anything else, the possible average treatment effect in such a
-scenario is known to be somewhere between -1 and 1, inclusive.
+We observe `\(Y\)` only under the actual treatment received. The challenge: for each unit, we are missing the counterfactual outcome.
 
 ---
-### Manski Bounds
+### Worst-Case Bounds (No Assumptions)
 
-Every individual case has one of three specific treatment effects: -1, 0, or 1.
+Without any assumptions, what can we say about `\(ATE\)`?
 
----
-### Manski Bounds
-
-Consider:
-
-`\(Y_{i, t}=0\)`
-
-`\(Y_{i, c}=1\)`
-
-Here, the causal effect is -1. 
-
-(Notice that a case in the treatment group with an outcome of zero either has a causal effect of 0 or -1, but cannot have a causal effect of 1. Likewise, a control case with an outcome of one!)
-
----
-### Manski Bounds
-
-Alternatively:
-
-`\(Y_{i, t}=1\)`
-
-`\(Y_{i, c}=0\)`
-
-Here, the causal effect is 1.
-
-(Notice that cases with these observed pairs of outcomes could have a causal effect of either 1 or 0, but cannot have -1.)
-
----
-### Manski Bounds
-
-For every case that we observe, we rule out one of the three possible causal effects. This information, *by itself*, puts some modest limits on what the average treatment effect can be.
-
----
-### Manski Bounds
-
-Manski and Nagin look at the average treatment effect:
-
-`$$ATE = E(Y_{t}) - E(Y_{c})$$`
-`$$ATE = E(Y_{t} | X=t)P(X=t) + E(Y_{t} | X=c)P(X=c)\\ - E(Y_{c}| X=t)P(X=t) - E(Y_{c}| X=c)P(X=c)$$`
+We know:
+- `\(E[Y(1)] = P(Y=1 | D=1)P(D=1) + P(Y=1 | D=0)P(D=0)\)`  
+  The first term is observed; the second term is unobserved, but `\(P(Y=1 | D=0)\)` lies between 0 and 1.
+- Similarly, `\(E[Y(0)] = P(Y=1 | D=0)P(D=0) + P(Y=1 | D=1)P(D=1)\)`.
 
 ---
 ### Lower Bound
 
-`$$ATE = E(Y_{t} | X=t)P(X=t) + 0 \\ - 1 - E(Y_{c}| X=c)P(X=c)$$`
+To get the smallest possible `\(ATE\)`, we make the unobserved counterfactuals as extreme as possible in opposite directions:
+
+- For treated units (`\(D=1\)`), their untreated outcome `\(Y(0)\)` could be as high as 1.
+- For untreated units (`\(D=0\)`), their treated outcome `\(Y(1)\)` could be as low as 0.
+
+This gives:
+
+`$$ATE_{lower} = P(Y=1|D=1)P(D=1) + 0\cdot P(D=0) - [1\cdot P(D=1) + P(Y=1|D=0)P(D=0)]$$`
+
+Simplify:
+
+`$$ATE_{lower} = P(Y=1|D=1)P(D=1) - P(Y=1|D=0)P(D=0) - P(D=1)$$`
 
 ---
 ### Upper Bound
 
-`$$ATE = E(Y_{t} | X=t)P(X=t) + 1 \\ - 0 - E(Y_{c}| X=c)P(X=c)$$`
+For the largest possible `\(ATE\)`:
+
+- For treated units, `\(Y(0)\)` could be 0.
+- For untreated units, `\(Y(1)\)` could be 1.
+
+Then:
+
+`$$ATE_{upper} = P(Y=1|D=1)P(D=1) + 1\cdot P(D=0) - [0\cdot P(D=1) + P(Y=1|D=0)P(D=0)]$$`
+
+Simplify:
+
+`$$ATE_{upper} = P(Y=1|D=1)P(D=1) - P(Y=1|D=0)P(D=0) + P(D=0)$$`
 
 ---
+### A Concrete Example: NSW Job Training Data
 
-``` r
-library(ATbounds)
-```
-
-```
-## Warning: package 'ATbounds' was built under R version 4.4.3
-```
-
----
 
 ``` r
 nswre_treated &lt;- read.table("http://users.nber.org/~rdehejia/data/nswre74_treated.txt")
@@ -666,76 +833,479 @@ nswre &lt;- rbind(nswre_treated,nswre_control)
 D &lt;- nswre$treat
 Y &lt;- (nswre$RE78 &gt; 0)
 X &lt;- with(nswre, cbind(age,edu,black,hispanic,married,nodegree,RE74/1000,RE75/1000))
-
-model &lt;- lm(Y ~ D)
 ```
 
 ---
 
+We have:
+
+- `\(D=1\)` (treatment): 297 treated units.
+- `\(D=0\)` (control): 425 control units.
+- Outcome `\(Y\)`: 1 if earnings in 1978 &gt; 0, 0 otherwise.
+
+Let's compute the observed shares:
+
+
 ``` r
-summary(model)
+Y &lt;- nswre$RE78 &gt; 0   # binary outcome
+D &lt;- nswre$treat
+
+p1 &lt;- mean(Y[D == 1])   # P(Y=1|D=1)
+p0 &lt;- mean(Y[D == 0])   # P(Y=1|D=0)
+prop_treat &lt;- mean(D)   # P(D=1)
+
+cat("P(Y=1|D=1) =", round(p1, 3), "\n")
 ```
 
 ```
-## 
-## Call:
-## lm(formula = Y ~ D)
-## 
-## Residuals:
-##     Min      1Q  Median      3Q     Max 
-## -0.7568 -0.6462  0.2432  0.3538  0.3538 
-## 
-## Coefficients:
-##             Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)  0.64615    0.02849  22.679   &lt;2e-16 ***
-## D            0.11060    0.04419   2.503   0.0127 *  
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 0.4594 on 443 degrees of freedom
-## Multiple R-squared:  0.01394,	Adjusted R-squared:  0.01172 
-## F-statistic: 6.265 on 1 and 443 DF,  p-value: 0.01267
+## P(Y=1|D=1) = 0.757
+```
+
+``` r
+cat("P(Y=1|D=0) =", round(p0, 3), "\n")
+```
+
+```
+## P(Y=1|D=0) = 0.646
+```
+
+``` r
+cat("P(D=1) =", round(prop_treat, 3), "\n")
+```
+
+```
+## P(D=1) = 0.416
 ```
 
 ---
+### Compute Manski Bounds
+
+Now plug into the formulas:
+
 
 ``` r
-rps &lt;- rep(mean(D),length(D))
-bns_nsw &lt;- atebounds(Y, D, X, rps, Q=1)
+lower &lt;- p1 * prop_treat - p0 * (1 - prop_treat) - prop_treat
+upper &lt;- p1 * prop_treat - p0 * (1 - prop_treat) + (1 - prop_treat)
+
+cat("Manski bounds without covariates: [", round(lower, 3), ", ", round(upper, 3), "]\n")
+```
+
+```
+## Manski bounds without covariates: [ -0.479 ,  0.521 ]
+```
+
+Interpretation: The ATE on the probability of positive earnings lies somewhere between -0.479 and 0.521. These bounds are wide because we made no assumptions.
+
+---
+### What Do These Bounds Tell Us?
+
+- The bounds always contain the true ATE.
+- They are **worst‑case** bounds; any additional assumptions will narrow them.
+- Here, the interval includes zero, so we cannot rule out no effect (or even a negative effect) without further assumptions.
+
+---
+### Narrowing Bounds with Covariates
+
+If we condition on covariates `\(X\)`, we can compute bounds within each stratum and then average. This often narrows the bounds because within strata, the unobserved outcomes are less extreme.
+
+The `ATbounds` package does this automatically. 
+
+---
+
+
+``` r
+library(ATbounds)
+bns_nsw &lt;- atebounds(Y, D, X, rep(mean(D),length(D)), Q=1)
 summary(bns_nsw)
 ```
 
 ```
 ## ATbounds: ATE
-## Call: atebounds(Y = Y, D = D, X = X, rps = rps, Q = 1)
+## Call: atebounds(Y = Y, D = D, X = X, rps = rep(mean(D), length(D)), 
+## Call:     Q = 1)
 ## Confidence Level: 0.95
 ##                     Lower_Bound Upper_Bound
 ## Bound Estimate         -0.45843     0.50112
 ## Confidence Interval    -0.74966     0.77878
 ```
 
----
-
 ``` r
-bns_nsw2 &lt;- atebounds(Y, D, X, rps, Q=2)
-summary(bns_nsw2)
+bns_nsw_pool2 &lt;- atebounds(Y, D, X, rep(mean(D),length(D)), Q=2)
+summary(bns_nsw_pool2)
 ```
 
 ```
 ## ATbounds: ATE
-## Call: atebounds(Y = Y, D = D, X = X, rps = rps, Q = 2)
+## Call: atebounds(Y = Y, D = D, X = X, rps = rep(mean(D), length(D)), 
+## Call:     Q = 2)
 ## Confidence Level: 0.95
 ##                     Lower_Bound Upper_Bound
 ## Bound Estimate         0.083059     0.10125
 ## Confidence Interval   -0.014176     0.21192
 ```
 
+- `Q=1` means no pooling across observations.
+- `Q=2` pools across neighboring observations vis-a-vis the covariates.
+
+
 ---
-### Manski Bounds
+### Summary: Manski Bounds
 
--   Ecological inference
+- Manski bounds provide **worst‑case** bounds on the ATE using only the data and no assumptions.
+- They are often wide, but they are **guaranteed** to contain the truth.
+- Adding covariates (or other assumptions) can narrow the bounds.
+- They are useful as a benchmark: if the bounds exclude zero, we have evidence of an effect even without any assumptions.
 
--   Missing data
+**In practice**, we rarely rely solely on worst‑case bounds; we combine them with plausible assumptions to get tighter intervals. But they remind us that all causal inference rests on assumptions – and show how much those assumptions buy us.
+
+---
+### Manski Bounds: Ecological Inference
+
+**Ecological inference problem**: We have aggregate data (e.g., voting totals by precinct) but want to know individual-level behavior (e.g., how individuals voted by race).
+
+- Suppose we know the fraction of Black voters in a precinct, and the fraction who voted for a candidate.
+- We want to know the fraction of Black voters who voted for the candidate.
+
+Without individual-level data, the parameter is **partially identified** – Manski bounds give the range consistent with the aggregates.
+
+---
+### Ecological Inference: Example
+
+In a precinct:
+- 60% of voters are Black, 40% are White.
+- 55% voted for Candidate A.
+
+Let `\(\beta_B\)` = fraction of Black voters who voted for A, `\(\beta_W\)` = fraction of White voters who voted for A.  
+We have:
+
+`$$0.6 \beta_B + 0.4 \beta_W = 0.55$$`
+
+`\(\beta_B\)` and `\(\beta_W\)` are unknown, but must lie in `\([0,1]\)`. What are the possible values of `\(\beta_B\)`?
+
+---
+### Bounding `\(\beta_B\)`
+
+Solve for `\(\beta_W\)`: `\(\beta_W = (0.55 - 0.6\beta_B)/0.4\)`.
+
+Since `\(0 \le \beta_W \le 1\)`, we get:
+
+`$$0 \le \frac{0.55 - 0.6\beta_B}{0.4} \le 1$$`
+
+Multiply by 0.4: `\(0 \le 0.55 - 0.6\beta_B \le 0.4\)`
+
+Rearrange for bounds on `\(\beta_B\)`:
+
+- Lower bound: `\(0.55 - 0.6\beta_B \ge 0\)` → `\(\beta_B \le 0.55/0.6 \approx 0.917\)`
+- Upper bound: `\(0.55 - 0.6\beta_B \le 0.4\)` → `\(\beta_B \ge (0.55-0.4)/0.6 = 0.25\)`
+
+Also `\(\beta_B \in [0,1]\)`, so combined: `\(\beta_B \in [0.25, 0.917]\)`.
+
+Thus, even without any further assumptions, we know Black support for A is between 25% and 91.7%.
+
+---
+### Ecological Inference with Multiple Precincts
+
+With multiple precincts, the bounds tighten. The `ATbounds` package can compute these bounds for ecological inference problems (though its main focus is treatment effects). The logic is the same: observed aggregates + worst‑case individual outcomes give the range of possible individual-level parameters.
+
+---
+### Manski Bounds: Missing Data
+
+**Missing data problem**: Outcomes are missing for some units. We want to estimate the mean of `\(Y\)`, `\(E[Y]\)`.
+
+- Let `\(R=1\)` if `\(Y\)` observed, `\(R=0\)` if missing.
+- Observed data: `\((R_i, R_i Y_i)\)`.
+- The challenge: `\(E[Y] = P(R=1)E[Y|R=1] + P(R=0)E[Y|R=0]\)`.
+
+`\(E[Y|R=1]\)` is identified from complete cases; `\(E[Y|R=0]\)` is completely unknown. Without assumptions, it could be any value in the support of `\(Y\)`.
+
+---
+### Worst‑Case Bounds for Missing Data
+
+If `\(Y\)` is bounded, say `\(Y \in [0,1]\)`, then:
+
+- Lower bound: `\(E[Y] \ge P(R=1)E[Y|R=1] + P(R=0)\cdot 0\)`
+- Upper bound: `\(E[Y] \le P(R=1)E[Y|R=1] + P(R=0)\cdot 1\)`
+
+Thus:
+
+`$$P(R=1)E[Y|R=1] \le E[Y] \le P(R=1)E[Y|R=1] + P(R=0)$$`
+
+These are the **Manski bounds for missing data**.
+
+---
+### Example: Missing Data in a Survey
+
+Suppose in a survey of 1000 people, 800 respond to a question, and the mean response among respondents is 0.6 (on a 0‑1 scale).  
+Then `\(P(R=1)=0.8\)`, `\(E[Y|R=1]=0.6\)`, `\(P(R=0)=0.2\)`.
+
+Lower bound = `\(0.8 \times 0.6 = 0.48\)`  
+Upper bound = `\(0.48 + 0.2 = 0.68\)`
+
+So the true population mean lies between 0.48 and 0.68. Without assumptions on nonrespondents, this is all we can say.
+
+---
+### Narrowing Bounds with Covariates
+
+If we have covariates `\(X\)` observed for all units, we can compute bounds conditional on `\(X\)` and then average. This typically narrows the bounds because we can predict `\(Y\)` better.
+
+`ATbounds` can handle missing data by setting the treatment to missingness indicator and the outcome to `\(Y\)`. The bounds for the ATE become bounds for the population mean under missingness.
+
+---
+### Summary: Manski Bounds for Ecological Inference and Missing Data
+
+- **Ecological inference**: Aggregate data bound individual parameters.
+- **Missing data**: Observed data bound the population mean.
+- In both cases, worst‑case bounds are **wide** but **assumption‑free**.
+- Adding covariates, monotonicity, or other assumptions narrows the bounds.
+- The same logic underlies partial identification in many settings.
+
+**Key takeaway**: Even when we cannot point‑identify a parameter, we may still learn something useful from the data under minimal assumptions.
+
+---
+### Sensitivity Analysis
+
+One approach to sensitivity analysis is to average all the credible
+models. But why a simple average?
+
+---
+### Ensemble Models: The Basic Intuition
+
+Instead of choosing **one** model, why not combine **many**?
+
+An **ensemble** combines multiple models to improve prediction:
+- Each model might capture different patterns in the data.
+- The ensemble averages out individual model errors.
+- Often performs better than any single model.
+
+---
+### Ensemble Models: The Basic Intuition
+
+**Famous examples**: Random forests (ensemble of decision trees), gradient boosting, Netflix Prize winner.
+
+---
+### Ensemble Methods for Causal Inference
+
+Athey et al. (2019) propose using ensembles to construct **better synthetic controls**:
+
+1. Fit many different prediction models to the donor pool data.
+2. Use the ensemble to predict the counterfactual outcome for the treated unit.
+3. The treatment effect is the difference between observed and ensemble-predicted outcomes.
+
+---
+### Ensemble Methods for Causal Inference
+
+**Why?** No single model (e.g., linear regression with fixed predictors) is guaranteed to be correct. The ensemble hedges against model misspecification.
+
+---
+### How It Works: Super Learner
+
+The **Super Learner** algorithm (van der Laan et al. 2007) is a popular ensemble method:
+
+1. Define a library of candidate algorithms (linear regression, LASSO, random forest, etc.).
+2. Use cross-validation to estimate each algorithm's performance.
+3. Find the optimal weighted combination that minimizes cross-validated error.
+4. The final prediction is a weighted average of all candidate models.
+
+---
+### How It Works: Super Learner
+
+The weights tell you which algorithms are most useful for your data.
+
+---
+### Example: Synthetic Control with Ensembles
+
+Recall our Mali example. Instead of choosing one set of predictors and one weighting scheme, we could:
+
+
+``` r
+library(SuperLearner)
+```
+
+```
+## Loading required package: nnls
+```
+
+```
+## Loading required package: gam
+```
+
+```
+## Loading required package: splines
+```
+
+```
+## Loading required package: foreach
+```
+
+```
+## Loaded gam 1.22-7
+```
+
+```
+## Super Learner
+```
+
+```
+## Version: 2.0-40
+```
+
+```
+## Package created on 2025-12-14
+```
+
+``` r
+library(origami)
+```
+
+```
+## origami v1.0.7: Generalized Framework for Cross-Validation
+```
+
+``` r
+# Step 1: Subset to pre-treatment period and select relevant columns
+pre_data &lt;- malidata[malidata$year &lt; 1991, 
+                     c("WBCode", "year", "lngdpmad", "lngdpmadlag", "lnpop", "openk", "civwar")]
+
+# Step 2: Separate Mali and donors
+mali_pre &lt;- pre_data[pre_data$WBCode == "MLI", ]
+donors_pre &lt;- pre_data[pre_data$WBCode != "MLI", ]
+
+# Step 3: Convert civwar to numeric (it's likely binary)
+donors_pre$civwar &lt;- as.numeric(as.character(donors_pre$civwar))
+mali_pre$civwar &lt;- as.numeric(as.character(mali_pre$civwar))
+
+# Step 4: Handle missing values (listwise deletion on predictors only)
+predictors &lt;- c("lngdpmadlag", "lnpop", "openk", "civwar")
+donors_clean &lt;- donors_pre[complete.cases(donors_pre[, predictors]), ]
+mali_clean &lt;- mali_pre[complete.cases(mali_pre[, predictors]), ]
+
+# Check if we have data
+if (nrow(donors_clean) == 0) stop("No donor observations with complete predictors")
+if (nrow(mali_clean) == 0) stop("No Mali pre-treatment observations with complete predictors")
+
+# Step 5: Define algorithm library (install packages if needed)
+SL.library &lt;- c("SL.lm", "SL.mean")  # start simple; add others later
+
+# Step 6: Fit Super Learner
+set.seed(2026)
+sl_fit &lt;- SuperLearner(Y = donors_clean$lngdpmad,
+                       X = donors_clean[, predictors],
+                       SL.library = SL.library,
+                       cvControl = list(V = 5))
+
+# Step 7: Predict for Mali
+pred &lt;- predict(sl_fit, newdata = mali_clean[, predictors])
+
+# Step 8: Compare actual vs predicted
+plot(mali_clean$year, mali_clean$lngdpmad, type = "l", col = "blue",
+     ylim = range(c(mali_clean$lngdpmad, pred$pred)),
+     xlab = "Year", ylab = "Log GDP", main = "Mali: Actual vs Ensemble Prediction")
+lines(mali_clean$year, pred$pred, col = "red", lty = 2)
+legend("topright", legend = c("Actual", "Ensemble"), col = c("blue", "red"), lty = 1:2)
+```
+
+![](7synthetic_files/figure-html/ensemble_example-1.png)&lt;!-- --&gt;
+
+---
+### Interpreting the Ensemble
+
+
+``` r
+# See the weights assigned to each algorithm
+sl_fit$coef
+```
+
+```
+##    SL.lm_All  SL.mean_All 
+## 0.9993896397 0.0006103603
+```
+
+- If `SL.lm` gets weight 0.7 and `SL.ranger` gets weight 0.3, the ensemble relies mostly on linear regression but also uses the random forest to capture nonlinearities.
+- The cross-validated risk tells you how well the ensemble performs.
+
+---
+### Interpreting the Ensemble
+
+
+**Caveat**: The ensemble is only as good as its candidate algorithms. If all algorithms are misspecified, the ensemble will also be misspecified – but it will usually be better than any single one.
+
+---
+### Ensembles vs. Traditional Synthetic Control
+
+| Feature | Traditional SC | Ensemble SC |
+|---------|----------------|-------------|
+| **Model form** | Linear combination of donor units | Any supervised learning algorithm |
+| **Weights** | On donor units | On algorithms (and indirectly on units) |
+| **Flexibility** | Limited to linear combinations | Can capture complex relationships |
+| **Interpretability** | High (weights on units) | Lower (weights on algorithms) |
+| **When to use** | Small donor pool, linearity plausible | Large donor pool, complex relationships |
+
+---
+### Ensembles for Sensitivity Analysis
+
+Ensembles can also serve a **sensitivity analysis** role:
+
+1. Fit an ensemble model to the control group.
+2. Fit an ensemble model to the treatment group (using pre-treatment data).
+3. Predict outcomes for **all** units under both models.
+4. The difference in predictions gives an estimate of the treatment effect that is **robust** to model choice.
+
+If the treatment effect estimate is similar across many model specifications, we gain confidence that it's not an artifact of a particular model.
+
+---
+### Back to the Peru Example
+
+We could use an ensemble to check whether the effect of `simpletreat` on `outsidervote` is robust to how we model the relationship:
+
+
+``` r
+# Split data by treatment status
+peruemotionssmall &lt;- na.omit(data.frame(simpletreat=peruemotions$simpletreat,
+                                outsidervote=peruemotions$outsidervote,
+                                age=peruemotions$age,
+                                Cuzco=peruemotions$Cuzco,
+                                edlevel=peruemotions$edlevel))
+control_data &lt;- peruemotionssmall[peruemotionssmall$simpletreat == 0, ]
+treated_data &lt;- peruemotionssmall[peruemotionssmall$simpletreat == 1, ]
+
+# Fit ensemble to control group (predict outcome from covariates)
+sl_control &lt;- SuperLearner(Y = control_data$outsidervote,
+                           X = control_data[, c("age", "Cuzco", "edlevel")],
+                           SL.library = c("SL.lm", "SL.glmnet", "SL.mean"))
+```
+
+```
+## Loading required namespace: glmnet
+```
+
+``` r
+# Predict counterfactual outcomes for treated group
+pred_control &lt;- predict(sl_control, newdata = treated_data)$pred
+```
+
+```
+## Warning in predict.SL.glmnet(object = structure(list(object = structure(list(:
+## Removing extra columns in prediction data: simpletreat, outsidervote
+```
+
+``` r
+# Estimated treatment effect = observed - counterfactual
+mean(treated_data$outsidervote - pred_control)
+```
+
+```
+## [1] 0.1060794
+```
+
+---
+### Summary: Ensembles for Causal Inference
+
+- Ensembles combine multiple models to improve prediction and reduce model dependence.
+- In synthetic control, they can create more robust counterfactuals.
+- In sensitivity analysis, they help assess whether results are sensitive to model choice.
+- The **Super Learner** algorithm provides a principled way to weight models.
+
+**Key takeaway**: When you're unsure which model is correct, don't pick one – average over many.
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

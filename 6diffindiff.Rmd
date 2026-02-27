@@ -1,7 +1,7 @@
 ---
 title: "6: Difference-in-Differences Designs"
 subtitle: "Quantitative Causal Inference"
-author: "<large>J. Seawright</large>"
+author: "<large>Jaye Seawright</large>"
 institute: "<small>Northwestern Political Science</small>" 
 date: "May 7 and May 12, 2026"
 output: 
@@ -57,10 +57,6 @@ style_mono_accent(
 )
 ```
 
----
-### Before and After
-
-Do we need over-time comparisons to achieve causal inference? Do they help? How?
 
 ### Before and After
 
@@ -70,15 +66,29 @@ Suppose we have a set of confounders that:
 
 2. Is completely shared across cases but varies over time.
 
----
-### Difference-In-Differences
-
-$Y_{0,i,t}$ and $Y_{1,i,t}$
+We need to difference out these time-invariant confounders and common time shocks.
 
 ---
-### Difference-In-Differences
+### The Difference-in-Differences Estimand
 
-$[Y_{1,i,t+k} - Y_{0,j,t+k}] - [Y_{0,i,t} - Y_{0,j,t}]$
+In potential outcomes notation:
+
+$$ATT = E[Y_{i,2}(1) - Y_{i,2}(0) | D_i = 1]$$
+
+We observe $Y_{i,2}(1)$ for treated units, but $Y_{i,2}(0)$ is counterfactual.
+
+---
+### The Difference-in-Differences Estimand
+
+DiD imputes the counterfactual using:
+
+$$\tiny E[Y_{i,2}(0) | D_i = 1] = E[Y_{i,1} | D_i = 1] + \underbrace{(E[Y_{j,2} | D_j = 0] - E[Y_{j,1} | D_j = 0])}_{\text{common trend}}$$
+---
+### The Difference-in-Differences Estimand
+
+The estimator:
+
+$$\hat{\tau}_{DiD} = (\bar{Y}_{T,2} - \bar{Y}_{T,1}) - (\bar{Y}_{C,2} - \bar{Y}_{C,1})$$
 
 ---
 ```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
@@ -141,128 +151,343 @@ clfe <- feols(Rate ~ Treated | State + Quarter,
 summary(clfe)
 ```
 
----
-### Parallel Trends
-
-The analysis here assumes that the treatment and control cases have *parallel time trends* on the dependent variable, conditional on any control variables and other adjustments in the model.
 
 ---
+### Interpreting the Organ Donations DiD Results
+
+- The coefficient on `Treated` is about **`r round(coef(clfe)["Treated"], 4)`**.
+- **Interpretation**: California's policy change increased the organ donation rate by approximately `r round(100*coef(clfe)["Treated"], 2)` percentage points relative to what would have happened without the policy, under the parallel trends assumption.
+- The p-value is `r round(summary(clfe)$coeftable[4], 4)` – this is above conventional significance levels, suggesting no evidence of an effect.
+- The confidence interval can be extracted: `confint(clfe)["Treated",]`.
+
+---
+
+**Substantive significance**: Is a `r round(100*coef(clfe)["Treated"], 2)` percentage point change large? It depends on the baseline donation rate. The mean donation rate in California before the policy was about `r mean(od$Rate[od$State=="California" & od$Quarter_Num < 4], na.rm=TRUE)` percent, so the estimated increase represents a relative change of roughly `r round(100*coef(clfe)["Treated"] / mean(od$Rate[od$State=="California" & od$Quarter_Num < 4], na.rm=TRUE), 1)`%.
+
+---
+### Testing Parallel Trends: Pre-Treatment Analysis
+
 ```{r, echo = FALSE, out.width="80%", fig.retina = 1, fig.align='center'}
 include_graphics("images/parallel1.png")
 ```
 
 ---
+### Testing Parallel Trends: Pre-Treatment Analysis
+
 ```{r, echo = FALSE, out.width="80%", fig.retina = 1, fig.align='center'}
 include_graphics("images/parallel2.png")
 ```
 
----
-### Parallel Trends
-
-One useful test is to statistically test whether the treatment and control group had equal time trends during the period before the treatment. If we fit a model that estimates separate time slopes for the two groups, and then we test for equality between those two slopes, that is one way of testing the parallel trends assumption. 
 
 ---
-```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
+```{r interpret_pretrend, echo = TRUE}
 od$calind <- 1*(od$State=='California')
 odparalleltrends.lm <- lm(Rate~Quarter_Num+Quarter_Num:calind, data=od[od$Quarter_Num<4,])
 summary(odparalleltrends.lm)
 ```
 
 ---
-```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
-library(interactions)
-```
+- This regression uses only the **pre-treatment period** (quarters 1–3) and models the donation rate as a function of time (`Quarter_Num`) and an interaction between time and being California (`calind`).
+- The coefficient on `Quarter_Num` is the time trend for the control group.
+- The coefficient on `Quarter_Num:calind` is the **difference in trends** between California and the control group.
+- Here, the interaction coefficient is `r round(coef(odparalleltrends.lm)["Quarter_Num:calind"], 4)` with p = `r round(summary(odparalleltrends.lm)$coef["Quarter_Num:calind", "Pr(>|t|)"], 4)`.
 
 ---
-```{r, echo = TRUE, out.width="70%", fig.retina = 1, fig.align='center'}
+
+**Interpretation**: The p-value > 0.05 suggests that we cannot reject the null hypothesis of parallel pre-treatment trends. This provides some support for the parallel trends assumption.
+
+---
+### Visualizing the Pre-Trends
+
+```{r plot_pretrend, echo = TRUE}
+library(interactions)
 interact_plot(odparalleltrends.lm, pred="Quarter_Num", modx="calind", interval=TRUE)
 ```
 
----
-### Parallel Trends
+- The plot shows the fitted linear trends for California (red) and the control group (blue) during the pre-treatment period.
+- The two lines are roughly parallel – the slopes are not significantly different, as indicated by the overlapping confidence bands.
+- This visual evidence aligns with the statistical test: no strong violation of parallel trends in the pre-treatment window.
 
-If the parallel trends assumption fails, a difference-in-differences design may not be salvageable. It might be possible to control for time trends, but this can subtract out part of the causal effect and produce bias. At this point, a great deal of care and thought is needed, as well as substantial skill with time-series methods.
+**Caveat**: Passing a pre-trend test does not *prove* that trends would have remained parallel after treatment – it only makes the assumption more plausible.
 
 ---
-```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
-include_graphics("images/ImaiKimdifndif.png")
+### What If the Pre-Trend Test Failed?
+
+- If the interaction were significant, it would indicate that California and the control group were already on different trajectories before the policy.
+- In that case, the DiD estimate would be biased because the counterfactual trend for California would not be the control group's trend.
+
+---
+
+- Possible remedies:
+  - Include group-specific linear time trends (though this can be sensitive).
+  - Use synthetic control methods to construct a more plausible counterfactual.
+  - Restrict to a subset of control units that better match California's pre-treatment trend (matching on trends).
+
+---
+
+In our example, the test barely passes, so the standard DiD estimate is perhaps a bit more credible.
+
+---
+### Summary: Organ Donations DiD
+
+| Question | Answer |
+|----------|--------|
+| Estimated effect | `r round(100*coef(clfe)["Treated"], 2)` percentage point increase |
+| Statistical significance | p = `r round(summary(clfe)$coeftable[4], 4)` |
+| Parallel trends? | Pre-trend test p = `r round(summary(odparalleltrends.lm)$coef["Quarter_Num:calind", "Pr(>|t|)"], 4)` – marginally not rejected |
+| Credibility of DiD | Acceptable, given the evidence |
+
+---
+### Timing
+
+- In the canonical 2×2 DiD (one treatment group, one control group, one pre/post period), the TWFE estimator gives the ATT under parallel trends.
+
+- With **staggered treatment adoption** (units treated at different times) and **heterogeneous treatment effects** (effects vary over time or across cohorts), TWFE no longer estimates a simple ATT.
+
+---
+### The Negative Weights Problem
+
+- Goodman‑Bacon (2021) and de Chaisemartin & d’Haultfoeuille (2020) show that the TWFE estimator is a **weighted average** of all possible 2×2 DiD comparisons, but **some weights can be negative**.
+
+---
+### Why Do Negative Weights Arise?
+
+Consider three groups:
+- **Early treated**: treated in period 1
+- **Late treated**: treated in period 2
+- **Never treated**: always untreated
+
+---
+### Why Do Negative Weights Arise?
+
+In a TWFE regression with unit and time fixed effects, the estimator implicitly uses:
+- Early‑treated vs. never‑treated (valid)
+- Late‑treated vs. never‑treated (valid)
+- **Early‑treated vs. late‑treated** (problematic)
+
+---
+### Why Do Negative Weights Arise?
+
+In the third comparison, **early‑treated units serve as controls for late‑treated units after their own treatment**. If treatment effects change over time, this comparison can have a negative weight.
+
+---
+### A Simple Example
+
+```{r neg_weights_sim, echo = TRUE}
+# Simulate staggered adoption with heterogeneous effects
+set.seed(2026)
+n <- 1000
+df <- data.frame(
+  id = 1:n,
+  group = sample(c("early", "late", "never"), n, replace = TRUE,
+                 prob = c(0.3, 0.3, 0.4)),
+  time = rep(1:3, each = n)
+)
+
+# Treatment timing: early treated at time 2, late treated at time 3
+df$treat <- ifelse(df$group == "early" & df$time >= 2, 1,
+            ifelse(df$group == "late" & df$time >= 3, 1, 0))
+
+# Heterogeneous effects: early effect = 2, late effect = 1, no effect for never
+df$y0 <- rnorm(n * 3, mean = 0, sd = 1)
+df$effect <- ifelse(df$group == "early" & df$time == 2, 2,
+             ifelse(df$group == "early" & df$time == 3, 2,
+             ifelse(df$group == "late" & df$time == 3, 1, 0)))
+df$y <- df$y0 + df$effect
 ```
 
 ---
-### Negative Weights
+### A Simple Example
 
-Negative weights can emerge in TWFE for difference-in-differences because treated observations of early treatment adopters end up serving as controls for late treatment adopters (see de Chaisemartin and d'Haultfoeuille 2020 and Goodman-Bacon 2021).
-
----
-### Panel Matching
-
-Imai and coauthors propose panel-based matching as a way of implementing difference-in-differences designs. 
-
----
-```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
-include_graphics("images/Shiraef1.png")
+```{r neg_weights_sim_part2, echo = TRUE}
+# TWFE estimator
+library(fixest)
+twfe <- feols(y ~ treat | id + time, data = df)
+summary(twfe)
 ```
 
 ---
-```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
-include_graphics("images/Shiraef2.png")
+### A Simple Example
+
+The true average treatment effect on the treated (ATT) is about `(0.3*2 + 0.3*1)/0.6 = 1.5`, but TWFE gives `r round(coef(twfe), 3)` – biased downward.
+
+---
+### Bacon Decomposition
+
+The Goodman‑Bacon decomposition splits the TWFE estimator into three types of 2×2 comparisons:
+
+1. **Timing groups** (early vs. late) – these can have negative weights.
+2. **Treated vs. untreated** – these are fine.
+3. **Untreated vs. treated** – symmetrical.
+
+---
+### Bacon Decomposition
+
+```{r bacon_example, echo = TRUE, eval = TRUE}
+library(bacondecomp)
+# Prepare data with id, time, outcome, treatment
+bacon_out <- bacon(y ~ treat,
+                   data = df,
+                   id_var = "id",
+                   time_var = "time")
 ```
 
 ---
-```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
-include_graphics("images/Shiraef3.png")
+### Bacon Decomposition
+```{r bacon_example_2, echo = TRUE, eval = TRUE}
+summary(bacon_out)
 ```
 
 ---
-```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
-include_graphics("images/Liu1.png")
+### Bacon Decomposition
+
+The output shows the weight and estimate for each 2×2 comparison, highlighting which groups contribute negatively.
+
+---
+### Intuition for Negative Weights
+
+When treatment effects vary over time, the early‑treated vs. late‑treated comparison can be **contaminated**:
+
+---
+### Intuition for Negative Weights
+
+- The early‑treated group is treated in period 2, so their outcome in period 3 reflects the effect of treatment in period 3 (possibly different from period 2).
+- The late‑treated group is still untreated in period 2, so the comparison of their period‑3 outcome differences can produce a weight that is **negative** if the early effect is larger than the late effect.
+
+---
+### Intuition for Negative Weights
+
+This means the TWFE estimator may even have the **wrong sign** if the heterogeneity is severe.
+
+---
+### Diagnosing the Problem
+
+- **Bacon decomposition**: Identifies which comparisons drive the estimate and their weights.
+- **Event study plots**: Plot coefficients for leads and lags of treatment. If pre‑trends are flat but post‑trends show patterns that change over time, heterogeneity may be present.
+- **Cohort‑specific ATTs**: Estimate treatment effects separately by cohort and time.
+
+---
+### Diagnosing the Problem
+
+```{r event_study, echo = TRUE, eval = TRUE}
+# Create leads and lags using fixest
+df$time_to_treat <- ifelse(df$group == "early", df$time - 2,
+                    ifelse(df$group == "late", df$time - 3, NA))
+es <- feols(y ~ i(time_to_treat, ref = -1) | id + time, data = df)
 ```
 
 ---
-### Functional Form and Parallel Trends
-
-$$Y_{0,i,t}=f(X_{i,t})+h(U_{i,t})+\epsilon_{i,t}$$
-
-in which $f(\cdot)$ and $h(\cdot)$ are known, parametric functions.
-
----
-### Strict Exogeneity
-
-$$\epsilon_{i,t} \perp\!\!\!\perp \{D_{j,s},X_{j,s},U_{j,s}\}$$
-for all $i,j \in \{1,2,...,N\}$ and $s,t \in \{1,2,...,T\}$.
-
----
-### Low-dimensional Decomposition
-
-There  exists  a  low-dimensional  decomposition  of
-
-$$h(U_{i,t}) : h(U_{i,t}) = L_{i,t}$$
-and $rank(L_{N×T}) << min\{N,T\}$.
-
----
-### Estimation
-
-1. Using only untreated observations, model the outcome, based on $X$ and whatever strategy is needed to capture $U$.
-
-2. Using the model from step 1, form fitted values $\hat{Y}_{0,i,t}$ for each *treated* observation.
-
-3. Estimate the treatment effect for each treated observation by: $\hat{\delta}_{i,t} = Y_{i,t} - \hat{Y}_{0,i,t}$.
-
-4. Average the $\hat{\delta}$ values to estimate whatever causal quantity is of interest.
-
----
-### Specific Estimators
-
-FEct: estimate $\hat{Y}_{0,i,t}$ using TWFE.
-
-IFEct: estimate $\hat{Y}_{0,i,t}$ using a version of TWFE augmented with a factor-analysis model to allow for existence of limited categories of time-varying unobserved covariates.
-
-Matrix completion: conceptually similar to factor analysis; somewhat different performance properties.
-
----
-```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
-include_graphics("images/Liu2.png")
+### Diagnosing the Problem
+```{r event_study_2, echo = FALSE, eval = TRUE}
+iplot(es)
 ```
+
+---
+### Diagnosing the Problem
+
+If coefficients for later periods differ across cohorts, TWFE is likely biased.
+
+---
+### Solutions: Modern DiD Estimators
+
+Several robust estimators have been developed.
+
+These estimators avoid negative weights by **not using already‑treated units as controls** and by explicitly allowing for effect heterogeneity.
+
+---
+### Example: Callaway & Sant'Anna
+
+```{r cs_example, echo = TRUE, eval = TRUE}
+library(did)
+
+# Prepare data: need a variable for first treatment period (0 = never treated)
+df$first_treat <- ifelse(df$group == "early", 2,
+                  ifelse(df$group == "late", 3, 0))
+
+cs_out <- att_gt(yname = "y",
+                 tname = "time",
+                 idname = "id",
+                 gname = "first_treat",
+                 data = df,
+                 control_group = "notyettreated")
+```
+
+---
+### Example: Callaway & Sant'Anna
+
+```{r cs_example_1_5, echo = TRUE, eval = TRUE}
+summary(cs_out)
+```
+
+---
+### Example: Callaway & Sant'Anna
+
+```{r cs_example_2, echo = TRUE, eval = TRUE}
+# Aggregate to overall ATT
+agg <- aggte(cs_out, type = "simple")
+summary(agg)
+```
+
+---
+### Example: Callaway & Sant'Anna
+
+The aggregated ATT should be close to the true value of 1.5.
+
+---
+### Summary: Key Takeaways
+
+- TWFE with staggered treatment and heterogeneous effects can produce **negative weights**, leading to bias.
+- Always diagnose using **Bacon decomposition** and **event study plots**.
+- When heterogeneity is suspected, use **modern DiD estimators** that are robust to these issues.
+- Reporting only the TWFE coefficient is no longer sufficient in applied work.
+
+---
+### Current Solutions
+
+```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+include_graphics("images/Roth1.png")
+```
+
+---
+### Current Solutions
+
+```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+include_graphics("images/Roth2.png")
+```
+
+---
+### Current Solutions
+
+Clearly, there are many available solutions to the issues with DiD with staggered treatment timing. Choosing among them is an advanced topic
+
+*   The details of the choice involve complex features of estimators.
+*   The literature comparing among options is ongoing and not yet final.
+
+---
+### You Must Pick a Solution
+
+Nonetheless, the current status quo in applied social-science methods is that you must use one of the available solutions when you have a DiD with staggered timing.
+
+*   The issues with traditional methods are widely known and can be extreme.
+*   Choosing virtually any of the contemporary methods will usually be better than the traditional methods when there is staggered timing.
+
+
+---
+### For example...
+
+What if, in addition to having staggered timing of treatment adoption and heterogeneous effects, we also have problems with parallel trends because of time-varying unobserved confounders? 
+
+*   The fect package implements interactive fixed effects estimators that allow for unobserved time-varying confounders through a factor structure.
+
+---
+
+In brief, the fect or fixed-effects counterfactual estimator imputes counterfactuals by fitting an outcome model using untreated observations, then estimates the individual treatment effect as the difference between observed and predicted outcomes. Finally, it computes average treatment effects on the treated (ATT) and period-specific ATTs. 
+
+This helps eliminate biases caused by improper weighting of heterogeneous treatment effects.
+
+---
+
+The ife or interactive fixed-effects counterfactual estimator adds a layer of factor analysis to try to remove time-varying confounders that might be the source of problems for parallel trends.
 
 ---
 ```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
@@ -290,5 +515,12 @@ euife
 ```
 
 ---
+### Difference-in-Differences: Key Takeaways
 
-[An overview of recent directions.](https://doi.org/10.1016/j.jeconom.2023.03.008)
+- DiD identifies the ATT under the **parallel trends assumption**.
+- Always test pre-treatment trends graphically and statistically.
+- With staggered treatment timing and heterogeneous effects, **TWFE can be biased** due to negative weights.
+- Modern estimators (CS, SA, dCDH, BJS) provide robust alternatives.
+- When parallel trends fails, **interactive fixed effects models** offer a path forward.
+- The choice among methods depends on the research design and requires careful justification.
+

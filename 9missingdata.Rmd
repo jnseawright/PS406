@@ -1,7 +1,7 @@
 ---
 title: "9: Missing Data and Selection"
 subtitle: "Quantitative Causal Inference"
-author: "<large>J. Seawright</large>"
+author: "<large>Jaye Seawright</large>"
 institute: "<small>Northwestern Political Science</small>" 
 date: "May 28 and June 2, 2026"
 output: 
@@ -219,7 +219,7 @@ include_graphics("images/King4.png")
 ```
 
 ---
-```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
+```{r mar effects, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
 perumareffects2 <- 1:100
 
 missing.prob <- inv.logit(-2.3 + -.5*peruemotions$edlevel + -.2*peruemotions$classid + peruemotions$leftright)

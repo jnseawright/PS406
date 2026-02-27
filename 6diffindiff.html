@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>6: Difference-in-Differences Designs</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Jaye Seawright" />
+    <script src="6diffindiff_files/header-attrs-2.30/header-attrs.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# 6: Difference-in-Differences Designs
+]
+.subtitle[
+## Quantitative Causal Inference
+]
+.author[
+### <large>Jaye Seawright</large>
+]
+.institute[
+### <small>Northwestern Political Science</small>
+]
+.date[
+### May 7 and May 12, 2026
+]
+
+---
+
+class: center, middle
+
+&lt;style type="text/css"&gt;
+pre {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+pre[class] {
+  max-height: 200px;
+}
+&lt;/style&gt;
+
+
+
+
+
+### Before and After
+
+Suppose we have a set of confounders that:
+
+1. Varies across cases but is fixed over time, and/or
+
+2. Is completely shared across cases but varies over time.
+
+We need to difference out these time-invariant confounders and common time shocks.
+
+---
+### The Difference-in-Differences Estimand
+
+In potential outcomes notation:
+
+`$$ATT = E[Y_{i,2}(1) - Y_{i,2}(0) | D_i = 1]$$`
+
+We observe `\(Y_{i,2}(1)\)` for treated units, but `\(Y_{i,2}(0)\)` is counterfactual.
+
+---
+### The Difference-in-Differences Estimand
+
+DiD imputes the counterfactual using:
+
+`$$\tiny E[Y_{i,2}(0) | D_i = 1] = E[Y_{i,1} | D_i = 1] + \underbrace{(E[Y_{j,2} | D_j = 0] - E[Y_{j,1} | D_j = 0])}_{\text{common trend}}$$`
+---
+### The Difference-in-Differences Estimand
+
+The estimator:
+
+`$$\hat{\tau}_{DiD} = (\bar{Y}_{T,2} - \bar{Y}_{T,1}) - (\bar{Y}_{C,2} - \bar{Y}_{C,1})$$`
+
+---
+&lt;img src="images/miamiboatlift.JPG" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+&lt;img src="images/mariel1.JPG" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+&lt;img src="images/mariel2.JPG" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+&lt;img src="images/marielcomparison.JPG" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+&lt;img src="images/marielcomparison2.JPG" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+&lt;img src="images/marielconclusions.JPG" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+### Analysis
+
+Starting simple, if we think *all* the confounding variables are constant either in time or space, then the model we want may be something like:
+
+`$$y_{i,t} = \alpha_{i} + \gamma_{t} + \beta_{1}Treatment_{i,t} + \epsilon_{i,t}$$`
+
+---
+
+``` r
+library(causaldata)
+od &lt;- causaldata::organ_donations
+library(fixest)
+```
+
+---
+
+``` r
+# Treatment variable
+od &lt;- od %&gt;%
+    mutate(Treated = State == 'California' &amp; 
+              Quarter %in% c('Q32011','Q42011','Q12012'))
+
+clfe &lt;- feols(Rate ~ Treated | State + Quarter,
+               data = od)
+```
+
+---
+
+``` r
+summary(clfe)
+```
+
+```
+## OLS estimation, Dep. Var.: Rate
+## Observations: 162
+## Fixed-effects: State: 27,  Quarter: 6
+## Standard-errors: IID 
+##              Estimate Std. Error  t value Pr(&gt;|t|) 
+## TreatedTRUE -0.022459   0.020497 -1.09573  0.27524 
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## RMSE: 0.021982     Adj. R2: 0.974196
+##                  Within R2: 0.009221
+```
+
+
+---
+### Interpreting the Organ Donations DiD Results
+
+- The coefficient on `Treated` is about **NA**.
+- **Interpretation**: California's policy change increased the organ donation rate by approximately NA percentage points relative to what would have happened without the policy, under the parallel trends assumption.
+- The p-value is 0.2752 – this is above conventional significance levels, suggesting no evidence of an effect.
+- The confidence interval can be extracted: `confint(clfe)["Treated",]`.
+
+---
+
+**Substantive significance**: Is a NA percentage point change large? It depends on the baseline donation rate. The mean donation rate in California before the policy was about 0.2713333 percent, so the estimated increase represents a relative change of roughly NA%.
+
+---
+### Testing Parallel Trends: Pre-Treatment Analysis
+
+&lt;img src="images/parallel1.png" width="80%" style="display: block; margin: auto;" /&gt;
+
+---
+### Testing Parallel Trends: Pre-Treatment Analysis
+
+&lt;img src="images/parallel2.png" width="80%" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+``` r
+od$calind &lt;- 1*(od$State=='California')
+odparalleltrends.lm &lt;- lm(Rate~Quarter_Num+Quarter_Num:calind, data=od[od$Quarter_Num&lt;4,])
+summary(odparalleltrends.lm)
+```
+
+```
+## 
+## Call:
+## lm(formula = Rate ~ Quarter_Num + Quarter_Num:calind, data = od[od$Quarter_Num &lt; 
+##     4, ])
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.31778 -0.11098  0.00612  0.11568  0.32600 
+## 
+## Coefficients:
+##                     Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)         0.433635   0.046060   9.415  1.7e-14 ***
+## Quarter_Num         0.005181   0.021380   0.242   0.8092    
+## Quarter_Num:calind -0.074189   0.042673  -1.739   0.0861 .  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.1567 on 78 degrees of freedom
+## Multiple R-squared:  0.03746,	Adjusted R-squared:  0.01278 
+## F-statistic: 1.518 on 2 and 78 DF,  p-value: 0.2256
+```
+
+---
+- This regression uses only the **pre-treatment period** (quarters 1–3) and models the donation rate as a function of time (`Quarter_Num`) and an interaction between time and being California (`calind`).
+- The coefficient on `Quarter_Num` is the time trend for the control group.
+- The coefficient on `Quarter_Num:calind` is the **difference in trends** between California and the control group.
+- Here, the interaction coefficient is -0.0742 with p = 0.0861.
+
+---
+
+**Interpretation**: The p-value &gt; 0.05 suggests that we cannot reject the null hypothesis of parallel pre-treatment trends. This provides some support for the parallel trends assumption.
+
+---
+### Visualizing the Pre-Trends
+
+
+``` r
+library(interactions)
+interact_plot(odparalleltrends.lm, pred="Quarter_Num", modx="calind", interval=TRUE)
+```
+
+![](6diffindiff_files/figure-html/plot_pretrend-1.png)&lt;!-- --&gt;
+
+- The plot shows the fitted linear trends for California (red) and the control group (blue) during the pre-treatment period.
+- The two lines are roughly parallel – the slopes are not significantly different, as indicated by the overlapping confidence bands.
+- This visual evidence aligns with the statistical test: no strong violation of parallel trends in the pre-treatment window.
+
+**Caveat**: Passing a pre-trend test does not *prove* that trends would have remained parallel after treatment – it only makes the assumption more plausible.
+
+---
+### What If the Pre-Trend Test Failed?
+
+- If the interaction were significant, it would indicate that California and the control group were already on different trajectories before the policy.
+- In that case, the DiD estimate would be biased because the counterfactual trend for California would not be the control group's trend.
+
+---
+
+- Possible remedies:
+  - Include group-specific linear time trends (though this can be sensitive).
+  - Use synthetic control methods to construct a more plausible counterfactual.
+  - Restrict to a subset of control units that better match California's pre-treatment trend (matching on trends).
+
+---
+
+In our example, the test barely passes, so the standard DiD estimate is perhaps a bit more credible.
+
+---
+### Summary: Organ Donations DiD
+
+| Question | Answer |
+|----------|--------|
+| Estimated effect | NA percentage point increase |
+| Statistical significance | p = 0.2752 |
+| Parallel trends? | Pre-trend test p = 0.0861 – marginally not rejected |
+| Credibility of DiD | Acceptable, given the evidence |
+
+---
+### Timing
+
+- In the canonical 2×2 DiD (one treatment group, one control group, one pre/post period), the TWFE estimator gives the ATT under parallel trends.
+
+- With **staggered treatment adoption** (units treated at different times) and **heterogeneous treatment effects** (effects vary over time or across cohorts), TWFE no longer estimates a simple ATT.
+
+---
+### The Negative Weights Problem
+
+- Goodman‑Bacon (2021) and de Chaisemartin &amp; d’Haultfoeuille (2020) show that the TWFE estimator is a **weighted average** of all possible 2×2 DiD comparisons, but **some weights can be negative**.
+
+---
+### Why Do Negative Weights Arise?
+
+Consider three groups:
+- **Early treated**: treated in period 1
+- **Late treated**: treated in period 2
+- **Never treated**: always untreated
+
+---
+### Why Do Negative Weights Arise?
+
+In a TWFE regression with unit and time fixed effects, the estimator implicitly uses:
+- Early‑treated vs. never‑treated (valid)
+- Late‑treated vs. never‑treated (valid)
+- **Early‑treated vs. late‑treated** (problematic)
+
+---
+### Why Do Negative Weights Arise?
+
+In the third comparison, **early‑treated units serve as controls for late‑treated units after their own treatment**. If treatment effects change over time, this comparison can have a negative weight.
+
+---
+### A Simple Example
+
+
+``` r
+# Simulate staggered adoption with heterogeneous effects
+set.seed(2026)
+n &lt;- 1000
+df &lt;- data.frame(
+  id = 1:n,
+  group = sample(c("early", "late", "never"), n, replace = TRUE,
+                 prob = c(0.3, 0.3, 0.4)),
+  time = rep(1:3, each = n)
+)
+
+# Treatment timing: early treated at time 2, late treated at time 3
+df$treat &lt;- ifelse(df$group == "early" &amp; df$time &gt;= 2, 1,
+            ifelse(df$group == "late" &amp; df$time &gt;= 3, 1, 0))
+
+# Heterogeneous effects: early effect = 2, late effect = 1, no effect for never
+df$y0 &lt;- rnorm(n * 3, mean = 0, sd = 1)
+df$effect &lt;- ifelse(df$group == "early" &amp; df$time == 2, 2,
+             ifelse(df$group == "early" &amp; df$time == 3, 2,
+             ifelse(df$group == "late" &amp; df$time == 3, 1, 0)))
+df$y &lt;- df$y0 + df$effect
+```
+
+---
+### A Simple Example
+
+
+``` r
+# TWFE estimator
+library(fixest)
+twfe &lt;- feols(y ~ treat | id + time, data = df)
+summary(twfe)
+```
+
+```
+## OLS estimation, Dep. Var.: y
+## Observations: 3,000
+## Fixed-effects: id: 1,000,  time: 3
+## Standard-errors: IID 
+##       Estimate Std. Error t value  Pr(&gt;|t|)    
+## treat  1.48028   0.068645 21.5643 &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## RMSE: 0.83017     Adj. R2: 0.354945
+##                 Within R2: 0.188878
+```
+
+---
+### A Simple Example
+
+The true average treatment effect on the treated (ATT) is about `(0.3*2 + 0.3*1)/0.6 = 1.5`, but TWFE gives 1.48 – biased downward.
+
+---
+### Bacon Decomposition
+
+The Goodman‑Bacon decomposition splits the TWFE estimator into three types of 2×2 comparisons:
+
+1. **Timing groups** (early vs. late) – these can have negative weights.
+2. **Treated vs. untreated** – these are fine.
+3. **Untreated vs. treated** – symmetrical.
+
+---
+### Bacon Decomposition
+
+
+``` r
+library(bacondecomp)
+```
+
+```
+## 
+## Attaching package: 'bacondecomp'
+```
+
+```
+## The following object is masked from 'package:causaldata':
+## 
+##     castle
+```
+
+``` r
+# Prepare data with id, time, outcome, treatment
+bacon_out &lt;- bacon(y ~ treat,
+                   data = df,
+                   id_var = "id",
+                   time_var = "time")
+```
+
+```
+##                       type weight avg_est
+## 1 Earlier vs Later Treated 0.1347 1.96571
+## 2 Later vs Earlier Treated 0.1347 1.01080
+## 3     Treated vs Untreated 0.7306 1.47734
+```
+
+---
+### Bacon Decomposition
+
+``` r
+summary(bacon_out)
+```
+
+```
+##     treated      untreated           estimate         weight      
+##  Min.   :2.0   Min.   :    2.00   Min.   :1.011   Min.   :0.1347  
+##  1st Qu.:2.0   1st Qu.:    2.75   1st Qu.:1.021   1st Qu.:0.1347  
+##  Median :2.5   Median :50001.00   Median :1.471   Median :0.2475  
+##  Mean   :2.5   Mean   :50000.75   Mean   :1.480   Mean   :0.2500  
+##  3rd Qu.:3.0   3rd Qu.:99999.00   3rd Qu.:1.930   3rd Qu.:0.3628  
+##  Max.   :3.0   Max.   :99999.00   Max.   :1.966   Max.   :0.3702  
+##      type          
+##  Length:4          
+##  Class :character  
+##  Mode  :character  
+##                    
+##                    
+## 
+```
+
+---
+### Bacon Decomposition
+
+The output shows the weight and estimate for each 2×2 comparison, highlighting which groups contribute negatively.
+
+---
+### Intuition for Negative Weights
+
+When treatment effects vary over time, the early‑treated vs. late‑treated comparison can be **contaminated**:
+
+---
+### Intuition for Negative Weights
+
+- The early‑treated group is treated in period 2, so their outcome in period 3 reflects the effect of treatment in period 3 (possibly different from period 2).
+- The late‑treated group is still untreated in period 2, so the comparison of their period‑3 outcome differences can produce a weight that is **negative** if the early effect is larger than the late effect.
+
+---
+### Intuition for Negative Weights
+
+This means the TWFE estimator may even have the **wrong sign** if the heterogeneity is severe.
+
+---
+### Diagnosing the Problem
+
+- **Bacon decomposition**: Identifies which comparisons drive the estimate and their weights.
+- **Event study plots**: Plot coefficients for leads and lags of treatment. If pre‑trends are flat but post‑trends show patterns that change over time, heterogeneity may be present.
+- **Cohort‑specific ATTs**: Estimate treatment effects separately by cohort and time.
+
+---
+### Diagnosing the Problem
+
+
+``` r
+# Create leads and lags using fixest
+df$time_to_treat &lt;- ifelse(df$group == "early", df$time - 2,
+                    ifelse(df$group == "late", df$time - 3, NA))
+es &lt;- feols(y ~ i(time_to_treat, ref = -1) | id + time, data = df)
+```
+
+```
+## NOTE: 1,212 observations removed because of NA values (RHS: 1,212).
+```
+
+```
+## The variable 'time_to_treat::1' has been removed because of collinearity (see
+## $collin.var).
+```
+
+---
+### Diagnosing the Problem
+![](6diffindiff_files/figure-html/event_study_2-1.png)&lt;!-- --&gt;
+
+---
+### Diagnosing the Problem
+
+If coefficients for later periods differ across cohorts, TWFE is likely biased.
+
+---
+### Solutions: Modern DiD Estimators
+
+Several robust estimators have been developed.
+
+These estimators avoid negative weights by **not using already‑treated units as controls** and by explicitly allowing for effect heterogeneity.
+
+---
+### Example: Callaway &amp; Sant'Anna
+
+
+``` r
+library(did)
+
+# Prepare data: need a variable for first treatment period (0 = never treated)
+df$first_treat &lt;- ifelse(df$group == "early", 2,
+                  ifelse(df$group == "late", 3, 0))
+
+cs_out &lt;- att_gt(yname = "y",
+                 tname = "time",
+                 idname = "id",
+                 gname = "first_treat",
+                 data = df,
+                 control_group = "notyettreated")
+```
+
+---
+### Example: Callaway &amp; Sant'Anna
+
+
+``` r
+summary(cs_out)
+```
+
+```
+## 
+## Call:
+## att_gt(yname = "y", tname = "time", idname = "id", gname = "first_treat", 
+##     data = df, control_group = "notyettreated")
+## 
+## Reference: Callaway, Brantly and Pedro H.C. Sant'Anna.  "Difference-in-Differences with Multiple Time Periods." Journal of Econometrics, Vol. 225, No. 2, pp. 200-230, 2021. &lt;https://doi.org/10.1016/j.jeconom.2020.12.001&gt;, &lt;https://arxiv.org/abs/1803.09015&gt; 
+## 
+## Group-Time Average Treatment Effects:
+##  Group Time ATT(g,t) Std. Error [95% Simult.  Conf. Band]  
+##      2    2   1.9238     0.1047        1.6710      2.1765 *
+##      2    3   1.9432     0.1055        1.6886      2.1977 *
+##      3    2  -0.0725     0.1086       -0.3345      0.1895  
+##      3    3   1.0607     0.1100        0.7953      1.3262 *
+## ---
+## Signif. codes: `*' confidence band does not cover 0
+## 
+## P-value for pre-test of parallel trends assumption:  0.49552
+## Control Group:  Not Yet Treated,  Anticipation Periods:  0
+## Estimation Method:  Doubly Robust
+```
+
+---
+### Example: Callaway &amp; Sant'Anna
+
+
+``` r
+# Aggregate to overall ATT
+agg &lt;- aggte(cs_out, type = "simple")
+summary(agg)
+```
+
+```
+## 
+## Call:
+## aggte(MP = cs_out, type = "simple")
+## 
+## Reference: Callaway, Brantly and Pedro H.C. Sant'Anna.  "Difference-in-Differences with Multiple Time Periods." Journal of Econometrics, Vol. 225, No. 2, pp. 200-230, 2021. &lt;https://doi.org/10.1016/j.jeconom.2020.12.001&gt;, &lt;https://arxiv.org/abs/1803.09015&gt; 
+## 
+## 
+##     ATT    Std. Error     [ 95%  Conf. Int.]  
+##  1.6477        0.0756     1.4996      1.7958 *
+## 
+## 
+## ---
+## Signif. codes: `*' confidence band does not cover 0
+## 
+## Control Group:  Not Yet Treated,  Anticipation Periods:  0
+## Estimation Method:  Doubly Robust
+```
+
+---
+### Example: Callaway &amp; Sant'Anna
+
+The aggregated ATT should be close to the true value of 1.5.
+
+---
+### Summary: Key Takeaways
+
+- TWFE with staggered treatment and heterogeneous effects can produce **negative weights**, leading to bias.
+- Always diagnose using **Bacon decomposition** and **event study plots**.
+- When heterogeneity is suspected, use **modern DiD estimators** that are robust to these issues.
+- Reporting only the TWFE coefficient is no longer sufficient in applied work.
+
+---
+### Current Solutions
+
+&lt;img src="images/Roth1.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+### Current Solutions
+
+&lt;img src="images/Roth2.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+### Current Solutions
+
+Clearly, there are many available solutions to the issues with DiD with staggered treatment timing. Choosing among them is an advanced topic
+
+*   The details of the choice involve complex features of estimators.
+*   The literature comparing among options is ongoing and not yet final.
+
+---
+### You Must Pick a Solution
+
+Nonetheless, the current status quo in applied social-science methods is that you must use one of the available solutions when you have a DiD with staggered timing.
+
+*   The issues with traditional methods are widely known and can be extreme.
+*   Choosing virtually any of the contemporary methods will usually be better than the traditional methods when there is staggered timing.
+
+
+---
+### For example...
+
+What if, in addition to having staggered timing of treatment adoption and heterogeneous effects, we also have problems with parallel trends because of time-varying unobserved confounders? 
+
+*   The fect package implements interactive fixed effects estimators that allow for unobserved time-varying confounders through a factor structure.
+
+---
+
+In brief, the fect or fixed-effects counterfactual estimator imputes counterfactuals by fitting an outcome model using untreated observations, then estimates the individual treatment effect as the difference between observed and predicted outcomes. Finally, it computes average treatment effects on the treated (ATT) and period-specific ATTs. 
+
+This helps eliminate biases caused by improper weighting of heterogeneous treatment effects.
+
+---
+
+The ife or interactive fixed-effects counterfactual estimator adds a layer of factor analysis to try to remove time-varying confounders that might be the source of problems for parallel trends.
+
+---
+
+``` r
+library(fect)
+```
+
+---
+
+``` r
+vdemeu &lt;- read.csv("data/vdemeu.csv")
+vdemeu &lt;- vdemeu[vdemeu$year&lt;2013,]
+eufect &lt;- fect(v2x_libdem ~ accession, index = c("country_name", "year"), force = "two-way",
+               data = vdemeu, method="fe",min.T0=1, se=1)
+```
+
+```
+## For identification purposes, units whose number of untreated periods &lt;1 are dropped automatically.
+```
+
+```
+## Parallel computing ...
+```
+
+```
+## Warning: UNRELIABLE VALUE: One of the foreach() iterations ('doFuture-1')
+## unexpectedly generated random numbers without declaring so. There is a risk
+## that those random numbers are not statistically sound and the overall results
+## might be invalid. To fix this, use '%dorng%' from the 'doRNG' package instead
+## of '%dopar%'. This ensures that proper, parallel-safe random numbers are
+## produced. To disable this check, set option 'doFuture.rng.onMisuse' to
+## "ignore". [future 'doFuture-1' (2f67b3c15a23aa9b0c3457c02c6bdfc5-1); on
+## 2f67b3c15a23aa9b0c3457c02c6bdfc5@WITPOLD2GQD2Z3&lt;16072&gt;]
+```
+
+```
+## Warning: UNRELIABLE VALUE: One of the foreach() iterations ('doFuture-2')
+## unexpectedly generated random numbers without declaring so. There is a risk
+## that those random numbers are not statistically sound and the overall results
+## might be invalid. To fix this, use '%dorng%' from the 'doRNG' package instead
+## of '%dopar%'. This ensures that proper, parallel-safe random numbers are
+## produced. To disable this check, set option 'doFuture.rng.onMisuse' to
+## "ignore". [future 'doFuture-2' (2f67b3c15a23aa9b0c3457c02c6bdfc5-2); on
+## 2f67b3c15a23aa9b0c3457c02c6bdfc5@WITPOLD2GQD2Z3&lt;16072&gt;]
+```
+
+```
+## Warning: UNRELIABLE VALUE: One of the foreach() iterations ('doFuture-3')
+## unexpectedly generated random numbers without declaring so. There is a risk
+## that those random numbers are not statistically sound and the overall results
+## might be invalid. To fix this, use '%dorng%' from the 'doRNG' package instead
+## of '%dopar%'. This ensures that proper, parallel-safe random numbers are
+## produced. To disable this check, set option 'doFuture.rng.onMisuse' to
+## "ignore". [future 'doFuture-3' (2f67b3c15a23aa9b0c3457c02c6bdfc5-3); on
+## 2f67b3c15a23aa9b0c3457c02c6bdfc5@WITPOLD2GQD2Z3&lt;16072&gt;]
+```
+
+```
+## Warning: UNRELIABLE VALUE: One of the foreach() iterations ('doFuture-4')
+## unexpectedly generated random numbers without declaring so. There is a risk
+## that those random numbers are not statistically sound and the overall results
+## might be invalid. To fix this, use '%dorng%' from the 'doRNG' package instead
+## of '%dopar%'. This ensures that proper, parallel-safe random numbers are
+## produced. To disable this check, set option 'doFuture.rng.onMisuse' to
+## "ignore". [future 'doFuture-4' (2f67b3c15a23aa9b0c3457c02c6bdfc5-4); on
+## 2f67b3c15a23aa9b0c3457c02c6bdfc5@WITPOLD2GQD2Z3&lt;16072&gt;]
+```
+
+```
+## Warning: UNRELIABLE VALUE: One of the foreach() iterations ('doFuture-5')
+## unexpectedly generated random numbers without declaring so. There is a risk
+## that those random numbers are not statistically sound and the overall results
+## might be invalid. To fix this, use '%dorng%' from the 'doRNG' package instead
+## of '%dopar%'. This ensures that proper, parallel-safe random numbers are
+## produced. To disable this check, set option 'doFuture.rng.onMisuse' to
+## "ignore". [future 'doFuture-5' (2f67b3c15a23aa9b0c3457c02c6bdfc5-5); on
+## 2f67b3c15a23aa9b0c3457c02c6bdfc5@WITPOLD2GQD2Z3&lt;16072&gt;]
+```
+
+```
+## Warning: UNRELIABLE VALUE: One of the foreach() iterations ('doFuture-6')
+## unexpectedly generated random numbers without declaring so. There is a risk
+## that those random numbers are not statistically sound and the overall results
+## might be invalid. To fix this, use '%dorng%' from the 'doRNG' package instead
+## of '%dopar%'. This ensures that proper, parallel-safe random numbers are
+## produced. To disable this check, set option 'doFuture.rng.onMisuse' to
+## "ignore". [future 'doFuture-6' (2f67b3c15a23aa9b0c3457c02c6bdfc5-6); on
+## 2f67b3c15a23aa9b0c3457c02c6bdfc5@WITPOLD2GQD2Z3&lt;16072&gt;]
+```
+
+```
+## Warning: UNRELIABLE VALUE: One of the foreach() iterations ('doFuture-7')
+## unexpectedly generated random numbers without declaring so. There is a risk
+## that those random numbers are not statistically sound and the overall results
+## might be invalid. To fix this, use '%dorng%' from the 'doRNG' package instead
+## of '%dopar%'. This ensures that proper, parallel-safe random numbers are
+## produced. To disable this check, set option 'doFuture.rng.onMisuse' to
+## "ignore". [future 'doFuture-7' (2f67b3c15a23aa9b0c3457c02c6bdfc5-7); on
+## 2f67b3c15a23aa9b0c3457c02c6bdfc5@WITPOLD2GQD2Z3&lt;16072&gt;]
+```
+
+```
+## Warning: UNRELIABLE VALUE: One of the foreach() iterations ('doFuture-8')
+## unexpectedly generated random numbers without declaring so. There is a risk
+## that those random numbers are not statistically sound and the overall results
+## might be invalid. To fix this, use '%dorng%' from the 'doRNG' package instead
+## of '%dopar%'. This ensures that proper, parallel-safe random numbers are
+## produced. To disable this check, set option 'doFuture.rng.onMisuse' to
+## "ignore". [future 'doFuture-8' (2f67b3c15a23aa9b0c3457c02c6bdfc5-8); on
+## 2f67b3c15a23aa9b0c3457c02c6bdfc5@WITPOLD2GQD2Z3&lt;16072&gt;]
+```
+
+```
+## 
+```
+
+```
+## F-test Failed. The estimated covariance matrix is singular.
+```
+
+```
+## 
+```
+
+``` r
+euife &lt;- fect(v2x_libdem ~ accession, index = c("country_name", "year"), force = "two-way",
+               data = vdemeu, method="ife",min.T0=1, se=1)
+```
+
+```
+## For identification purposes, units whose number of untreated periods &lt;1 are dropped automatically.
+```
+
+```
+## Parallel computing ...
+```
+
+```
+## Warning: UNRELIABLE VALUE: One of the foreach() iterations ('doFuture-1')
+## unexpectedly generated random numbers without declaring so. There is a risk
+## that those random numbers are not statistically sound and the overall results
+## might be invalid. To fix this, use '%dorng%' from the 'doRNG' package instead
+## of '%dopar%'. This ensures that proper, parallel-safe random numbers are
+## produced. To disable this check, set option 'doFuture.rng.onMisuse' to
+## "ignore". [future 'doFuture-1' (2f67b3c15a23aa9b0c3457c02c6bdfc5-9); on
+## 2f67b3c15a23aa9b0c3457c02c6bdfc5@WITPOLD2GQD2Z3&lt;16072&gt;]
+```
+
+```
+## Warning: UNRELIABLE VALUE: One of the foreach() iterations ('doFuture-2')
+## unexpectedly generated random numbers without declaring so. There is a risk
+## that those random numbers are not statistically sound and the overall results
+## might be invalid. To fix this, use '%dorng%' from the 'doRNG' package instead
+## of '%dopar%'. This ensures that proper, parallel-safe random numbers are
+## produced. To disable this check, set option 'doFuture.rng.onMisuse' to
+## "ignore". [future 'doFuture-2' (2f67b3c15a23aa9b0c3457c02c6bdfc5-10); on
+## 2f67b3c15a23aa9b0c3457c02c6bdfc5@WITPOLD2GQD2Z3&lt;16072&gt;]
+```
+
+```
+## Warning: UNRELIABLE VALUE: One of the foreach() iterations ('doFuture-3')
+## unexpectedly generated random numbers without declaring so. There is a risk
+## that those random numbers are not statistically sound and the overall results
+## might be invalid. To fix this, use '%dorng%' from the 'doRNG' package instead
+## of '%dopar%'. This ensures that proper, parallel-safe random numbers are
+## produced. To disable this check, set option 'doFuture.rng.onMisuse' to
+## "ignore". [future 'doFuture-3' (2f67b3c15a23aa9b0c3457c02c6bdfc5-11); on
+## 2f67b3c15a23aa9b0c3457c02c6bdfc5@WITPOLD2GQD2Z3&lt;16072&gt;]
+```
+
+```
+## Warning: UNRELIABLE VALUE: One of the foreach() iterations ('doFuture-4')
+## unexpectedly generated random numbers without declaring so. There is a risk
+## that those random numbers are not statistically sound and the overall results
+## might be invalid. To fix this, use '%dorng%' from the 'doRNG' package instead
+## of '%dopar%'. This ensures that proper, parallel-safe random numbers are
+## produced. To disable this check, set option 'doFuture.rng.onMisuse' to
+## "ignore". [future 'doFuture-4' (2f67b3c15a23aa9b0c3457c02c6bdfc5-12); on
+## 2f67b3c15a23aa9b0c3457c02c6bdfc5@WITPOLD2GQD2Z3&lt;16072&gt;]
+```
+
+```
+## Warning: UNRELIABLE VALUE: One of the foreach() iterations ('doFuture-5')
+## unexpectedly generated random numbers without declaring so. There is a risk
+## that those random numbers are not statistically sound and the overall results
+## might be invalid. To fix this, use '%dorng%' from the 'doRNG' package instead
+## of '%dopar%'. This ensures that proper, parallel-safe random numbers are
+## produced. To disable this check, set option 'doFuture.rng.onMisuse' to
+## "ignore". [future 'doFuture-5' (2f67b3c15a23aa9b0c3457c02c6bdfc5-13); on
+## 2f67b3c15a23aa9b0c3457c02c6bdfc5@WITPOLD2GQD2Z3&lt;16072&gt;]
+```
+
+```
+## Warning: UNRELIABLE VALUE: One of the foreach() iterations ('doFuture-6')
+## unexpectedly generated random numbers without declaring so. There is a risk
+## that those random numbers are not statistically sound and the overall results
+## might be invalid. To fix this, use '%dorng%' from the 'doRNG' package instead
+## of '%dopar%'. This ensures that proper, parallel-safe random numbers are
+## produced. To disable this check, set option 'doFuture.rng.onMisuse' to
+## "ignore". [future 'doFuture-6' (2f67b3c15a23aa9b0c3457c02c6bdfc5-14); on
+## 2f67b3c15a23aa9b0c3457c02c6bdfc5@WITPOLD2GQD2Z3&lt;16072&gt;]
+```
+
+```
+## Warning: UNRELIABLE VALUE: One of the foreach() iterations ('doFuture-7')
+## unexpectedly generated random numbers without declaring so. There is a risk
+## that those random numbers are not statistically sound and the overall results
+## might be invalid. To fix this, use '%dorng%' from the 'doRNG' package instead
+## of '%dopar%'. This ensures that proper, parallel-safe random numbers are
+## produced. To disable this check, set option 'doFuture.rng.onMisuse' to
+## "ignore". [future 'doFuture-7' (2f67b3c15a23aa9b0c3457c02c6bdfc5-15); on
+## 2f67b3c15a23aa9b0c3457c02c6bdfc5@WITPOLD2GQD2Z3&lt;16072&gt;]
+```
+
+```
+## Warning: UNRELIABLE VALUE: One of the foreach() iterations ('doFuture-8')
+## unexpectedly generated random numbers without declaring so. There is a risk
+## that those random numbers are not statistically sound and the overall results
+## might be invalid. To fix this, use '%dorng%' from the 'doRNG' package instead
+## of '%dopar%'. This ensures that proper, parallel-safe random numbers are
+## produced. To disable this check, set option 'doFuture.rng.onMisuse' to
+## "ignore". [future 'doFuture-8' (2f67b3c15a23aa9b0c3457c02c6bdfc5-16); on
+## 2f67b3c15a23aa9b0c3457c02c6bdfc5@WITPOLD2GQD2Z3&lt;16072&gt;]
+```
+
+```
+## 
+```
+
+```
+## F-test Failed. The estimated covariance matrix is singular.
+```
+
+```
+## 
+```
+
+---
+
+``` r
+eufect
+```
+
+```
+## Call:
+## fect.formula(formula = v2x_libdem ~ accession, data = vdemeu, 
+##     index = c("country_name", "year"), force = "two-way", method = "fe", 
+##     se = 1, min.T0 = 1)
+## 
+## ATT:
+##                               ATT    S.E. CI.lower CI.upper   p.value
+## Tr obs equally weighted   -0.2067 0.06235  -0.3289 -0.08451 9.152e-04
+## Tr units equally weighted -0.2188 0.05175  -0.3202 -0.11736 2.363e-05
+```
+
+---
+
+``` r
+euife
+```
+
+```
+## Call:
+## fect.formula(formula = v2x_libdem ~ accession, data = vdemeu, 
+##     index = c("country_name", "year"), force = "two-way", method = "ife", 
+##     se = 1, min.T0 = 1)
+## 
+## ATT:
+##                               ATT    S.E. CI.lower CI.upper   p.value
+## Tr obs equally weighted   -0.2067 0.06315  -0.3305 -0.08295 1.062e-03
+## Tr units equally weighted -0.2188 0.05564  -0.3278 -0.10974 8.416e-05
+```
+
+---
+### Difference-in-Differences: Key Takeaways
+
+- DiD identifies the ATT under the **parallel trends assumption**.
+- Always test pre-treatment trends graphically and statistically.
+- With staggered treatment timing and heterogeneous effects, **TWFE can be biased** due to negative weights.
+- Modern estimators (CS, SA, dCDH, BJS) provide robust alternatives.
+- When parallel trends fails, **interactive fixed effects models** offer a path forward.
+- The choice among methods depends on the research design and requires careful justification.
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create();
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
