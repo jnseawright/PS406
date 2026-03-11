@@ -25,7 +25,7 @@ set.seed(27)             # make random results reproducible
 
 # Due Date: June 12, 2026
 
-[Submit your research design here.](https://canvas.northwestern.edu/courses/230286/assignments/1562507)
+[Submit your research design here.](https://canvas.northwestern.edu/courses/251621/assignments/1730771)
 
 ### Grant Proposal
 
