@@ -5,7 +5,7 @@ author:
 - |
   Jaye Seawright\
   j-seawright@northwestern.edu\
-  Office Hours: Tuesdays, 3-5pm
+  Office Hours: Mondays, 12-2pm
 title: Political Science 406, Spring 2025
 ---
 
