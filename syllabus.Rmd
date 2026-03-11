@@ -205,7 +205,7 @@ Final grades will be determined based on the weighted components below.
 | Component | Weight | Notes |
 |----------|--------|-------|
 | Estimator Presentation | 25% | Graded Outstanding/Pass/Revisit |
-| Lab Assignments | 35% | Best 7 of 8 labs; graded Outstanding/Pass/Revisit |
+| Lab Assignments | 35% | Best 7 of 9 labs; graded Outstanding/Pass/Revisit |
 | Grant Proposal | 40% | Scored 0-5 using TGS criteria |
 
 ### Grading Scale for Components
