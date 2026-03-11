@@ -1,0 +1,37 @@
+---
+title: "Political Science 406 Lab 9: Missing Data"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    highlight: tango
+  pdf_document: default
+urlcolor: blue
+---
+
+```{r include = FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,                 # don't show code
+  warning = FALSE,              # don't show warnings
+  message = FALSE,              # don't show messages (less serious warnings)
+  cache = FALSE,                # set to TRUE to save results from last compilation
+  fig.align = "center",         # center figures
+  attr.source = '.numberLines'  # add line numbers to code
+)
+
+library(tidyverse)       # load libraries you always use here
+
+set.seed(27)             # make random results reproducible
+```
+
+# Due Date: June 6, 2026
+
+[Submit your lab here.](https://canvas.northwestern.edu/courses/230286/assignments/1562400)
+
+### Problem 1: Democracy and Inequality with Multiple Imputation
+Return to the inequality dataset from Lab 2. Fit the interaction model (Gini ~ Polity * log(GDP)) after performing multiple imputation with mice (5 imputations). Compare the results with the complete‑case analysis from Lab 2. Are there meaningful differences? What does this suggest about the missingness mechanism?
+
+### Problem 2: Missing Data in the AJR Replication
+Load the AJR replication data (ajrdata.csv). You can find [the original article](https://doi.org/10.1257/aer.91.5). Replication data are [available](https://github.com/jnseawright/PS406/blob/main/data/ajrdata.csv) as well. Replicate the IV analysis from Lab 3 (or a simplified version) using listwise deletion. Then use multiple imputation (mice) to handle missing values in the covariates. Re‑estimate the IV model on each imputed dataset and pool the results using mitools or mice::pool. Compare the coefficients and standard errors. Discuss whether multiple imputation changes the substantive conclusions.
+
+### Problem 3: Missingness Mechanisms
+For the AJR data, consider the variable logmort0 (settler mortality). Speculate on whether missingness in this variable is MCAR, MAR, or MNAR. Justify your answer. If it were MNAR, what additional analyses might you attempt?

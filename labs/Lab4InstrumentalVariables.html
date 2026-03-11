@@ -12,7 +12,7 @@
 
 <meta name="date" content="2026-03-05" />
 
-<title>Political Science 406 Lab 2: Regression</title>
+<title>Political Science 406 Lab 4: Instrumental Variables</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -220,107 +220,6 @@ ul.task-list{list-style: none;}
 
 
 
-<style type="text/css">
-code {
-white-space: pre;
-}
-.sourceCode {
-overflow: visible;
-}
-</style>
-<style type="text/css" data-origin="pandoc">
-html { -webkit-text-size-adjust: 100%; }
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-{ counter-reset: source-line 0; }
-pre.numberSource code > span
-{ position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-{ content: counter(source-line);
-position: relative; left: -1em; text-align: right; vertical-align: baseline;
-border: none; display: inline-block;
--webkit-touch-callout: none; -webkit-user-select: none;
--khtml-user-select: none; -moz-user-select: none;
--ms-user-select: none; user-select: none;
-padding: 0 4px; width: 4em;
-color: #aaaaaa;
-}
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
-div.sourceCode
-{ background-color: #f8f8f8; }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
-code span.al { color: #ef2929; } 
-code span.an { color: #8f5902; font-weight: bold; font-style: italic; } 
-code span.at { color: #204a87; } 
-code span.bn { color: #0000cf; } 
-code span.cf { color: #204a87; font-weight: bold; } 
-code span.ch { color: #4e9a06; } 
-code span.cn { color: #8f5902; } 
-code span.co { color: #8f5902; font-style: italic; } 
-code span.cv { color: #8f5902; font-weight: bold; font-style: italic; } 
-code span.do { color: #8f5902; font-weight: bold; font-style: italic; } 
-code span.dt { color: #204a87; } 
-code span.dv { color: #0000cf; } 
-code span.er { color: #a40000; font-weight: bold; } 
-code span.ex { } 
-code span.fl { color: #0000cf; } 
-code span.fu { color: #204a87; font-weight: bold; } 
-code span.im { } 
-code span.in { color: #8f5902; font-weight: bold; font-style: italic; } 
-code span.kw { color: #204a87; font-weight: bold; } 
-code span.op { color: #ce5c00; font-weight: bold; } 
-code span.ot { color: #8f5902; } 
-code span.pp { color: #8f5902; font-style: italic; } 
-code span.sc { color: #ce5c00; font-weight: bold; } 
-code span.ss { color: #4e9a06; } 
-code span.st { color: #4e9a06; } 
-code span.va { color: #000000; } 
-code span.vs { color: #4e9a06; } 
-code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } 
-</style>
-<script>
-// apply pandoc div.sourceCode style to pre.sourceCode instead
-(function() {
-  var sheets = document.styleSheets;
-  for (var i = 0; i < sheets.length; i++) {
-    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
-    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
-    var j = 0;
-    while (j < rules.length) {
-      var rule = rules[j];
-      // check if there is a div.sourceCode rule
-      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
-        j++;
-        continue;
-      }
-      var style = rule.style.cssText;
-      // check if color or background-color is set
-      if (rule.style.color === '' && rule.style.backgroundColor === '') {
-        j++;
-        continue;
-      }
-      // replace div.sourceCode by a pre.sourceCode rule
-      sheets[i].deleteRule(j);
-      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
-    }
-  }
-})();
-</script>
 
 
 
@@ -421,67 +320,48 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">Political Science 406 Lab 2:
-Regression</h1>
+<h1 class="title toc-ignore">Political Science 406 Lab 4: Instrumental
+Variables</h1>
 <h4 class="date">2026-03-05</h4>
 
 </div>
 
 
-<div id="due-date-april-24-2026" class="section level1">
-<h1>Due Date: April 24, 2026</h1>
-<p><a href="https://canvas.northwestern.edu/courses/230286/assignments/1562273">Submit
+<div id="due-date-may-9-2025" class="section level1">
+<h1>Due Date: May 9, 2025</h1>
+<p><a href="https://canvas.northwestern.edu/courses/230286/assignments/1562397">Submit
 your lab here.</a></p>
-<div id="problem-1-bivariate-regression-in-r" class="section level3">
-<h3>Problem 1: Bivariate Regression in R</h3>
-<p>We will be analyzing a data set on inequality for a collection of 118
-countries during the mid-1990s.</p>
-<p>Begin by loading the data set into R, using the following
-command:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>inequality <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;https://raw.githubusercontent.com/jnseawright/PS406/main/data/Inequality.csv&quot;</span>)</span></code></pre></div>
-<p>Look at the names of the variables in the data set, to make sure your
-copy downloaded correctly:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">names</span>(inequality)</span></code></pre></div>
-<pre><code>##  [1] &quot;X&quot;                    &quot;Code&quot;                 &quot;Country&quot;             
-##  [4] &quot;Year&quot;                 &quot;Gini&quot;                 &quot;Polity&quot;              
-##  [7] &quot;GDP&quot;                  &quot;Industry&quot;             &quot;FuelExports&quot;         
-## [10] &quot;CommunistLegacy&quot;      &quot;Region&quot;               &quot;Expropriation&quot;       
-## [13] &quot;SettlerMortality&quot;     &quot;vdem_corr&quot;            &quot;militaryexpenditure&quot; 
-## [16] &quot;educationexpenditure&quot; &quot;electricityaccess&quot;    &quot;netmigration&quot;</code></pre>
-<p>Now carry out a bivariate regression, using the Gini coefficient (a
-measure of inequality) as the dependent variable and the Polity variable
-(a measure of democracy) as the independent variable. Suppose that the
-results are causal; what do they mean? What assumption is required? Draw
-a DAG representing your causal assumption. Identify at least two
-confounders and explain why they might bias the estimate.</p>
+<div id="problem-1-rainfall-economic-shocks-and-civil-conflict" class="section level3">
+<h3>Problem 1: Rainfall, Economic Shocks, and Civil Conflict</h3>
+<p>We are going to replicate an instrumental variables analysis of civil
+conflict in Africa, using rainfall as an instrument for economic growth.
+Consider skimming <a href="https://doi.org/10.1086/421174">the
+article</a>, by Edward Miguel, Shanker Satyanath, and Ernest Sergenti.
+Download <a href="https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/27324">replication
+data, which comes with variable definitions</a>.</p>
+<p>Please replicate model 5 of table 4. Do you get the same coefficient
+estimates? How about standard errors? If there is a difference, can you
+explain why?</p>
+<p>How strong is the instrument? Are there any obvious difficulties with
+the estimate?</p>
+<p>Assume that the instrument is unproblematic. What is the causal
+meaning of the estimate?</p>
 </div>
-<div id="problem-2-multivariate-regression-in-r" class="section level3">
-<h3>Problem 2: Multivariate Regression in R</h3>
-<p>You should now expand the model by incorporating logged GDP as a
-second independent variable.</p>
-<p>Update your DAG to include this new variable. Does controlling for
-log(GDP) block any backdoor paths? Are there any potential bad controls
-(mediators, colliders) in this setup?</p>
+<div id="problem-2-diagnostics" class="section level3">
+<h3>Problem 2: Diagnostics</h3>
+<p>Weak instruments: Compute the first‑stage F‑statistic manually. Is it
+above 10?</p>
+<p>LATE interpretation: Who are the compliers in this context? Explain
+in plain language.</p>
 </div>
-<div id="problem-3-interaction-terms-in-r" class="section level3">
-<h3>Problem 3: Interaction Terms in R</h3>
-<p>Add an interaction between Polity and log(GDP). Interpret the
-interaction coefficient. Use the interactions package to plot marginal
-effects. Discuss whether the interaction is substantively
-meaningful.</p>
-</div>
-<div id="problem-4-weights" class="section level3">
-<h3>Problem 4: Weights</h3>
-<p>Create a dichotomous treatment variable: democracy = 1 if Polity &gt;
-0 else 0. Use lmw to estimate the ATE with URI (regression weights) and
-MRI (uniform weights). Plot the URI weights. Are any cases highly
-influential? Compare the two ATE estimates. What does this tell you
-about the sensitivity of your regression to weighting?</p>
-<p>The library we used to carry out these tasks in class was lmw; you
-can find its documentation <a href="https://cran.r-project.org/web/packages/lmw/index.html">here.</a></p>
-<p>As is often the case, a first recommended step in using this package
-is to make a special dataframe that includes only the variables you plan
-to use and then to get rid of missing data.</p>
+<div id="problem-3-sensitivity-to-exclusion-restriction" class="section level3">
+<h3>Problem 3: Sensitivity to Exclusion Restriction</h3>
+<p>Suppose the exclusion restriction is violated because rainfall
+affects conflict through channels other than growth (e.g., agricultural
+livelihoods directly affect grievances). Use sensemakr to assess how
+strong a direct effect of rainfall on conflict would need to be to
+render your IV estimate insignificant. (Hint: you’ll need to run a
+reduced‑form regression.)</p>
 </div>
 </div>
 

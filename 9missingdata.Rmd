@@ -57,12 +57,11 @@ style_mono_accent(
 )
 ```
 
----
 ### Missingness!
 
 1. Sometimes, our data aren't complete!
 
-2. Missing data can have different effects, depending on which variables are missing (treatment, outcome, controls) and *why* they are missing.
+2. Missing data can have different effects on causal inference, depending on which variables are missing (treatment, outcome, controls) and *why* they are missing.
 
 
 ---
@@ -184,6 +183,10 @@ sd(perunonigeffects)
 ```
 
 ---
+
+Based on what we just saw, when is it a good idea to just delete missing data, and when will that cause trouble?
+
+---
 ### Fixing Missingness
 
 1. Delete the data and move on.
@@ -219,7 +222,7 @@ include_graphics("images/King4.png")
 ```
 
 ---
-```{r mar effects, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
+```{r mar_effects, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
 perumareffects2 <- 1:100
 
 missing.prob <- inv.logit(-2.3 + -.5*peruemotions$edlevel + -.2*peruemotions$classid + peruemotions$leftright)
@@ -286,7 +289,7 @@ library(mice)
 ```
 
 ---
-```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
+```{r, echo = TRUE, eval=FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
 perumieffects <- 1:100
 
 missing.prob <- inv.logit(-2.3 + -.5*peruemotions$edlevel + -.2*peruemotions$classid + peruemotions$leftright)
@@ -301,10 +304,19 @@ for (i in 1:100){
 ```
 
 ---
-```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
+```{r, echo = TRUE, eval=FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
 summary(perumieffects)
 sd(perumieffects)
 ```
+
+---
+```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+include_graphics("images/perumieffects.png")
+```
+
+---
+
+What is the difference between multiple imputation and making up fake data?
 
 ---
 ### How Many Imputations?
@@ -379,7 +391,10 @@ include_graphics("images/Laqueur3.PNG")
 ```
 
 ---
-```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
+```{r, echo = TRUE, eval=FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+#Code to install superMICE, which is available but not currently updated.
+#library(remotes)
+#install_version("superMICE", version = "1.1.1")
 library(superMICE)
 
 perusupermieffects <- 1:10
@@ -401,11 +416,13 @@ for (i in 1:10){
 ```
 
 ---
-```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
-summary(perusupermieffects)
-sd(perusupermieffects)
+```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
+include_graphics("images/supermi.png")
 ```
 
+---
+
+What do we get by adding a machine-learning perspective to multiple imputation?
 
 ---
 ### Non-Ignorable Missingness
@@ -433,12 +450,6 @@ $$y^{*} = \mathbf{x} \beta + \epsilon$$
 $$\epsilon \sim N(0, \sigma^{2})$$
 ---
 ### Tobit
-```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
-include_graphics("images/tobit_broken_equation.PNG")
-```
-
----
-### Tobit
 
 $$y = \left\{
      \begin{array}{lr}
@@ -446,6 +457,32 @@ $$y = \left\{
        - & : y^{*} \leq 0
      \end{array}
    \right.$$
+
+
+
+
+---
+### Tobit (Censored Regression) Likelihood
+
+For observation $i$, the contribution to the likelihood depends on whether $y_i$ is uncensored, left‑censored, or right‑censored.
+
+Assume a latent variable $y_i^* = \mathbf{x}_i\beta + \epsilon_i$, with $\epsilon_i \sim N(0,\sigma^2)$.  
+We observe $y_i = y_i^*$ if $L < y_i^* < U$, otherwise we know only that $y_i^* \leq L$ or $y_i^* \geq U$.
+
+---
+
+$$
+\mathcal{L}_i = 
+\begin{cases}
+\dfrac{1}{\sigma}\phi\!\left(\dfrac{y_i - \mathbf{x}_i\beta}{\sigma}\right) 
+& \text{if } y_i^* \text{ is uncensored (i.e., } L < y_i < U \text{)} \\[2em]
+\Phi\!\left(\dfrac{L - \mathbf{x}_i\beta}{\sigma}\right) 
+& \text{if } y_i^* \text{ is left‑censored (i.e., } y_i = L \text{)} \\[2em]
+1 - \Phi\!\left(\dfrac{U - \mathbf{x}_i\beta}{\sigma}\right) 
+& \text{if } y_i^* \text{ is right‑censored (i.e., } y_i = U \text{)}
+\end{cases}
+$$
+
 
 ---
 
@@ -456,6 +493,23 @@ scores, as well as, the type of program the student is enrolled in
 who answer all questions on the academic aptitude test correctly receive
 a score of 800, even though it is likely that these students are not
 "truly" equal in aptitude.
+
+---
+
+Here, there is an upper censoring point $U = 800$ (and no lower censoring), so the likelihood becomes  
+
+$$
+\mathcal{L}_i = 
+\begin{cases}
+\dfrac{1}{\sigma}\phi\!\left(\dfrac{y_i - \mathbf{x}_i\beta}{\sigma}\right) & \text{if } y_i < 800 \\[1.5em]
+1 - \Phi\!\left(\dfrac{800 - \mathbf{x}_i\beta}{\sigma}\right) & \text{if } y_i = 800
+\end{cases}
+$$
+
+---
+
+The model is estimated by maximizing the sum of the log‑likelihoods:  
+$\displaystyle \max_{\beta,\sigma} \sum_i \log \mathcal{L}_i$.
 
 ---
 ```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
@@ -480,84 +534,113 @@ summary(m <- vglm(apt ~ read + math +
 ```
 
 ---
-### Heckman/Type 2 Tobit
+### Heckman Selection Model: Two Latent Equations
 
-$$y_{i}^{S*} = \mathbf{x}_{i}^{S} \beta^{S} + \epsilon_{i}^{S}$$
+**Selection equation** (who is observed?):  
 
-$$y_{i}^{O*} = \mathbf{x}_{i}^{O} \beta^{O} + \epsilon_{i}^{O}$$
+$$
+y_{i}^{S*} = \mathbf{x}_{i}^{S} \beta^{S} + \epsilon_{i}^{S}
+$$
 
-$$y_{i}^{S} = \left\{
-     \begin{array}{lr}
-       0 & : y_{i}^{S*} \leq 0\\
-       1 & : y_{i}^{S*} > 0
-     \end{array}
-   \right.$$
-
-$$y_{i}^{O} = \left\{
-     \begin{array}{lr}
-       0 & : y_{i}^{S} = 0\\
-       y_{i}^{O*} & : y_{i}^{S} = 1
-     \end{array}
-   \right.$$
+We observe the binary indicator $y_i^S = 1$ if $y_i^{S*} > 0$, and $y_i^S = 0$ otherwise.
 
 ---
-### Heckman/Type 2 Tobit
+### Heckman Selection Model: Two Latent Equations
 
-$$\text{E}(y_{i}^{O} | x^{O} = x_{i}^{O}, x^{S} = x_{i}^{S}, y^{S} = 1)$$
+**Outcome equation** (the quantity of interest):  
 
-$$= \text{E}(\mathbf{x}_{i}^{O} \beta^{O} + \epsilon_{i}^{O} | x^{O} = x_{i}^{O}, x^{S} = x_{i}^{S}, y^{S} = 1)$$
+$$
+y_{i}^{O*} = \mathbf{x}_{i}^{O} \beta^{O} + \epsilon_{i}^{O}
+$$
 
-$$= \mathbf{x}_{i}^{O} \beta^{O} + \text{E}(\epsilon_{i}^{O} | x^{O} = x_{i}^{O}, x^{S} = x_{i}^{S}, y^{S} = 1)$$
-
----
-### Heckman/Type 2 Tobit
-
-$$\mathbf{x}_{i}^{O} \beta^{O} + \text{E}(\epsilon_{i}^{O} | x^{O} = x_{i}^{O}, x^{S} = x_{i}^{S}, y^{S} = 1)$$
-
-$$= \mathbf{x}_{i}^{O} \beta^{O} + \text{E}(\epsilon_{i}^{O} | y^{S} = 1)$$
-
-$$= \mathbf{x}_{i}^{O} \beta^{O} + \text{E}(\epsilon_{i}^{O} | \epsilon_{i}^{S} > - \mathbf{x}_{i}^{S} \beta^{S})$$
+We observe $y_i^O = y_i^{O*}$ only when $y_i^S = 1$; otherwise $y_i^O$ is missing.
 
 ---
-### Heckman/Type 2 Tobit
 
-$$\left(
-     \begin{array}{lr}
-       \epsilon^{S}\\
-       \epsilon^{O}
-     \end{array}
-   \right) \sim N \left( \left(
-     \begin{array}{lr}
-       0\\
-       0
-     \end{array}\right) ,
-     \left(
-     \begin{array}{lr}
-       1 & \sigma_{S, O}\\
-       \sigma_{S, O} & \sigma^{2}
-     \end{array},
-   \right) \right)$$
+The error terms are assumed to be bivariate normal:
 
----
-### Heckman/Type 2 Tobit
+$$
+\begin{pmatrix}
+\epsilon^{S} \\ \epsilon^{O}
+\end{pmatrix}
+\sim N\!\left(
+\begin{pmatrix} 0 \\ 0 \end{pmatrix},
+\begin{pmatrix}
+1 & \rho\sigma \\
+\rho\sigma & \sigma^2
+\end{pmatrix}
+\right)
+$$
 
-This is a tobit if we use maximum likelihood and the conditional distribution of the error terms to estimate the model.
+(Here $\rho$ is the correlation, and the variance of $\epsilon^{S}$ is normalized to 1 for identification.)
+
 
 ---
-### Heckman/Type 2 Tobit
+### The Selection Problem
 
-Heckman instead substitutes the first regression into the second regression. You still need the two error terms to be normally distributed, because their distributions figure into the resulting formula, and the ratio of the normal probability function to the cumulative density function (inverse Mills ratio) actually appears in the equation.
+We are interested in $E[y_i^O \mid \mathbf{x}^O]$, but we only observe $y_i^O$ for the selected subsample ($y_i^S = 1$).  
+
+The conditional expectation for the observed cases is:
+
+$$
+E[y_i^O \mid \mathbf{x}^O, \mathbf{x}^S, y_i^S = 1] 
+= \mathbf{x}_i^O \beta^O + E[\epsilon_i^O \mid \mathbf{x}^O, \mathbf{x}^S, y_i^S = 1]
+$$
+
+---
+### The Selection Problem
+
+Because $y_i^S = 1$ implies $\epsilon_i^S > -\mathbf{x}_i^S \beta^S$, the second term is not zero if $\epsilon_i^O$ and $\epsilon_i^S$ are correlated:
+
+$$
+E[\epsilon_i^O \mid \epsilon_i^S > -\mathbf{x}_i^S \beta^S] = \rho\sigma \,
+\underbrace{\frac{\phi(-\mathbf{x}_i^S \beta^S)}{1 - \Phi(-\mathbf{x}_i^S \beta^S)}}_{\text{Inverse Mills Ratio } \lambda(\mathbf{x}_i^S \beta^S)}
+$$
+
+(Here $\phi$ and $\Phi$ are the standard normal pdf and cdf.)
+
+---
+### The Inverse Mills Ratio (IMR)
+
+Using symmetry of the normal distribution, $\phi(-z) = \phi(z)$ and $1 - \Phi(-z) = \Phi(z)$, we can write:
+
+$$
+\lambda(\mathbf{x}_i^S \beta^S) = \frac{\phi(\mathbf{x}_i^S \beta^S)}{\Phi(\mathbf{x}_i^S \beta^S)}
+$$
+
+Thus the conditional expectation for the observed outcomes becomes:
+
+$$
+E[y_i^O \mid \mathbf{x}^O, \mathbf{x}^S, y_i^S = 1] 
+= \mathbf{x}_i^O \beta^O + \underbrace{\rho\sigma}_{\equiv \beta_\lambda} \, \lambda(\mathbf{x}_i^S \beta^S)
+$$
+
+---
+
+This shows that selection bias is like an **omitted variable problem**: if we could include $\lambda(\mathbf{x}_i^S \beta^S)$ in the regression, we would get consistent estimates of $\beta^O$.
+
+---
+### Heckman’s Two‑Step Procedure
+
+1. **First step:** Estimate the selection equation using a probit model ($y_i^S$ on $\mathbf{x}^S$) to obtain $\hat{\beta}^S$.
+
+2. **Second step:** For the selected subsample ($y_i^S = 1$), compute the estimated IMR  
+   $\hat{\lambda}_i = \dfrac{\phi(\mathbf{x}_i^S \hat{\beta}^S)}{\Phi(\mathbf{x}_i^S \hat{\beta}^S)}$  
+   and run an OLS regression of $y_i^O$ on $\mathbf{x}^O$ and $\hat{\lambda}_i$:
+
+   $$
+   y_i^O = \mathbf{x}_i^O \beta^O + \beta_\lambda \hat{\lambda}_i + \eta_i
+   $$
+
+   The coefficient on $\hat{\lambda}_i$ estimates $\rho\sigma$, and its significance tests for selection bias.
+
+---
+
+Maximum likelihood (the `selection()` function in **sampleSelection**) estimates both equations simultaneously and is generally more efficient.
 
 ---
 ```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
 library(sampleSelection)
-```
-
----
-```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
-data("Mroz87")
-ols1 = lm(log(wage) ~ educ + exper + I( exper^2 ) + city, data=subset(Mroz87, lfp==1))
-summary(ols1)
 ```
 
 ---
@@ -580,6 +663,11 @@ mroz.heckit = heckit( lfp ~ age + I( age^2 ) + kids5 + huswage + educ,
                  log(wage) ~ educ + exper + I( exper^2 ) + city, data=Mroz87 )
 summary(mroz.heckit)
 ```
+
+---
+
+What are we trying to fix with the Heckman process? What do we need in order to make it work? What parts of the model do we care about when we are done?
+
 
 ---
 ```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}

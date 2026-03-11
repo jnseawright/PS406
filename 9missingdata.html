@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>9: Missing Data and Selection</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Jaye Seawright" />
+    <script src="9missingdata_files/header-attrs-2.30/header-attrs.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# 9: Missing Data and Selection
+]
+.subtitle[
+## Quantitative Causal Inference
+]
+.author[
+### <large>Jaye Seawright</large>
+]
+.institute[
+### <small>Northwestern Political Science</small>
+]
+.date[
+### May 28 and June 2, 2026
+]
+
+---
+
+class: center, middle
+
+&lt;style type="text/css"&gt;
+pre {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+pre[class] {
+  max-height: 200px;
+}
+&lt;/style&gt;
+
+
+
+
+### Missingness!
+
+1. Sometimes, our data aren't complete!
+
+2. Missing data can have different effects on causal inference, depending on which variables are missing (treatment, outcome, controls) and *why* they are missing.
+
+
+---
+### Some Notation
+
+`$$\mathbb{Y} = \{\mathbb{Y}_{O}, \mathbb{Y}_{M}\}$$`
+
+`$$R_{i} = \left\{
+     \begin{array}{lr}
+       1 &amp; : Y_{i} \text{ is observed}\\
+       0 &amp; : Y_{i} \text{ is missing}
+     \end{array}
+   \right.$$`
+
+---
+### Some Notation
+
+`$$Pr(\mathbb{R} | \mathbb{Y}, \mathbb{X})$$`
+
+---
+### MCAR
+
+`$$Pr(\mathbb{R} | \mathbb{Y}, \mathbb{X}) = Pr(\mathbb{R})$$`
+
+---
+### MAR
+
+`$$Pr(\mathbb{R} | \mathbb{Y}, \mathbb{X}) = Pr(\mathbb{R} | \mathbb{Y}_{O}, \mathbb{X})$$`
+
+---
+### Non-Ignorable
+
+`$$Pr(\mathbb{R} | \mathbb{Y}, \mathbb{X}) \neq Pr(\mathbb{R} | \mathbb{Y}_{O}, \mathbb{X})$$`
+
+---
+![image](images/lalltitle.JPG)
+
+---
+![image](images/lallmcartable.JPG)
+
+---
+### Completely Random Missing Data
+
+1. Equivalent to a random subsample.
+
+2. MCAR missingness reduces effective sample sizes, and therefore increases standard errors, but is otherwise fairly harmless.
+
+---
+
+``` r
+summary(lm(outsidervote ~ simpletreat,
+  data=peruemotions))
+```
+
+```
+## 
+## Call:
+## lm(formula = outsidervote ~ simpletreat, data = peruemotions)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -0.6093 -0.4916  0.3907  0.5084  0.5084 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  0.49164    0.02874  17.104   &lt;2e-16 ***
+## simpletreat  0.11763    0.04962   2.371   0.0182 *  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.497 on 448 degrees of freedom
+## Multiple R-squared:  0.01239,	Adjusted R-squared:  0.01018 
+## F-statistic:  5.62 on 1 and 448 DF,  p-value: 0.01818
+```
+
+---
+
+``` r
+perueffects &lt;- 1:100
+
+for (i in 1:100){
+  perutemp &lt;- peruemotions[sample(1:nrow(peruemotions),nrow(peruemotions)-100, replace = TRUE),]
+  perueffects[i] &lt;- lm(outsidervote ~ simpletreat, data=perutemp)$coef[2]
+}
+
+summary(perueffects)
+```
+
+```
+##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+## -0.01227  0.09331  0.12395  0.12144  0.15874  0.23923
+```
+
+``` r
+sd(perueffects)
+```
+
+```
+## [1] 0.05378655
+```
+
+---
+### Missingness at Random
+
+1. Missingness is correlated with observed variables in some way.
+
+2. MAR missingness reduces effective sample sizes, but can also cause bias.
+
+---
+
+``` r
+library(boot)
+library(Rlab)
+```
+
+```
+## Rlab 4.5.1 attached.
+```
+
+```
+## 
+## Attaching package: 'Rlab'
+```
+
+```
+## The following object is masked from 'package:dplyr':
+## 
+##     count
+```
+
+```
+## The following objects are masked from 'package:stats':
+## 
+##     dexp, dgamma, dweibull, pexp, pgamma, pweibull, qexp, qgamma,
+##     qweibull, rexp, rgamma, rweibull
+```
+
+```
+## The following object is masked from 'package:datasets':
+## 
+##     precip
+```
+
+---
+
+``` r
+perumareffects &lt;- 1:100
+
+missing.prob &lt;- inv.logit(-2.3 + -.5*peruemotions$edlevel + -.2*peruemotions$classid + peruemotions$leftright)
+missing.prob[is.na(missing.prob)] &lt;- .3
+
+for (i in 1:100){
+  perutemp &lt;- peruemotions
+  perutemp$outsidervote[rbern(length(missing.prob),missing.prob)==1] &lt;- NA
+  perumareffects[i] &lt;- lm(outsidervote ~ simpletreat, data=perutemp)$coef[2]
+}
+
+summary(perumareffects)
+```
+
+```
+##      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
+## -0.004473  0.048243  0.070860  0.069547  0.087756  0.134944
+```
+
+``` r
+sd(perumareffects)
+```
+
+```
+## [1] 0.02676801
+```
+
+---
+### Nonignorable Missingness 
+
+1. Missingness is correlated with the missing values themselves.
+
+2. Nonignorable missingness reduces effective sample sizes, and often causes bias that is hard to solve.
+
+---
+
+``` r
+perunonigeffects &lt;- 1:100
+
+missing.threshold &lt;- -2.3 + 4*peruemotions$outsidervote
+missing.threshold[is.na(missing.threshold)] &lt;- .3
+
+for (i in 1:100){
+  perutemp &lt;- peruemotions
+  perutemp$outsidervote[rbern(length(missing.threshold),1-inv.logit(missing.threshold))==1] &lt;- NA
+  perunonigeffects[i] &lt;- lm(outsidervote ~ simpletreat, data=perutemp)$coef[2]
+}
+
+summary(perunonigeffects)
+```
+
+```
+##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+## -0.06536  0.02427  0.04762  0.04410  0.07085  0.12269
+```
+
+``` r
+sd(perunonigeffects)
+```
+
+```
+## [1] 0.03659413
+```
+
+---
+
+Based on what we just saw, when is it a good idea to just delete missing data, and when will that cause trouble?
+
+---
+### Fixing Missingness
+
+1. Delete the data and move on.
+
+2. Fill in the data with some kind of best guess.
+
+3. Repair the missingness with a statistical model.
+
+---
+### Listwise Deletion
+
+Deleting the entire case when one or more value is missing is called ''listwise deletion.'' It works for MCAR data, or in general (more or less) in a model when the causes of missingness are included as covariates.
+
+---
+&lt;img src="images/King1.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+&lt;img src="images/King2.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+&lt;img src="images/King3.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+&lt;img src="images/King4.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+
+``` r
+perumareffects2 &lt;- 1:100
+
+missing.prob &lt;- inv.logit(-2.3 + -.5*peruemotions$edlevel + -.2*peruemotions$classid + peruemotions$leftright)
+missing.prob[is.na(missing.prob)] &lt;- .3
+
+for (i in 1:100){
+  perutemp &lt;- peruemotions
+  perutemp$outsidervote[rbern(length(missing.prob),missing.prob)==1] &lt;- NA
+  perumareffects2[i] &lt;- lm(outsidervote ~ simpletreat + edlevel + classid + leftright, data=perutemp)$coef[2]
+}
+
+summary(perumareffects2)
+```
+
+```
+##       Min.    1st Qu.     Median       Mean    3rd Qu.       Max. 
+## -0.0008869  0.0563184  0.0747493  0.0740636  0.0955806  0.1437823
+```
+
+``` r
+sd(perumareffects2)
+```
+
+```
+## [1] 0.02940371
+```
+
+
+---
+### Imputation
+
+We can use the known values of variables within a case to come up with a best guess for the missing values within that case, given the joint distributions across the rest of the data. The most common family of ways to do this is multiple imputation.
+
+---
+### Multiple Imputation
+
+1. Come up with an initial guess for all the missing values.
+
+2. Choose one variable (`\(Y_{i}\)`) to work on. Use the initial guesses, as well as the observed values, for all the other variables to run a regression with `\(YX_{i}\)` as the outcome and `\(Y_{-i}\)` as well as `\(X\)` as the predictors. Draw fitted values from that regression for the missing values on `\(Y_{i}\)`.
+
+---
+### Multiple Imputation
+
+3. Move on to the next variable with missing values, and repeat step 2. Continue until all the variables have had their turn.
+
+4. Use the predicted values from these regressions as the new initial guesses and repeat steps 2 and 3. Keep this up until repeating the process produces regression distributions that don't change much across iterations.
+
+---
+### Multiple Imputation
+
+The resulting guesses are better than nothing, but they aren't real data --- they are draws from a distribution. To capture the uncertainty, we should take multiple draws from that distribution for each data point. This will create multiple copies of the data set.
+
+We then run our model of interest on each copy of the data set, and combine the results together to get a final answer.
+
+---
+### Multiple Imputation
+
+For `\(M\)` imputations:
+
+`$$\hat{\beta} = \frac{1}{m} \displaystyle\sum_{m=1}^{M} \hat{\beta}_{m}$$`
+
+---
+### Multiple Imputation
+
+For `\(M\)` imputations:
+
+`$$V_{\beta} = W + (1 + \frac{1}{M}) B$$`
+
+`$$W = \frac{1}{m} \displaystyle\sum_{m=1}^{M} s^{2}_{m}$$`
+
+`$$B = \frac{1}{m - 1} \displaystyle\sum_{m=1}^{M} (\hat{\beta}_{m} - \hat{\beta})^{2}$$`
+
+---
+
+``` r
+library(mice)
+```
+
+```
+## 
+## Attaching package: 'mice'
+```
+
+```
+## The following object is masked from 'package:stats':
+## 
+##     filter
+```
+
+```
+## The following objects are masked from 'package:base':
+## 
+##     cbind, rbind
+```
+
+---
+
+``` r
+perumieffects &lt;- 1:100
+
+missing.prob &lt;- inv.logit(-2.3 + -.5*peruemotions$edlevel + -.2*peruemotions$classid + peruemotions$leftright)
+missing.prob[is.na(missing.prob)] &lt;- .3
+
+for (i in 1:100){
+  perutemp &lt;- peruemotions
+  perutemp$outsidervote[rbern(length(missing.prob),missing.prob)==1] &lt;- NA
+  perumice &lt;- mice(perutemp)
+  perumieffects[i] &lt;- summary(pool(with(perumice, summary(lm(outsidervote ~ simpletreat)))))[2,2]
+}
+```
+
+---
+
+``` r
+summary(perumieffects)
+sd(perumieffects)
+```
+
+---
+&lt;img src="images/perumieffects.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+
+What is the difference between multiple imputation and making up fake data?
+
+---
+### How Many Imputations?
+
+mice defaults to 5, because of the older received wisdom of the literature.
+
+&gt; In many applications, just 3–5 imputations are sufficient to obtain excellent results. ... Many are surprised by the claim that only 3–5 imputations may be needed. Rubin (1987: 114) shows that the efficiency of an estimate based on `\(m\)` imputations is approximately `\((1 + \frac{\gamma}{m})^{-1}\)`...
+
+---
+### How Many Imputations?
+
+&gt;...where `\(\gamma\)` is the fraction of missing information for the quantity being estimated.... gains rapidly diminish after the first few imputations. ... In most situations there is simply little advantage to producing and analyzing more than a few imputed datasets (Schafer and Olsen 1998: 548–549).
+
+---
+&lt;img src="images/Graham1.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+&lt;img src="images/Graham2.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+&lt;img src="images/lallross.JPG" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+&lt;img src="images/arelbundok.jpg" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+&lt;img src="images/arelbundok2.jpg" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+&lt;img src="images/pepinsky.jpg" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+&lt;img src="images/pepinsky2.jpg" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+&lt;img src="images/LaqueurTitle.PNG" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+&lt;img src="images/Laqueur1.PNG" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+&lt;img src="images/Laqueur2.PNG" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+&lt;img src="images/crossvalidatedrisk.PNG" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+&lt;img src="images/Laqueur3.PNG" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+
+``` r
+#Code to install superMICE, which is available but not currently updated.
+#library(remotes)
+#install_version("superMICE", version = "1.1.1")
+library(superMICE)
+
+perusupermieffects &lt;- 1:10
+
+missing.prob &lt;- inv.logit(-2.3 + -.5*peruemotions$edlevel + -.2*peruemotions$classid + peruemotions$leftright)
+missing.prob[is.na(missing.prob)] &lt;- .3
+SL.lib &lt;- c("SL.mean", "SL.biglasso", "SL.randomForest")
+
+for (i in 1:10){
+  perutemp &lt;- peruemotions
+  perutemp$outsidervote[rbern(length(missing.prob),missing.prob)==1] &lt;- NA
+  perumice &lt;- mice::mice(perutemp,
+                method = "SuperLearner",
+                SL.library = SL.lib,
+                kernel = "gaussian",
+                bw = c(0.25, 1, 5))
+  perusupermieffects[i] &lt;- summary(pool(with(perumice, summary(lm(outsidervote ~ simpletreat)))))[2,2]
+}
+```
+
+---
+&lt;img src="images/supermi.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+
+What do we get by adding a machine-learning perspective to multiple imputation?
+
+---
+### Non-Ignorable Missingness
+
+Censoring: data above/below a certain threshold on a variable (or variables) have missing values in the dataset
+
+Truncation: cases data above/below a certain threshold on a variable (or variables) are not included in the dataset
+
+General Selection Problems: other forms of correlation between missingness and values of the data
+
+---
+### Non-Ignorable Missingness
+
+For non-ignorable missingness, the two main solutions are:
+
+1. Statistical models, usually using maximum-likelihood techniques.
+
+2. Nonparametric bounds, an idea to be discussed next week.
+
+---
+### Tobit
+
+`$$y^{*} = \mathbf{x} \beta + \epsilon$$`
+
+`$$\epsilon \sim N(0, \sigma^{2})$$`
+---
+### Tobit
+
+`$$y = \left\{
+     \begin{array}{lr}
+        y^{*} &amp; : y^{*} &gt; 0\\
+       - &amp; : y^{*} \leq 0
+     \end{array}
+   \right.$$`
+
+
+
+
+---
+### Tobit (Censored Regression) Likelihood
+
+For observation `\(i\)`, the contribution to the likelihood depends on whether `\(y_i\)` is uncensored, left‑censored, or right‑censored.
+
+Assume a latent variable `\(y_i^* = \mathbf{x}_i\beta + \epsilon_i\)`, with `\(\epsilon_i \sim N(0,\sigma^2)\)`.  
+We observe `\(y_i = y_i^*\)` if `\(L &lt; y_i^* &lt; U\)`, otherwise we know only that `\(y_i^* \leq L\)` or `\(y_i^* \geq U\)`.
+
+---
+
+$$
+\mathcal{L}_i = 
+`\begin{cases}
+\dfrac{1}{\sigma}\phi\!\left(\dfrac{y_i - \mathbf{x}_i\beta}{\sigma}\right) 
+&amp; \text{if } y_i^* \text{ is uncensored (i.e., } L &lt; y_i &lt; U \text{)} \\[2em]
+\Phi\!\left(\dfrac{L - \mathbf{x}_i\beta}{\sigma}\right) 
+&amp; \text{if } y_i^* \text{ is left‑censored (i.e., } y_i = L \text{)} \\[2em]
+1 - \Phi\!\left(\dfrac{U - \mathbf{x}_i\beta}{\sigma}\right) 
+&amp; \text{if } y_i^* \text{ is right‑censored (i.e., } y_i = U \text{)}
+\end{cases}`
+$$
+
+
+---
+
+Consider the situation in which we have a measure of academic aptitude
+(scaled 200-800) which we want to model using reading and math test
+scores, as well as, the type of program the student is enrolled in
+(academic, general, or vocational). The problem here is that students
+who answer all questions on the academic aptitude test correctly receive
+a score of 800, even though it is likely that these students are not
+"truly" equal in aptitude.
+
+---
+
+Here, there is an upper censoring point `\(U = 800\)` (and no lower censoring), so the likelihood becomes  
+
+$$
+\mathcal{L}_i = 
+`\begin{cases}
+\dfrac{1}{\sigma}\phi\!\left(\dfrac{y_i - \mathbf{x}_i\beta}{\sigma}\right) &amp; \text{if } y_i &lt; 800 \\[1.5em]
+1 - \Phi\!\left(\dfrac{800 - \mathbf{x}_i\beta}{\sigma}\right) &amp; \text{if } y_i = 800
+\end{cases}`
+$$
+
+---
+
+The model is estimated by maximizing the sum of the log‑likelihoods:  
+`\(\displaystyle \max_{\beta,\sigma} \sum_i \log \mathcal{L}_i\)`.
+
+---
+
+``` r
+dat &lt;- read.csv(
+     "https://stats.idre.ucla.edu/stat/data/tobit.csv")
+
+library(VGAM)
+```
+
+```
+## Loading required package: stats4
+```
+
+```
+## Loading required package: splines
+```
+
+```
+## 
+## Attaching package: 'VGAM'
+```
+
+```
+## The following object is masked from 'package:boot':
+## 
+##     simplex
+```
+
+---
+
+``` r
+summary(lm(apt ~ read + math +
+          prog,  
+          data = dat))
+```
+
+```
+## 
+## Call:
+## lm(formula = apt ~ read + math + prog, data = dat)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -161.463  -42.474   -0.707   43.180  181.554 
+## 
+## Coefficients:
+##                Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)     242.735     30.140   8.054 7.80e-14 ***
+## read              2.553      0.583   4.379 1.95e-05 ***
+## math              5.383      0.659   8.169 3.84e-14 ***
+## proggeneral     -13.741     11.744  -1.170 0.243423    
+## progvocational  -48.835     12.982  -3.762 0.000223 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 62.38 on 195 degrees of freedom
+## Multiple R-squared:  0.6127,	Adjusted R-squared:  0.6048 
+## F-statistic: 77.13 on 4 and 195 DF,  p-value: &lt; 2.2e-16
+```
+
+---
+
+``` r
+summary(m &lt;- vglm(apt ~ read + math +
+          prog, tobit(Upper = 800), 
+          data = dat))
+```
+
+```
+## 
+## Call:
+## vglm(formula = apt ~ read + math + prog, family = tobit(Upper = 800), 
+##     data = dat)
+## 
+## Coefficients: 
+##                 Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept):1  209.55956   32.54590   6.439 1.20e-10 ***
+## (Intercept):2    4.18476    0.05235  79.944  &lt; 2e-16 ***
+## read             2.69796    0.61928   4.357 1.32e-05 ***
+## math             5.91460    0.70539   8.385  &lt; 2e-16 ***
+## proggeneral    -12.71458   12.40857  -1.025 0.305523    
+## progvocational -46.14327   13.70667  -3.366 0.000761 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Names of linear predictors: mu, loglink(sd)
+## 
+## Log-likelihood: -1041.063 on 394 degrees of freedom
+## 
+## Number of Fisher scoring iterations: 5
+```
+
+---
+### Heckman Selection Model: Two Latent Equations
+
+**Selection equation** (who is observed?):  
+
+$$
+y_{i}^{S*} = \mathbf{x}_{i}^{S} \beta^{S} + \epsilon_{i}^{S}
+$$
+
+We observe the binary indicator `\(y_i^S = 1\)` if `\(y_i^{S*} &gt; 0\)`, and `\(y_i^S = 0\)` otherwise.
+
+---
+### Heckman Selection Model: Two Latent Equations
+
+**Outcome equation** (the quantity of interest):  
+
+$$
+y_{i}^{O*} = \mathbf{x}_{i}^{O} \beta^{O} + \epsilon_{i}^{O}
+$$
+
+We observe `\(y_i^O = y_i^{O*}\)` only when `\(y_i^S = 1\)`; otherwise `\(y_i^O\)` is missing.
+
+---
+
+The error terms are assumed to be bivariate normal:
+
+$$
+`\begin{pmatrix}
+\epsilon^{S} \\ \epsilon^{O}
+\end{pmatrix}`
+\sim N\!\left(
+\begin{pmatrix} 0 \\ 0 \end{pmatrix},
+`\begin{pmatrix}
+1 &amp; \rho\sigma \\
+\rho\sigma &amp; \sigma^2
+\end{pmatrix}`
+\right)
+$$
+
+(Here `\(\rho\)` is the correlation, and the variance of `\(\epsilon^{S}\)` is normalized to 1 for identification.)
+
+
+---
+### The Selection Problem
+
+We are interested in `\(E[y_i^O \mid \mathbf{x}^O]\)`, but we only observe `\(y_i^O\)` for the selected subsample (`\(y_i^S = 1\)`).  
+
+The conditional expectation for the observed cases is:
+
+$$
+E[y_i^O \mid \mathbf{x}^O, \mathbf{x}^S, y_i^S = 1] 
+= \mathbf{x}_i^O \beta^O + E[\epsilon_i^O \mid \mathbf{x}^O, \mathbf{x}^S, y_i^S = 1]
+$$
+
+---
+### The Selection Problem
+
+Because `\(y_i^S = 1\)` implies `\(\epsilon_i^S &gt; -\mathbf{x}_i^S \beta^S\)`, the second term is not zero if `\(\epsilon_i^O\)` and `\(\epsilon_i^S\)` are correlated:
+
+$$
+E[\epsilon_i^O \mid \epsilon_i^S &gt; -\mathbf{x}_i^S \beta^S] = \rho\sigma \,
+\underbrace{\frac{\phi(-\mathbf{x}_i^S \beta^S)}{1 - \Phi(-\mathbf{x}_i^S \beta^S)}}_{\text{Inverse Mills Ratio } \lambda(\mathbf{x}_i^S \beta^S)}
+$$
+
+(Here `\(\phi\)` and `\(\Phi\)` are the standard normal pdf and cdf.)
+
+---
+### The Inverse Mills Ratio (IMR)
+
+Using symmetry of the normal distribution, `\(\phi(-z) = \phi(z)\)` and `\(1 - \Phi(-z) = \Phi(z)\)`, we can write:
+
+$$
+\lambda(\mathbf{x}_i^S \beta^S) = \frac{\phi(\mathbf{x}_i^S \beta^S)}{\Phi(\mathbf{x}_i^S \beta^S)}
+$$
+
+Thus the conditional expectation for the observed outcomes becomes:
+
+$$
+E[y_i^O \mid \mathbf{x}^O, \mathbf{x}^S, y_i^S = 1] 
+= \mathbf{x}_i^O \beta^O + \underbrace{\rho\sigma}_{\equiv \beta_\lambda} \, \lambda(\mathbf{x}_i^S \beta^S)
+$$
+
+---
+
+This shows that selection bias is like an **omitted variable problem**: if we could include `\(\lambda(\mathbf{x}_i^S \beta^S)\)` in the regression, we would get consistent estimates of `\(\beta^O\)`.
+
+---
+### Heckman’s Two‑Step Procedure
+
+1. **First step:** Estimate the selection equation using a probit model (`\(y_i^S\)` on `\(\mathbf{x}^S\)`) to obtain `\(\hat{\beta}^S\)`.
+
+2. **Second step:** For the selected subsample (`\(y_i^S = 1\)`), compute the estimated IMR  
+   `\(\hat{\lambda}_i = \dfrac{\phi(\mathbf{x}_i^S \hat{\beta}^S)}{\Phi(\mathbf{x}_i^S \hat{\beta}^S)}\)`  
+   and run an OLS regression of `\(y_i^O\)` on `\(\mathbf{x}^O\)` and `\(\hat{\lambda}_i\)`:
+
+   $$
+   y_i^O = \mathbf{x}_i^O \beta^O + \beta_\lambda \hat{\lambda}_i + \eta_i
+   $$
+
+   The coefficient on `\(\hat{\lambda}_i\)` estimates `\(\rho\sigma\)`, and its significance tests for selection bias.
+
+---
+
+Maximum likelihood (the `selection()` function in **sampleSelection**) estimates both equations simultaneously and is generally more efficient.
+
+---
+
+``` r
+library(sampleSelection)
+```
+
+```
+## Loading required package: maxLik
+```
+
+```
+## Loading required package: miscTools
+```
+
+```
+## 
+## Please cite the 'maxLik' package as:
+## Henningsen, Arne and Toomet, Ott (2011). maxLik: A package for maximum likelihood estimation in R. Computational Statistics 26(3), 443-458. DOI 10.1007/s00180-010-0217-1.
+## 
+## If you have questions, suggestions, or comments regarding the 'maxLik' package, please use a forum or 'tracker' at maxLik's R-Forge site:
+## https://r-forge.r-project.org/projects/maxlik/
+```
+
+---
+
+``` r
+data("Mroz87")
+ols1 = lm(log(wage) ~ educ + exper + I( exper^2 ) + city, data=subset(Mroz87, lfp==1))
+summary(ols1)
+```
+
+```
+## 
+## Call:
+## lm(formula = log(wage) ~ educ + exper + I(exper^2) + city, data = subset(Mroz87, 
+##     lfp == 1))
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -3.10084 -0.32453  0.05292  0.36261  2.34806 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -0.5308476  0.1990253  -2.667  0.00794 ** 
+## educ         0.1057097  0.0143280   7.378 8.58e-13 ***
+## exper        0.0410584  0.0131963   3.111  0.00199 ** 
+## I(exper^2)  -0.0007973  0.0003938  -2.025  0.04352 *  
+## city         0.0542225  0.0680903   0.796  0.42629    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.6667 on 423 degrees of freedom
+## Multiple R-squared:  0.1581,	Adjusted R-squared:  0.1501 
+## F-statistic: 19.86 on 4 and 423 DF,  p-value: 5.389e-15
+```
+
+---
+
+``` r
+mroz.tobit = selection( lfp ~ age + I( age^2 ) + kids5 + huswage + educ,
+                 log(wage) ~ educ + exper + I( exper^2 ) + city, data=Mroz87 )
+summary(mroz.tobit)
+```
+
+```
+## --------------------------------------------
+## Tobit 2 model (sample selection model)
+## Maximum Likelihood estimation
+## Newton-Raphson maximisation, 2 iterations
+## Return code 8: successive function values within relative tolerance limit (reltol)
+## Log-Likelihood: -891.1769 
+## 753 observations (325 censored and 428 observed)
+## 13 free parameters (df = 740)
+## Probit selection equation:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -0.6153808  1.5178025  -0.405 0.685270    
+## age          0.0097374  0.0691127   0.141 0.887994    
+## I(age^2)    -0.0004856  0.0007857  -0.618 0.536769    
+## kids5       -0.8541359  0.1156288  -7.387 4.06e-13 ***
+## huswage     -0.0422970  0.0125412  -3.373 0.000783 ***
+## educ         0.1478204  0.0235240   6.284 5.64e-10 ***
+## Outcome equation:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -0.5440471  0.2721876  -1.999  0.04600 *  
+## educ         0.1063107  0.0165931   6.407 2.64e-10 ***
+## exper        0.0411377  0.0131664   3.124  0.00185 ** 
+## I(exper^2)  -0.0008006  0.0003942  -2.031  0.04261 *  
+## city         0.0534526  0.0685656   0.780  0.43589    
+##    Error terms:
+##       Estimate Std. Error t value Pr(&gt;|t|)    
+## sigma  0.66284    0.02268  29.228   &lt;2e-16 ***
+## rho    0.01433    0.20297   0.071    0.944    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## --------------------------------------------
+```
+
+---
+
+``` r
+mroz.heckit = heckit( lfp ~ age + I( age^2 ) + kids5 + huswage + educ,
+                 log(wage) ~ educ + exper + I( exper^2 ) + city, data=Mroz87 )
+summary(mroz.heckit)
+```
+
+```
+## --------------------------------------------
+## Tobit 2 model (sample selection model)
+## 2-step Heckman / heckit estimation
+## 753 observations (325 censored and 428 observed)
+## 14 free parameters (df = 740)
+## Probit selection equation:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -0.6204199  1.5164452  -0.409 0.682564    
+## age          0.0100365  0.0689931   0.145 0.884378    
+## I(age^2)    -0.0004891  0.0007841  -0.624 0.532954    
+## kids5       -0.8546564  0.1153682  -7.408  3.5e-13 ***
+## huswage     -0.0421711  0.0124158  -3.397 0.000719 ***
+## educ         0.1476737  0.0234280   6.303  5.0e-10 ***
+## Outcome equation:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -0.5471531  0.2890638  -1.893  0.05877 .  
+## educ         0.1064521  0.0171745   6.198 9.48e-10 ***
+## exper        0.0411569  0.0131805   3.123  0.00186 ** 
+## I(exper^2)  -0.0008014  0.0003950  -2.029  0.04282 *  
+## city         0.0532725  0.0687956   0.774  0.43897    
+## Multiple R-Squared:0.1581,	Adjusted R-Squared:0.1481
+##    Error terms:
+##               Estimate Std. Error t value Pr(&gt;|t|)
+## invMillsRatio  0.01173    0.15157   0.077    0.938
+## sigma          0.66285         NA      NA       NA
+## rho            0.01769         NA      NA       NA
+## --------------------------------------------
+```
+
+---
+
+What are we trying to fix with the Heckman process? What do we need in order to make it work? What parts of the model do we care about when we are done?
+
+
+---
+&lt;img src="images/Sartori1.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+&lt;img src="images/Sartori2.png" width="90%" style="display: block; margin: auto;" /&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create();
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

@@ -1,0 +1,48 @@
+---
+title: "Political Science 406 Lab 7: Synthetic Control"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    highlight: tango
+  pdf_document: default
+urlcolor: blue
+---
+
+```{r include = FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,                 # don't show code
+  warning = FALSE,              # don't show warnings
+  message = FALSE,              # don't show messages (less serious warnings)
+  cache = FALSE,                # set to TRUE to save results from last compilation
+  fig.align = "center",         # center figures
+  attr.source = '.numberLines'  # add line numbers to code
+)
+
+library(tidyverse)       # load libraries you always use here
+
+set.seed(27)             # make random results reproducible
+```
+
+# Due Date: May 23, 2026
+
+[Submit your lab here.](https://canvas.northwestern.edu/courses/230286/assignments/1562447)
+
+### Problem 1: Design a Synthetic Control Study
+Propose a synthetic control design to estimate the effect of Trump's 2016 election on US carbon emissions. Specify:
+
+*   Treated unit, donor pool, outcome variable, predictors.
+
+*   Pre‑treatment period and post‑treatment period.
+
+*   What are the key assumptions?
+
+### Problem 2: Implement with Synth
+Load the data (you may need to assemble from World Bank or other sources). Use dataprep and synth to construct the synthetic US and estimate the effect. Plot the path.
+
+### Problem 3: Placebo Tests
+Run placebo tests by applying the same method to each donor country (in‑space placebo). Create a plot showing the gap for the US and all placebos. Calculate the p‑value as the proportion of placebos with a post‑treatment gap as large as the US.
+
+###Problem 4: Sensitivity Analysis
+Drop one donor at a time and re‑estimate. Does the result change substantially? Discuss the robustness of your findings.
+
+

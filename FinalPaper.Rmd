@@ -23,7 +23,7 @@ library(tidyverse)       # load libraries you always use here
 set.seed(27)             # make random results reproducible
 ```
 
-# Due Date: June 13, 2025
+# Due Date: June 12, 2026
 
 [Submit your research design here.](https://canvas.northwestern.edu/courses/230286/assignments/1562507)
 
@@ -31,4 +31,33 @@ set.seed(27)             # make random results reproducible
 
 The final project for this class is a mock grant proposal that features a research design that shows mastery of at least one cutting-edge quantitative causal inference estimator from this class. The proposal will be evaluated based on the criteria listed for the Northwestern Graduate School's [Graduate Research Grant](https://www.tgs.northwestern.edu/funding/fellowships-and-grants/internal-fellowships-grants/graduate-research-grant.html), and the format must meet the rules for the ``Description of the project'' section of a proposal for that grant --- five pages, double spaced, up to three pages of references/endnotes/figures --- with the exception that it does not need to already have IRB approval.
 
-Note that a successful proposal will not only score well on the criteria for grant review --- which is good practice for your professional future! --- but will also show mastery of at least one cutting edge causal inference estimator. I am not going to list out here which estimators are cutting edge and which are not, but you are probably best off if you use an estimator that you did not know about before this quarter.
+**Suggested Proposal Structure:** (Note that you are free to depart from this as works for you)
+- **Research Question (0.5 page):** Clear, focused question including cause, effect, and empirical setting
+- **Contribution (0.5 page):** Why this matters (theory, policy, methods), and a discussion of both academic and real-world impact
+- **Causal Model (1 page):** DAG or other easy-to-interpret visual representation of the theory with justification of relationships; identify treatment, outcome, confounders
+- **Identification Strategy (1 pages):** Which estimator, why it fits, key assumptions (stated formally and in plain language)
+- **Data (1 page):** Source, sample, measurement, any anticipated missing data, and a power calculation if possible
+- **Implementation (0.5 page):** How you'll estimate (software, key packages), anticipated results under different scenarios
+- **Limitations/Robustness (0.5 page):** Sensitivity analyses, placebo tests, alternative specifications
+
+Note that a successful proposal will not only score well on the criteria for grant review --- which is good practice for your professional future! --- but will also show mastery of at least one cutting edge causal inference estimator. 
+
+**Examples of cutting‑edge estimators covered:**
+- Causal forests (`grf`) for heterogeneous treatment effects
+- Modern staggered DiD estimators (Callaway & Sant'Anna, Sun & Abraham, `fect`)
+- Synthetic control with placebo tests and sensitivity analysis
+- Double/debiased machine learning (`hdm`, `DML`)
+- Outcome-adaptive LASSO for high-dimensional confounding
+- Regression discontinuity with optimal bandwidth selection and bias correction (`rdrobust`)
+- Instrumental variables with weak-instrument robust inference (AR confidence intervals)
+
+**Note:** Standard regression or a basic experiment are *not* cutting‑edge for this assignment.
+
+**Recommended Timeline**
+
+- **Week 5:** Identify research question and potential estimator (come to office hours)
+- **Week 6:** Draft DAG and identification strategy
+- **Week 7:** Identify data source
+- **Week 8:** Complete draft for peer feedback (optional)
+- **Week 9:** Revise based on feedback
+- **Finals week:** Submit final

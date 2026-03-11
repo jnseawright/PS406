@@ -12,7 +12,7 @@
 
 <meta name="date" content="2026-03-05" />
 
-<title>Political Science 406 Lab 2: Regression</title>
+<title>Political Science 406 Lab 1: Experiments</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -421,67 +421,67 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">Political Science 406 Lab 2:
-Regression</h1>
+<h1 class="title toc-ignore">Political Science 406 Lab 1:
+Experiments</h1>
 <h4 class="date">2026-03-05</h4>
 
 </div>
 
 
-<div id="due-date-april-24-2026" class="section level1">
-<h1>Due Date: April 24, 2026</h1>
-<p><a href="https://canvas.northwestern.edu/courses/230286/assignments/1562273">Submit
+<div id="due-date-april-17-2026" class="section level1">
+<h1>Due Date: April 17, 2026</h1>
+<p><a href="https://canvas.northwestern.edu/courses/230286/assignments/1562190">Submit
 your lab here.</a></p>
-<div id="problem-1-bivariate-regression-in-r" class="section level3">
-<h3>Problem 1: Bivariate Regression in R</h3>
-<p>We will be analyzing a data set on inequality for a collection of 118
-countries during the mid-1990s.</p>
-<p>Begin by loading the data set into R, using the following
-command:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>inequality <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;https://raw.githubusercontent.com/jnseawright/PS406/main/data/Inequality.csv&quot;</span>)</span></code></pre></div>
-<p>Look at the names of the variables in the data set, to make sure your
-copy downloaded correctly:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">names</span>(inequality)</span></code></pre></div>
-<pre><code>##  [1] &quot;X&quot;                    &quot;Code&quot;                 &quot;Country&quot;             
-##  [4] &quot;Year&quot;                 &quot;Gini&quot;                 &quot;Polity&quot;              
-##  [7] &quot;GDP&quot;                  &quot;Industry&quot;             &quot;FuelExports&quot;         
-## [10] &quot;CommunistLegacy&quot;      &quot;Region&quot;               &quot;Expropriation&quot;       
-## [13] &quot;SettlerMortality&quot;     &quot;vdem_corr&quot;            &quot;militaryexpenditure&quot; 
-## [16] &quot;educationexpenditure&quot; &quot;electricityaccess&quot;    &quot;netmigration&quot;</code></pre>
-<p>Now carry out a bivariate regression, using the Gini coefficient (a
-measure of inequality) as the dependent variable and the Polity variable
-(a measure of democracy) as the independent variable. Suppose that the
-results are causal; what do they mean? What assumption is required? Draw
-a DAG representing your causal assumption. Identify at least two
-confounders and explain why they might bias the estimate.</p>
+<div id="problem-1-analyzing-experimental-data-difference-in-means" class="section level3">
+<h3>Problem 1: Analyzing Experimental Data: Difference in Means</h3>
+<p>In this lab, you will reanalyze the results of the experiment
+reported in Dunning and Harrison’s 2010 APSR article. The <a href="http://isps.yale.edu/research/data/d015#.VwKCmuIrKUk">article and
+replication data are available.</a></p>
+<p>First, use the difference in means to estimate one of the main
+treatment effects discussed in the paper (disregard compliance, i.e.,
+subjects’ perception of the ethnicity of the politician and of whether a
+joking cousin relationship exists). Use randomization inference to find
+a P value for that difference. Discuss the results and any causal
+implications.</p>
+<p>The R library used in class for randomization inference is ri2, and
+you can find its documentation and a vignette <a href="https://cran.r-project.org/web/packages/ri2/index.html">here.</a></p>
+<p>One key step is to declare the research design for the randomization
+inference. This involves specifying the total sample size as well as the
+sample size per treatment group. You do this with the declare_ra()
+function, using the N parameter to set up the total sample size, the m
+parameter to specify the size of the treatment group in a two-group
+design, or the m_each parameter to provide a list of sample sizes for
+each treatment group in a multi-group design.</p>
+<p>Then, you can use the conduct_ri() function to combine that
+declaration with a formula that provides a model, some data, and a null
+hypothesis.</p>
 </div>
-<div id="problem-2-multivariate-regression-in-r" class="section level3">
-<h3>Problem 2: Multivariate Regression in R</h3>
-<p>You should now expand the model by incorporating logged GDP as a
-second independent variable.</p>
-<p>Update your DAG to include this new variable. Does controlling for
-log(GDP) block any backdoor paths? Are there any potential bad controls
-(mediators, colliders) in this setup?</p>
-</div>
-<div id="problem-3-interaction-terms-in-r" class="section level3">
-<h3>Problem 3: Interaction Terms in R</h3>
-<p>Add an interaction between Polity and log(GDP). Interpret the
-interaction coefficient. Use the interactions package to plot marginal
-effects. Discuss whether the interaction is substantively
-meaningful.</p>
-</div>
-<div id="problem-4-weights" class="section level3">
-<h3>Problem 4: Weights</h3>
-<p>Create a dichotomous treatment variable: democracy = 1 if Polity &gt;
-0 else 0. Use lmw to estimate the ATE with URI (regression weights) and
-MRI (uniform weights). Plot the URI weights. Are any cases highly
-influential? Compare the two ATE estimates. What does this tell you
-about the sensitivity of your regression to weighting?</p>
-<p>The library we used to carry out these tasks in class was lmw; you
-can find its documentation <a href="https://cran.r-project.org/web/packages/lmw/index.html">here.</a></p>
-<p>As is often the case, a first recommended step in using this package
-is to make a special dataframe that includes only the variables you plan
-to use and then to get rid of missing data.</p>
+<div id="problem-2-analyzing-experimental-data-mediation" class="section level3">
+<h3>Problem 2: Analyzing Experimental Data: Mediation</h3>
+<p>Estimate a mediation effect that helps clarify a hypothesis in the
+article, using what seems to you to be a reasonable set of control
+variables. Again, explain your model and assumptions using whatever form
+of reasoning makes sense for you. Are your results consistent with the
+arguments of the article?</p>
+<p>The R library used for mediation in class is (intuitively enough)
+mediation, and you can find its documentation and a vignette <a href="https://cran.r-project.org/web/packages/mediation/index.html">here.</a></p>
+<p>The essential steps to this process are, first, to create a data
+frame containing the variables necessary for your mediation analysis and
+to run na.omit on that data frame, because this analysis is not friendly
+to missing data. Second, run a regression predicting your mediator based
+on the treatment variable and any control variables you find
+appropriate. Third, run a regression predicting your outcome based on
+the mediator, the treatment variable, and any control variables you find
+appropriate. Third, run a command like the following:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>mediator_output <span class="ot">&lt;-</span> <span class="fu">mediate</span>(REGRESSION_PREDICTING_MEDIATOR, REGRESSION_PREDICTING_OUTCOME, <span class="at">treat=</span><span class="st">&quot;TREATMENT_VARIABLE&quot;</span>, <span class="at">mediator =</span> <span class="st">&quot;MEDIATOR_VARIABLE&quot;</span>)</span></code></pre></div>
+<p>You will likely want to run the summary and plot commands on the
+output of this command. You may also want to run the medsens command to
+check how sensitive the model is to omitted variables.</p>
+<p>###Problem 3: Population Inference (Optional Challenge)</p>
+<p>Using the generalize package, assess how well the experimental sample
+represents the target population (use Census data or simulated
+population). Estimate the population average treatment effect (PATE) and
+compare it to the sample ATE.</p>
 </div>
 </div>
 
