@@ -23,9 +23,9 @@ library(tidyverse)       # load libraries you always use here
 set.seed(27)             # make random results reproducible
 ```
 
-# Due Date: May 30, 2026
+# Due Date: June 5, 2026
 
-[Submit your lab here.](https://canvas.northwestern.edu/courses/230286/assignments/1562502)
+[Submit your lab here.](https://canvas.northwestern.edu/courses/251621/assignments/1730807)
 
 ### Problem 1: Double Selection with LASSO
 

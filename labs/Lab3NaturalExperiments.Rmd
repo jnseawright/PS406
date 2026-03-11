@@ -25,7 +25,7 @@ set.seed(27)             # make random results reproducible
 
 # Due Date: May 1, 2026
 
-[Submit your lab here.](https://canvas.northwestern.edu/courses/230286/assignments/1562347)
+[Submit your lab here.](https://canvas.northwestern.edu/courses/251621/assignments/1730775)
 
 ### Problem 1: Evaluate a Natural Experiment
 

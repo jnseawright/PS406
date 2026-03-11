@@ -12,7 +12,7 @@
 
 <meta name="date" content="2026-03-11" />
 
-<title>Political Science 406 Lab 8: Machine Learning</title>
+<title>Political Science 406 Lab 5: Natural Experiments, Part 2</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -320,48 +320,44 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">Political Science 406 Lab 8: Machine
-Learning</h1>
+<h1 class="title toc-ignore">Political Science 406 Lab 5: Natural
+Experiments, Part 2</h1>
 <h4 class="date">2026-03-11</h4>
 
 </div>
 
 
-<div id="due-date-june-5-2026" class="section level1">
-<h1>Due Date: June 5, 2026</h1>
-<p><a href="https://canvas.northwestern.edu/courses/251621/assignments/1730807">Submit
+<div id="due-date-may-15-2026" class="section level1">
+<h1>Due Date: May 15, 2026</h1>
+<p><a href="https://canvas.northwestern.edu/courses/251621/assignments/1730778">Submit
 your lab here.</a></p>
-<div id="problem-1-double-selection-with-lasso" class="section level3">
-<h3>Problem 1: Double Selection with LASSO</h3>
-<p>Load King and Zeng’s dataset on possible predictors of state
-collapse, kingzeng.csv. The <a href="https://dataverse.harvard.edu/dataset.xhtml?persistentId=hdl:%201902.1/RPQIODIANR">website
-for these data</a> contains full files and a codebook.</p>
-<p>Your goal is to estimate the effect of democracy (or another binary
-treatment) on homicide rates. Use rlassoEffects from the hdm package to
-perform double selection: first, select controls predicting the outcome;
-second, select controls predicting the treatment. Report the final ATE
-estimate and standard error. List which variables were selected.</p>
+<div id="problem-1-regression-discontinuity-and-partisan-sheriffs" class="section level3">
+<h3>Problem 1: Regression Discontinuity and Partisan Sheriffs</h3>
+<p>Our <a href="https://doi.org/10.1017/S0003055419000613">original
+article</a> here is by Thompson.</p>
+<p>Use the <a href="https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/CFASH6">replication
+data</a>.</p>
+<p>Use rdrobust to estimate the incumbency advantage for sheriffs at the
+50% vote threshold. Report the conventional, bias‑corrected, and robust
+estimates. Plot the RD graph using rdplot.</p>
 </div>
-<div id="problem-2-causal-forest" class="section level3">
-<h3>Problem 2: Causal Forest</h3>
-<p>Use causal_forest from the grf package to estimate conditional
-average treatment effects (CATEs) for the same data. Plot the
-distribution of CATEs. Which variables appear most important for
-heterogeneity (use variable_importance)? Produce a violin plot of CATEs
-by a key covariate (e.g., region or income level).</p>
+<div id="problem-2-manipulation-test" class="section level3">
+<h3>Problem 2: Manipulation Test</h3>
+<p>Conduct a density test using rddensity. Is there evidence of sorting
+around the cutoff? Interpret the plot and p‑value.</p>
 </div>
-<div id="problem-3-compare-with-traditional-regression" class="section level3">
-<h3>Problem 3: Compare with Traditional Regression</h3>
-<p>Run a simple OLS regression of homicide on democracy, controlling for
-a few key variables (e.g., GDP, population). Compare the OLS estimate to
-the double‑selection and causal forest ATE (you can average the CATEs to
-get an ATE). Discuss possible reasons for differences.</p>
+<div id="problem-3-placebo-cutoffs" class="section level3">
+<h3>Problem 3: Placebo Cutoffs</h3>
+<p>Choose two placebo cutoffs (e.g., 0.4 and 0.6) and re‑run rdrobust.
+Do you find significant effects? What does this tell you about the
+validity of the design?</p>
 </div>
-<div id="problem-4-reflection" class="section level3">
-<h3>Problem 4: Reflection</h3>
-<p>In a paragraph, explain how the machine learning approaches differ
-from the regression methods used earlier in the course. What are the
-trade‑offs?</p>
+<div id="problem-4-covariate-balance" class="section level3">
+<h3>Problem 4: Covariate Balance</h3>
+<p>Test whether a pre‑treatment covariate (e.g., past election margin)
+is smooth at the cutoff using rdrobust with that covariate as the
+outcome. Report the result. If you find imbalance, what does that
+imply?</p>
 </div>
 </div>
 

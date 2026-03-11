@@ -25,7 +25,7 @@ set.seed(27)             # make random results reproducible
 
 # Due Date: April 24, 2026
 
-[Submit your lab here.](https://canvas.northwestern.edu/courses/230286/assignments/1562273)
+[Submit your lab here.](https://canvas.northwestern.edu/courses/251621/assignments/1730774)
 
 ### Problem 1: Bivariate Regression in R
 

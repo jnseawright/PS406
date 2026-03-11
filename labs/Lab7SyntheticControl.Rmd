@@ -23,9 +23,9 @@ library(tidyverse)       # load libraries you always use here
 set.seed(27)             # make random results reproducible
 ```
 
-# Due Date: May 23, 2026
+# Due Date: May 29, 2026
 
-[Submit your lab here.](https://canvas.northwestern.edu/courses/230286/assignments/1562447)
+[Submit your lab here.](https://canvas.northwestern.edu/courses/251621/assignments/1730805)
 
 ### Problem 1: Design a Synthetic Control Study
 Propose a synthetic control design to estimate the effect of Trump's 2016 election on US carbon emissions. Specify:
