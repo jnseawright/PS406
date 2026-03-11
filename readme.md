@@ -34,4 +34,5 @@
 
 ### Presenting an Estimator In Class
 
-* [Presenting an Estimator](https://canvas.northwestern.edu/courses/230286/assignments/1562510)
+* [Presentation Materials Submission](https://canvas.northwestern.edu/courses/251621/assignments/1730769)
+* [Presentation Signups *NOT YET ACTIVE*]()
