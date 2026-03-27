@@ -5,7 +5,7 @@ author:
 - |
   Jaye Seawright\
   j-seawright@northwestern.edu\
-  Office Hours: Mondays, 12-2pm
+  Office Hours: Mondays, 2-4pm
 title: Political Science 406, Spring 2025
 ---
 
@@ -136,6 +136,8 @@ A signup sheet for estimators will be distributed after the first class session,
 email, etc.) to plan your presentation. Please feel free to talk through drafts of your
 presentation and even to rehearse a version before the class arrives.
 
+Presentations will become part of our class time together; on weeks when we do not have presentations, advanced and cutting-edge material will be led by the professor and discussed by the group as a collective. No additional readings or special preparation are needed for these elements of the class.
+
 The presentation is graded as follows. An "outstanding" presentation
 includes all of the key elements listed above, is clear, professional,
 and helpful to the audience, has few if any mistakes (saying "I don't
@@ -181,7 +183,7 @@ be regraded.
 
 The third and final assessment is a mock grant proposal that features a
 research design that shows mastery of at least one cutting-edge
-quantitative causal inference estimator from this class. The proposal
+quantitative causal inference estimator from this class. The grant proposal is due on the last day of final's week. The proposal
 will be evaluated based on the criteria listed for the Northwestern
 Graduate School's Graduate Research Grant
 (<https://www.tgs.northwestern.edu/funding/fellowships-and-grants/internal-fellowships-grants/graduate-research-grant.html>),
@@ -206,14 +208,16 @@ Final grades will be determined based on the weighted components below.
 |----------|--------|-------|
 | Estimator Presentation | 25% | Graded Outstanding/Pass/Revisit |
 | Lab Assignments | 35% | Best 7 of 9 labs; graded Outstanding/Pass/Revisit |
-| Grant Proposal | 40% | Scored 0-5 using TGS criteria |
+| Grant Proposal | 40% | Scored 0-5 using TGS criteria, with a score of 4 receiving full credit and 5 getting modest extra credit |
 
 ### Grading Scale for Components
 
 **Labs and Presentation** are graded on an Outstanding/Pass/Revisit scale:
 
 - **Outstanding** work demonstrates mastery at a professional level and receives 100% credit.
-- **Pass** work shows clear understanding of core ideas with minor gaps and receives 85% credit.
+- **Pass** work shows clear understanding of core ideas with minor gaps and receives 90% credit.
+- **Marginal** work has strengths but also deep flaws or issues with preparation and receives 80% credit.
+- **Failed** work has more serious flaws and will receive a lower, individually appropriate grade.
 - **Revisit** work has fundamental misunderstandings and must be resubmitted within two weeks for credit.
 
 **The Grant Proposal** will be scored on a 0-5 scale by the instructor using the TGS Graduate Research Grant review criteria. A score of:
@@ -229,6 +233,10 @@ Final grades will be determined based on the weighted components below.
 - 1 represents work that does not meet basic requirements
 
 - 0 represents non-submission
+
+### Late Work
+
+Given the pace of this seminar, I will not accept late work (beyond a two-hour grace window) without prior agreement. If you miss a weekly lab, move on to the next. Falling behind tends to create bigger problems!
 
 ### Final Letter Grades
 
@@ -254,56 +262,13 @@ Final course letter grades will be assigned based on the weighted average of the
 
 - F = below 60
 
-## Academic Honesty
+## Northwestern University Syllabus Standards 
 
-Group work is encouraged for labs. Your in-class presentation and grant
-proposal must, of course, reflect your original work. Any quotations
-from other people's work must be fully cited and documented. The same is
-true for paraphrases or for statistics or facts that are not general
-knowledge. Please do not hesitate to ask for additional details if you
-are confused about this assignment. The WCAS policy on academic
-integrity reads:
-
-> In a scholarly community like Northwestern, academic integrity is of
-> the utmost importance. If you are guilty of dishonesty in academic
-> work, you may receive a failing grade in the course and be suspended
-> or permanently excluded from the University. The brochure \"Academic
-> Integrity at Northwestern: A Basic Guide\" details the types of
-> offenses that constitute academic dishonesty and contains a thorough
-> discussion of the proper citation of sources. You can get this
-> brochure at the Office of Undergraduate Studies and Advising. A
-> document on how instances of alleged academic dishonesty are handled
-> is available online. The Undergraduate Catalog contains a
-> non-exhaustive list of behaviors that violate standards of academic
-> integrity. These include: cheating, plagiarism, fabrication, obtaining
-> an unfair advantage, aiding and abetting dishonesty, falsification of
-> records and official documents, and unauthorized access to
-> computerized academic or administrative records or systems. Each of
-> these is described in more detail in the catalog. One important type
-> of academic dishonesty is plagiarism. Plagiarism includes more than
-> just copying someone else's work. Northwestern's "Principles Regarding
-> Academic Integrity" defines plagiarism as "submitting material that in
-> part or whole is not entirely one's own work without attributing those
-> same portions to their correct source." A Northwestern web page
-> provides links to additional information on academic integrity,
-> including information on relevant policies and on how to recognize and
-> avoid violations of academic integrity in your own work. More tips on
-> avoiding plagiarism are available from Northwestern's Writing Place.
-> Sometimes students think that another student has acted in a way that
-> is academically dishonest. In this situation you should consult with
-> the Weinberg College Adviser.
-
-This course's projects will be submitted electronically, via the
-course's Canvas page, rather than in printed form. As per university
-policy, all student work may by analyzed electronically for violations
-of the university's academic integrity policy and may also be included
-in a database for the purpose of testing for plagiarized content.
+This course follows the Northwestern University Syllabus Standards. Students are responsible for familiarizing themselves with this information. 
 
 # Course Schedule and Readings
 
-This schedule is subject to changes (minor or major) depending on how
-long each topic actually takes us to cover, as well as on the needs of
-the class. Slides and code for in-class discussion and examples are
+This schedule is subject to minor adjustments in pacing and some readings may be dropped or (in extreme cases) added depending on the needs of the class. Slides and code for in-class discussion and examples are
 available on the course github site
 (<https://github.com/jnseawright/PS406>).
 
@@ -311,7 +276,7 @@ Week 1: *Experiments.*
 
 -   Cunningham, Chapters 1, 3-4.
 
--   Huntington-Klein, Chapters 1-11.
+-   Huntington-Klein, Chapters 6, 7, and 10 (although everything up to Chapter 11 can be useful background to review at some point).
 
 Examples:
 
@@ -358,7 +323,7 @@ Examples:
 Week 3: *Natural Experiments: Conceptual Introduction.*
 
 -   Dunning, *Natural Experiments in the Social Sciences*, Chapters 5,
-    6, 8-10.
+    6, 8-10. *Note: these chapter are available in .pdf form on the canvas site.*
 
 Examples:
 
@@ -467,7 +432,7 @@ Week 8: *Machine Learning for Causal Inference.*
     and Brandon M. Stewart, 2018. "How to Make Causal Inferences Using
     Texts." <https://arxiv.org/abs/1802.02163>
 
--   Huntington-Klein, Chapter 19.
+-   Huntington-Klein, Chapter 22.
 
 Examples:
 
@@ -486,7 +451,7 @@ Examples:
 
 Week 9: *Selection and Missing Data.*
 
--   Morgan and Winship, Chapter 8.
+-   Morgan and Winship, Chapter 8. (This reading is available on the Canvas site in .pdf format.)
 
 -   Christopher Winship and Robert D. Mare, 1992, "Models for Sample
     Selection Bias," *Annual Review of Sociology*.
