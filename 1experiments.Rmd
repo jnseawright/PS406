@@ -457,7 +457,7 @@ library(ri2)
 
 emotions_declaration <- declare_ra(N = 450, m = 151)
 
-emotions_table <- data_frame(Z = peruemotions$simpletreat,
+emotions_table <- data.frame(Z = peruemotions$simpletreat,
                              Y = peruemotions$outsidervote)
 ```
 
@@ -478,6 +478,8 @@ ri2_emotionsresult
 
 ---
 ### Balance Testing
+
+A balance test is an analysis of the degree to which the distribution of side variables across treatment groups is near its expectation. It is a potentially useful test of the hypothesis that randomization has balanced variables across groups.
 
 ---
 ```{r, echo = TRUE, out.width="100%", fig.retina = 1}
@@ -543,9 +545,9 @@ bal.tab(peruemotionscovs, treat=peruemotions$simpletreat,
 
 ---
 
-```{r, eval=FALSE}
+```{r, eval=TRUE}
 library(AER)
-iv_model <- ivreg(Y ~ D + X | Z + X, data = mydata)
+iv_model <- ivreg(outsidervote ~ enojado + age + Cuzco | simpletreat + age + Cuzco, data = peruemotions)
 summary(iv_model)
 ```
 
@@ -866,7 +868,7 @@ effect <- pred_treated - pred_control
 effect_df <- data.frame(age = age_grid, effect = effect)
 
 ageeffect <- ggplot(effect_df, aes(x = age, y = effect)) +
-  geom_line(color = "darkred", size = 1.2) +
+  geom_line(color = "darkred", linewidth = 1.2) +
   geom_hline(yintercept = 0, linetype = "dashed") +
   labs(title = "Estimated Treatment Effect by Age (Loess)",
        x = "Age", y = "Treatment Effect on Outsider Vote") +

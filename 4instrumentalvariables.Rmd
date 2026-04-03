@@ -1,7 +1,7 @@
 ---
 title: "4: Instrumental Variables"
 subtitle: "Quantitative Causal Inference"
-author: "<large>J. Seawright</large>"
+author: "<large>Jaye Seawright</large>"
 institute: "<small>Northwestern Political Science</small>" 
 date: "April 23 and 28, 2026"
 output: 

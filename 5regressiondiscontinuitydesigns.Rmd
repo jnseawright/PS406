@@ -1,7 +1,7 @@
 ---
 title: "5: Regression Discontinuity Designs"
 subtitle: "Quantitative Causal Inference"
-author: "<large>J. Seawright</large>"
+author: "<large>Jaye Seawright</large>"
 institute: "<small>Northwestern Political Science</small>" 
 date: "April 30 and May 5, 2026"
 output: 

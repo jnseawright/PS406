@@ -331,7 +331,7 @@ plot( LupuPeisahkinDAG2 )
 
 ---
 
-*   Here, Victimization causes DeportationRegion and Dekulakized. How does this change the appropriate set of congrol variables?
+*   Here, Victimization causes DeportationRegion and Dekulakized. How does this change the appropriate set of control variables?
 
 ---
 ```{r, echo = TRUE, out.width="50%", fig.retina = 1}

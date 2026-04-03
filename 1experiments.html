@@ -3,7 +3,7 @@
   <head>
     <title>1: Potential Outcomes and Experiments</title>
     <meta charset="utf-8" />
-    <meta name="author" content="J. Seawright" />
+    <meta name="author" content="Jaye Seawright" />
     <script src="1experiments_files/header-attrs-2.30/header-attrs.js"></script>
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
   </head>
@@ -18,7 +18,7 @@ class: center, middle, inverse, title-slide
 ## Quantitative Causal Inference
 ]
 .author[
-### <large>J. Seawright</large>
+### <large>Jaye Seawright</large>
 ]
 .institute[
 ### <small>Northwestern Political Science</small>
@@ -531,7 +531,15 @@ library(ri2)
 ```
 
 ```
+## Warning: package 'ri2' was built under R version 4.5.3
+```
+
+```
 ## Loading required package: randomizr
+```
+
+```
+## Warning: package 'randomizr' was built under R version 4.5.3
 ```
 
 ```
@@ -541,16 +549,8 @@ library(ri2)
 ``` r
 emotions_declaration &lt;- declare_ra(N = 450, m = 151)
 
-emotions_table &lt;- data_frame(Z = peruemotions$simpletreat,
+emotions_table &lt;- data.frame(Z = peruemotions$simpletreat,
                              Y = peruemotions$outsidervote)
-```
-
-```
-## Warning: `data_frame()` was deprecated in tibble 1.1.0.
-## ℹ Please use `tibble()` instead.
-## This warning is displayed once per session.
-## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
-## generated.
 ```
 
 ---
@@ -578,10 +578,16 @@ ri2_emotionsresult
 ---
 ### Balance Testing
 
+A balance test is an analysis of the degree to which the distribution of side variables across treatment groups is near its expectation. It is a potentially useful test of the hypothesis that randomization has balanced variables across groups.
+
 ---
 
 ``` r
 library(cobalt)
+```
+
+```
+## Warning: package 'cobalt' was built under R version 4.5.3
 ```
 
 ```
@@ -691,8 +697,79 @@ bal.tab(peruemotionscovs, treat=peruemotions$simpletreat,
 
 ``` r
 library(AER)
-iv_model &lt;- ivreg(Y ~ D + X | Z + X, data = mydata)
+```
+
+```
+## Loading required package: car
+```
+
+```
+## Loading required package: carData
+```
+
+```
+## 
+## Attaching package: 'car'
+```
+
+```
+## The following object is masked from 'package:dplyr':
+## 
+##     recode
+```
+
+```
+## Loading required package: lmtest
+```
+
+```
+## Loading required package: zoo
+```
+
+```
+## 
+## Attaching package: 'zoo'
+```
+
+```
+## The following objects are masked from 'package:base':
+## 
+##     as.Date, as.Date.numeric
+```
+
+```
+## Loading required package: sandwich
+```
+
+```
+## Loading required package: survival
+```
+
+``` r
+iv_model &lt;- ivreg(outsidervote ~ enojado + age + Cuzco | simpletreat + age + Cuzco, data = peruemotions)
 summary(iv_model)
+```
+
+```
+## 
+## Call:
+## ivreg(formula = outsidervote ~ enojado + age + Cuzco | simpletreat + 
+##     age + Cuzco, data = peruemotions)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -2.0072 -0.3754 -0.3502  0.6301  0.6580 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)
+## (Intercept)  0.301540   0.189017   1.595    0.111
+## enojado      1.574324   0.959493   1.641    0.102
+## age          0.002736   0.003503   0.781    0.435
+## Cuzco       -0.019777   0.072614  -0.272    0.785
+## 
+## Residual standard error: 0.6454 on 434 degrees of freedom
+## Multiple R-Squared: -0.6561,	Adjusted R-squared: -0.6675 
+## Wald test: 1.323 on 3 and 434 DF,  p-value: 0.2663
 ```
 
 ---
@@ -828,6 +905,10 @@ These assumptions are often called **sequential ignorability** (Imai et al. 2010
 
 
 ```
+## Warning: package 'ggdag' was built under R version 4.5.3
+```
+
+```
 ## 
 ## Attaching package: 'ggdag'
 ```
@@ -888,6 +969,8 @@ Y_{i}(t',m) \perp\!\!\!\perp M_{i,t} \mid (W_{i} = t, X_{i} = x)
 **In words**:  
 Among units that received a particular treatment level `\(t\)`, the potential outcome (for any treatment `\(t'\)` and mediator value `\(m\)`) is independent of the actual mediator value, **given covariates**.
 
+---
+
 - This is the **strongest** assumption. It says there is no unmeasured variable that affects both the mediator and the outcome **after** treatment is assigned.
 - In the DAG, this means no arrow from an unmeasured `\(U\)` into both `\(M\)` and `\(Y\)`.
 - In the Peruvian example: we must believe that, among those who got the treatment (or control), their `risk` level is not correlated with `outsidervote` due to some omitted variable (e.g., personality, news exposure) – after adjusting for `Cuzco` and `age`.
@@ -924,6 +1007,10 @@ library(mediation)
 ```
 
 ```
+## Warning: package 'mediation' was built under R version 4.5.3
+```
+
+```
 ## Loading required package: MASS
 ```
 
@@ -947,6 +1034,10 @@ library(mediation)
 ```
 
 ```
+## Warning: package 'mvtnorm' was built under R version 4.5.3
+```
+
+```
 ## 
 ## Attaching package: 'mvtnorm'
 ```
@@ -955,10 +1046,6 @@ library(mediation)
 ## The following object is masked from 'package:jtools':
 ## 
 ##     standardize
-```
-
-```
-## Loading required package: sandwich
 ```
 
 ```
@@ -1056,6 +1143,12 @@ In the Peruvian emotions study:
 | **Interactions** (linear) | Simple, interpretable | Assumes linearity, limited to a few variables |
 | **Subgroup analysis** | Transparent, policy‑relevant | Multiple testing issues, low power |
 | **Non‑parametric smoothing** | Flexible, visual | Hard to quantify uncertainty |
+
+---
+### Approaches to Exploring Heterogeneity
+
+| Method | Strengths | Weaknesses |
+|--------|-----------|------------|
 | **Machine learning (CATE)** | Handles many variables, detects complex patterns | "Black box", requires large samples |
 | **Generic machine learning (Causal Forests, BART)** | Built‑in inference, variable importance | Computationally intensive |
 
@@ -1158,19 +1251,11 @@ effect &lt;- pred_treated - pred_control
 effect_df &lt;- data.frame(age = age_grid, effect = effect)
 
 ageeffect &lt;- ggplot(effect_df, aes(x = age, y = effect)) +
-  geom_line(color = "darkred", size = 1.2) +
+  geom_line(color = "darkred", linewidth = 1.2) +
   geom_hline(yintercept = 0, linetype = "dashed") +
   labs(title = "Estimated Treatment Effect by Age (Loess)",
        x = "Age", y = "Treatment Effect on Outsider Vote") +
   theme_minimal()
-```
-
-```
-## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
-## ℹ Please use `linewidth` instead.
-## This warning is displayed once per session.
-## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
-## generated.
 ```
 
 ---
@@ -1247,7 +1332,13 @@ subgroup_effects
 
 ``` r
 library(grf)
+```
 
+```
+## Warning: package 'grf' was built under R version 4.5.3
+```
+
+``` r
 # Prepare data
 X &lt;- peruemotions[, c("age", "Cuzco")]  # covariates
 W &lt;- peruemotions$simpletreat            # treatment
@@ -1287,6 +1378,9 @@ hist(cate$predictions, breaks = 30,
 ```
 
 ![](1experiments_files/figure-html/unnamed-chunk-26-1.png)&lt;!-- --&gt;
+---
+
+![](1experiments_files/figure-html/unnamed-chunk-27-1.png)&lt;!-- --&gt;
 
 ---
 ### Interpreting Causal Forest Output
@@ -1300,7 +1394,10 @@ barplot(t(var_imp), names.arg = colnames(X),
         ylab = "Importance")
 ```
 
-![](1experiments_files/figure-html/unnamed-chunk-27-1.png)&lt;!-- --&gt;
+![](1experiments_files/figure-html/unnamed-chunk-28-1.png)&lt;!-- --&gt;
+---
+
+![](1experiments_files/figure-html/unnamed-chunk-29-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -1413,16 +1510,19 @@ O'Muircheartaigh and Hedges propose:
 
 ---
 
-``` r
-library(devtools)
-```
+- The `generalize` package (Ackerman et al.) provides tools to:
+  1. **Assess** how well the sample represents the target population.
+  2. **Estimate** the PATE using weighting, post‑stratification, or matching.
 
-```
-## Loading required package: usethis
-```
+---
+### Installing and Loading the Package
+
 
 ``` r
-if (!require("generalize")) devtools::install_github('benjamin-ackerman/generalize')
+# Install from GitHub (if not already installed)
+if (!require("generalize")) {
+  devtools::install_github("benjamin-ackerman/generalize")
+}
 ```
 
 ```
@@ -1433,231 +1533,171 @@ if (!require("generalize")) devtools::install_github('benjamin-ackerman/generali
 library(generalize)
 ```
 
----
-
-<!DOCTYPE html><html><head><title>R: Assess Generalizability of Randomized Trial to Population</title>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.css">
-<script>
-const macros = { "\\R": "\\textsf{R}", "\\mbox": "\\text", "\\code": "\\texttt"};
-function processMathHTML() {
-    var l = document.getElementsByClassName('reqn');
-    for (let e of l) { katex.render(e.textContent, e, { throwOnError: false, macros }); }
-    return;
-}</script>
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.js"
-    onload="processMathHTML();"></script>
-<link rel="stylesheet" type="text/css" href="R.css">
-</head><body><div class="container"><main>
-
-<table style="width: 100%;"><tr><td>assess</td><td style="text-align: right;">R Documentation</td></tr></table>
-
-<h2>Assess Generalizability of Randomized Trial to Population</h2>
-
-<h3>Description</h3>
-
-<p>Assess Generalizability of Randomized Trial to Population
-</p>
-
-
-<h3>Usage</h3>
-
-<pre><code class='language-R'>assess(
-  trial,
-  selection_covariates,
-  data,
-  selection_method = "lr",
-  sl_library = NULL,
-  survey_weights = FALSE,
-  trim_weights = FALSE,
-  trim_pctile = 0.97,
-  is_data_disjoint = TRUE,
-  trimpop = FALSE,
-  seed
-)
-</code></pre>
-
-
-<h3>Arguments</h3>
-
-<table role = "presentation">
-<tr><td><code id="trial">trial</code></td>
-<td>
-<p>variable name denoting binary trial participation (1 = trial participant, 0 = not trial participant)</p>
-</td></tr>
-<tr><td><code id="selection_covariates">selection_covariates</code></td>
-<td>
-<p>vector of covariate names in data set that predict trial participation</p>
-</td></tr>
-<tr><td><code id="data">data</code></td>
-<td>
-<p>data frame comprised of &quot;stacked&quot; trial and target population data</p>
-</td></tr>
-<tr><td><code id="selection_method">selection_method</code></td>
-<td>
-<p>method to estimate the probability of trial participation.  Default is logistic regression (&quot;lr&quot;).  Other methods supported are Random Forests (&quot;rf&quot;) and Lasso (&quot;lasso&quot;)</p>
-</td></tr>
-<tr><td><code id="sl_library">sl_library</code></td>
-<td>
-<p>vector of SuperLearner library methods. If &lsquo;selection_method' = &rsquo;super', specify names of methods to include in library. Default is NULL.</p>
-</td></tr>
-<tr><td><code id="survey_weights">survey_weights</code></td>
-<td>
-<p>variable name of population data's complex survey weights. Default is FALSE: if FALSE, then population data do not come a complex survey and weights do not need to be incorporated in estimation.</p>
-</td></tr>
-<tr><td><code id="trim_weights">trim_weights</code></td>
-<td>
-<p>logical. If TRUE, then trim the weights to the value specified in 'trim_pctile'. Default is FALSE.</p>
-</td></tr>
-<tr><td><code id="trim_pctile">trim_pctile</code></td>
-<td>
-<p>numeric. If 'trim_weights' is TRUE, then specify what percentile weights should be trimmed to. Default is 0.97.</p>
-</td></tr>
-<tr><td><code id="is_data_disjoint">is_data_disjoint</code></td>
-<td>
-<p>logical. If TRUE, then trial and population data are considered independent.  This affects calculation of the weights - see details for more information.</p>
-</td></tr>
-<tr><td><code id="trimpop">trimpop</code></td>
-<td>
-<p>logical. If TRUE, then population data are subset to exclude individuals with covariates outside bounds of trial covariates.</p>
-</td></tr>
-<tr><td><code id="seed">seed</code></td>
-<td>
-<p>numeric. By default, the seed is set to 13783, otherwise can be specified (such as for simulation purposes).</p>
-</td></tr>
-</table>
-
-
-<h3>Value</h3>
-
-<p><code>assess</code> returns an object of the class &quot;generalize_assess&quot;
-</p>
-
-</main>
-
-</div>
-</body></html>
+- The package requires **covariate data** for the sample and either:
+  - Covariate data for a sample from the target population, or
+  - Known population totals (e.g., from census).
 
 ---
-<!DOCTYPE html><html><head><title>R: Generalize Average Treatment Effect from Randomized Trial to...</title>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.css">
-<script>
-const macros = { "\\R": "\\textsf{R}", "\\mbox": "\\text", "\\code": "\\texttt"};
-function processMathHTML() {
-    var l = document.getElementsByClassName('reqn');
-    for (let e of l) { katex.render(e.textContent, e, { throwOnError: false, macros }); }
-    return;
-}</script>
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.js"
-    onload="processMathHTML();"></script>
-<link rel="stylesheet" type="text/css" href="R.css">
-</head><body><div class="container"><main>
+### Setting Up the Peruvian Emotions Example
 
-<table style="width: 100%;"><tr><td>generalize</td><td style="text-align: right;">R Documentation</td></tr></table>
-
-<h2>Generalize Average Treatment Effect from Randomized Trial to Population</h2>
-
-<h3>Description</h3>
-
-<p>Generalize Average Treatment Effect from Randomized Trial to Population
-</p>
+We'll use the `peruemotions` data as our experimental sample.  
+We need a target population. For illustration, we'll create a hypothetical population that is older on average than the sample.
 
 
-<h3>Usage</h3>
+``` r
+# Create a sample dataframe (complete cases)
 
-<pre><code class='language-R'>generalize(
-  outcome,
-  treatment,
-  trial,
-  selection_covariates,
-  data,
-  method = "weighting",
-  selection_method = "lr",
-  sl_library = NULL,
-  survey_weights = FALSE,
-  trim_weights = FALSE,
-  trim_pctile = 0.97,
-  is_data_disjoint = TRUE,
-  trimpop = FALSE,
-  seed
-)
-</code></pre>
+smalldata &lt;- data.frame(simpletreat=peruemotions$simpletreat, outsidervote=peruemotions$outsidervote, age=peruemotions$age, Cuzco=peruemotions$Cuzco, inexperiment=1)
+sample_data &lt;- na.omit(smalldata)
 
+# Simulate a target population (e.g., from census)
+set.seed(2026)
+n_pop &lt;- 5000
+pop_age &lt;- rnorm(n_pop, mean = 50, sd = 15)  # older population
+pop_Cuzco &lt;- rbinom(n_pop, 1, 0.3)            # 30% from Cuzco
 
-<h3>Arguments</h3>
+#create an empty dataframe with the same structure as the sample data
+pop_data &lt;- sample_data[0,]
+for (i in 1:n_pop){
+  pop_data &lt;- add_row(pop_data, age = pop_age[i], Cuzco = pop_Cuzco[i], inexperiment = 0, simpletreat=NA, outsidervote=NA)
+}
 
-<table role = "presentation">
-<tr><td><code id="outcome">outcome</code></td>
-<td>
-<p>variable name denoting outcome</p>
-</td></tr>
-<tr><td><code id="treatment">treatment</code></td>
-<td>
-<p>variable name denoting binary treatment assignment (ok if only available in trial, not population)</p>
-</td></tr>
-<tr><td><code id="trial">trial</code></td>
-<td>
-<p>variable name denoting binary trial participation (1 = trial participant, 0 = not trial participant)</p>
-</td></tr>
-<tr><td><code id="selection_covariates">selection_covariates</code></td>
-<td>
-<p>vector of covariate names in data set that predict trial participation</p>
-</td></tr>
-<tr><td><code id="data">data</code></td>
-<td>
-<p>data frame comprised of &quot;stacked&quot; trial and target population data</p>
-</td></tr>
-<tr><td><code id="method">method</code></td>
-<td>
-<p>method to generalize average treatment effect to the target population.  Default is &quot;weighting&quot; (weighting by participation probability).  Other methods supported are &quot;BART&quot; (Bayesian Additive Regression Trees - NOT READY YET) and &quot;TMLE&quot; (Targeted Maximum Likelihood Estimation)</p>
-</td></tr>
-<tr><td><code id="selection_method">selection_method</code></td>
-<td>
-<p>method to estimate the probability of trial participation.  Default is logistic regression (&quot;lr&quot;).  Other methods supported are Random Forests (&quot;rf&quot;) and Lasso (&quot;lasso&quot;)</p>
-</td></tr>
-<tr><td><code id="sl_library">sl_library</code></td>
-<td>
-<p>vector of SuperLearner library methods. If &lsquo;selection_method' = &rsquo;super', specify names of methods to include in library. Default is NULL.</p>
-</td></tr>
-<tr><td><code id="survey_weights">survey_weights</code></td>
-<td>
-<p>variable name of population data's complex survey weights. Default is FALSE: if FALSE, then population data do not come a complex survey and weights do not need to be incorporated in estimation.</p>
-</td></tr>
-<tr><td><code id="trim_weights">trim_weights</code></td>
-<td>
-<p>logical. If TRUE, then trim the weights to the value specified in 'trim_pctile'. Default is FALSE.</p>
-</td></tr>
-<tr><td><code id="trim_pctile">trim_pctile</code></td>
-<td>
-<p>numeric. If 'trim_weights' is TRUE, then specify what percentile weights should be trimmed to. Default is 0.97.</p>
-</td></tr>
-<tr><td><code id="is_data_disjoint">is_data_disjoint</code></td>
-<td>
-<p>logical. If TRUE, then trial and population data are considered independent.  This affects calculation of the weights - see details for more information.</p>
-</td></tr>
-<tr><td><code id="trimpop">trimpop</code></td>
-<td>
-<p>logical. If TRUE, then population data are subset to exclude individuals with covariates outside bounds of trial covariates.</p>
-</td></tr>
-<tr><td><code id="seed">seed</code></td>
-<td>
-<p>numeric. By default, the seed is set to 13783, otherwise can be specified (such as for simulation purposes).</p>
-</td></tr>
-</table>
+combined_data &lt;- rbind(sample_data, pop_data)
+```
+
+---
+### Assessing Sample Representativeness with `assess()`
+
+- `assess()` compares the distribution of covariates in the sample to the target population.
+- It returns **standardized mean differences** (SMD) for each covariate.
 
 
-<h3>Value</h3>
+``` r
+# Assess using stacked data, our covariates, and the variable indicating which sample is which
+assess_obj &lt;- assess("inexperiment", c("age","Cuzco"), combined_data)
+```
 
-<p><code>generalize</code> returns an object of the class &quot;generalize&quot;
-</p>
+```
+## Warning: `funs()` was deprecated in dplyr 0.8.0.
+## ℹ Please use a list of either functions or lambdas:
+## 
+## # Simple named list: list(mean = mean, median = median)
+## 
+## # Auto named with `tibble::lst()`: tibble::lst(mean, median)
+## 
+## # Using lambdas list(~ mean(., trim = .2), ~ median(., na.rm = TRUE))
+## ℹ The deprecated feature was likely used in the generalize package.
+##   Please report the issue to the authors.
+## This warning is displayed once per session.
+## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+## generated.
+```
 
-</main>
+``` r
+summary(assess_obj)
+```
 
-</div>
-</body></html>
+```
+## Probability of Trial Participation: 
+##  
+## Selection Model: inexperiment ~ age + Cuzco 
+##  
+##                               Min.    1st Qu.     Median       Mean    3rd Qu.
+## Trial (n = 438)       0.0013215221 0.10998474 0.26400056 0.21690113 0.30466234
+## Population (n = 5000) 0.0001077219 0.01175172 0.03086079 0.06859946 0.07970334
+##                            Max.
+## Trial (n = 438)       0.3798418
+## Population (n = 5000) 0.8795315
+## 
+## Estimated by Logistic Regression
+## Generalizability Index: 0.736
+## ============================================ 
+## Covariate Distributions: 
+##  
+##         trial population  ASMD
+## age   31.1324    49.8792 1.639
+## Cuzco  0.3379     0.3000 0.080
+```
+
+- SMD &gt; 0.1 or 0.25 indicates potential imbalance.
+
+---
+### Interpreting the Assessment
+
+- **Age** is reasonably imbalanced (SMD = 1.64) – the sample is younger than the population.
+- **Cuzco** is not really imbalanced.
+- This suggests the SATE may not equal the PATE; we need to adjust.
+
+---
+### Estimating the PATE with `generalize()`
+
+- `generalize()` estimates the population treatment effect using one of several methods:
+  - `method = "weighting"` (inverse probability of sampling weights)
+  - `method = "poststratification"`
+  - `method = "matching"`
+
+---
+
+- Basic syntax:
+  `generalize(Y, Tr, trial, covariates, data, method = "weighting", selection_method = "lr")`
+
+- `method` can be `"weighting"` (default) or `"TMLE"`.
+
+- `selection_method` can be `"lr"` (default), `"rf"` or `"lasso"`.
+
+---
+
+
+``` r
+# Weighting estimator
+gen_weight &lt;- generalize("outsidervote", "simpletreat", "inexperiment", 
+                         c("age", "Cuzco"), combined_data,
+                         method = "weighting", selection_method = "lr")
+```
+
+```
+## Waiting for profiling to be done...
+## Waiting for profiling to be done...
+```
+
+``` r
+summary(gen_weight)
+```
+
+```
+## Average Treatment Effect Estimates: 
+##  
+## Outcome Model: outsidervote ~ simpletreat 
+##  
+##      Estimate Std. Error 95% CI Lower 95% CI Upper
+## SATE 1.515537         NA    1.0145212     2.274963
+## TATE 1.352015         NA    0.3340785     5.471600
+## 
+## ============================================ 
+## TATE estimated by Weighting
+## Weights estimated by Logistic Regression
+## 
+## Trial sample size: 438
+## Population size: 5000
+## 
+## Generalizability Index: 0.736
+## 
+## Covariate Distributions after Weighting: 
+##  
+##       trial (weighted) population  ASMD
+## age            55.9715    49.8792 0.344
+## Cuzco           0.2712     0.3000 0.064
+```
+
+---
+### Key Assumptions for Generalization
+
+1. **Selection on observables**: Sample selection into the experiment is ignorable given covariates.
+2. **Overlap**: Every combination of covariates in the population has some representation in the sample.
+3. **Correct specification**: The weighting/post‑stratification model is correct.
+4. **SUTVA** still holds within the sample.
+
+These assumptions are analogous to those for causal inference, but now applied to sampling.
 
 ---
 &lt;img src="images/Bush1.png" width="90%" /&gt;

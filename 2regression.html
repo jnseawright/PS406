@@ -91,6 +91,11 @@ For every value of \(X\), there must be both treated and control units.
 ---
 ### Visualizing Confounding with DAGs
 
+
+```
+## Warning: package 'dagitty' was built under R version 4.5.3
+```
+
 ![](2regression_files/figure-html/confounder_dag-1.png)&lt;!-- --&gt;
 
 ---
@@ -281,7 +286,7 @@ plot( LupuPeisahkinDAG2 )
 
 ---
 
-*   Here, Victimization causes DeportationRegion and Dekulakized. How does this change the appropriate set of congrol variables?
+*   Here, Victimization causes DeportationRegion and Dekulakized. How does this change the appropriate set of control variables?
 
 ---
 
@@ -334,6 +339,10 @@ Are presidential regimes especially vulnerable to democratic backsliding? Let's 
 
 ---
 
+
+```
+## Warning: package 'ggdag' was built under R version 4.5.3
+```
 
 ```
 ## 
@@ -681,7 +690,13 @@ If there is causal heterogeneity, the OLS weights are a biased estimator of ATE,
 
 ``` r
 library(lmw)
+```
 
+```
+## Warning: package 'lmw' was built under R version 4.5.3
+```
+
+``` r
 qog2000demsin2020clean &lt;- qog2000demsin2020 %&gt;% filter(!is.na(br_pres) &amp; !is.na(ccp_systyear) &amp; 
                                                          !is.na(ht_colonial) &amp; !is.na(br_pvote))
 ```
