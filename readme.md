@@ -35,7 +35,7 @@
 ### Presenting an Estimator In Class
 
 * [Presentation Materials Submission](https://canvas.northwestern.edu/courses/251621/assignments/1730769)
-* [Presentation Signups *NOT YET ACTIVE*]()
+* [Presentation Signups](https://jnseawright.github.io/PS406/presentation_signups.html)
 
 ### Gradebook
 
