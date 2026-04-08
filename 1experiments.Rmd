@@ -45,6 +45,9 @@ BibOptions(check.entries = FALSE,
 # bibliography.
 
 peruemotions <- read.csv("https://raw.githubusercontent.com/jnseawright/PS406/main/data/peruemotions.csv")
+
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+
 ```
 ```{r xaringan-themer, include=FALSE, warning=FALSE}
 library(xaringanthemer,MnSymbol)
@@ -56,6 +59,7 @@ style_mono_accent(
   text_font_size = "1.6rem"
 )
 ```
+
 ---
 ### Business
 
@@ -287,43 +291,6 @@ summ(lm(outsidervote ~ simpletreat, data=peruemotions))
 What do we need to assume in order to get a causal inference here?
 
 ---
-### Randomization Inference
-
--   It is clearly important to test the null hypothesis that
-    $E(y_{i,t}) = E(y_{i,c})$ for all $i$.
-
--   If this hypothesis is true, then every case's treatment assignment
-    is unrelated to its outcome.
-
--   Thus, under the null hypothesis, it is fine for us to reassign
-    treatment at random --- the outcome won't change.
-
----
-### Randomization Inference
-
--   Randomization inference involves:
-
-    1.  Randomly reordering the treatment condition vector
-
-    2.  Calculating the difference between the treatment and control
-        group for the new (artificial) treatment condition vector
-
-    3.  Storing the result somewhere
-
-    4.  Repeating the whole process hundreds or thousands of times.
-
----
-### Randomization Inference
-
--   If the null hypothesis is true, then the distribution of simulated
-    differences in means is the sampling distribution from which the
-    real difference in means was drawn.
-
--   Therefore, a good $P$ value for our observed difference in means is
-    the proportion of simulated differences in means that are at least
-    as far from 0 as the real number.
-
----
 ### Assumptions
 
 When analyzing an experiment using randomization inference, we do *not*
@@ -394,11 +361,14 @@ If SUTVA is violated:
 ### Experimental Realism
 
 **Definition**:  
-The extent to which the treatment in an experiment **mirrors the real‑world intervention** it is meant to represent.
+The extent to which the treatment in an experiment **actually engages the attention and participation of the subjects** it is meant to represent.
 
-Also called **psychological realism** or **mundane realism** (though these have slightly different connotations).
+Also related to **psychological realism** (which adds the criterion that decisions need to be taken using the same psychological rules and processes as in the relevant real world situations) or **mundane realism** (which adds an idea of the situation generally feeling realistic).
 
-**Key question**: Does the experience of treatment in the lab correspond to how the intervention would be experienced in the real world?
+---
+### Realism
+
+**Key question**: Does the experience of treatment in the lab correspond to how the theoretically meaningful parts of how the intervention would be experienced in the real world?
 
 ---
 ### Experimental Realism vs. Internal Validity
@@ -409,9 +379,9 @@ Also called **psychological realism** or **mundane realism** (though these have 
   - **Experimental realism**: Questionable – In the real world, people watch ads while distracted, with friends, during commercial breaks, etc.
 
 ---
-### Why Experimental Realism Matters
+### Why Realism Matters
 
-If experimental realism is low:
+If realism is low:
 
 - The treatment may not engage the same psychological processes as the real intervention.
 - Effect sizes may be attenuated or inflated compared to real‑world settings.
@@ -422,7 +392,7 @@ If experimental realism is low:
 **Example**: A lab study on voter mobilization finds that showing people a 5‑minute video about civic duty increases turnout by 10 percentage points. But in the real world, people don't watch such videos – they get mailers, phone calls, or door knocks. The lab treatment lacks realism, so the effect may not generalize.
 
 ---
-### Assessing Experimental Realism in Your Study
+### Assessing Realism in Your Study
 
 Ask these questions:
 
@@ -433,7 +403,7 @@ Ask these questions:
    - Manipulation checks can help assess this.
 
 ---
-### Assessing Experimental Realism in Your Study
+### Assessing Realism in Your Study
 
 
 3\. **Are there artificial constraints that don't exist in the real world?**
@@ -443,13 +413,66 @@ Ask these questions:
    - In the Peruvian study: Does watching emotion‑inducing videos in a lab capture how emotions from real political events affect voting?
 
 ---
-### Practical Tips for Enhancing Experimental Realism
+### Practical Tips for Enhancing Realism
 
 - Use realistic materials (actual news clips, real campaign mailers).
 - Create naturalistic settings (online studies, field experiments).
 - Allow for distraction or delay (don't measure outcomes immediately).
 - Consider **field experiments** as the gold standard for realism.
 - Acknowledge limitations and discuss how they might affect generalizability.
+
+
+---
+### Balance Testing
+
+A balance test is an analysis of the degree to which the distribution of side variables across treatment groups is near its expectation. It is a potentially useful test of the hypothesis that randomization has balanced variables across groups.
+
+---
+```{r, echo = TRUE, out.width="100%", fig.retina = 1}
+
+library(cobalt)
+peruemotionscovs <- subset(peruemotions, select = c(Cuzco, age))
+bal.tab(peruemotionscovs, treat=peruemotions$simpletreat, 
+        thresholds = c(m = .1, v = 2))
+```
+
+---
+### Randomization Inference
+
+-   It is clearly important to test the null hypothesis that
+    $E(y_{i,t}) = E(y_{i,c})$ for all $i$.
+
+-   If this hypothesis is true, then every case's treatment assignment
+    is unrelated to its outcome.
+
+-   Thus, under the null hypothesis, it is fine for us to reassign
+    treatment at random --- the outcome won't change.
+
+---
+### Randomization Inference
+
+-   Randomization inference involves:
+
+    1.  Randomly reordering the treatment condition vector
+
+    2.  Calculating the difference between the treatment and control
+        group for the new (artificial) treatment condition vector
+
+    3.  Storing the result somewhere
+
+    4.  Repeating the whole process hundreds or thousands of times.
+
+---
+### Randomization Inference
+
+-   If the null hypothesis is true, then the distribution of simulated
+    differences in means is the sampling distribution from which the
+    real difference in means was drawn.
+
+-   Therefore, a good $P$ value for our observed difference in means is
+    the proportion of simulated differences in means that are at least
+    as far from 0 as the real number.
+
 
 ---
 ```{r, echo = TRUE, out.width="100%", fig.retina = 1}
@@ -476,131 +499,6 @@ ri2_emotionsresult <- conduct_ri(
 ri2_emotionsresult
 ```
 
----
-### Balance Testing
-
-A balance test is an analysis of the degree to which the distribution of side variables across treatment groups is near its expectation. It is a potentially useful test of the hypothesis that randomization has balanced variables across groups.
-
----
-```{r, echo = TRUE, out.width="100%", fig.retina = 1}
-
-library(cobalt)
-peruemotionscovs <- subset(peruemotions, select = c(Cuzco, age))
-bal.tab(peruemotionscovs, treat=peruemotions$simpletreat, 
-        thresholds = c(m = .1, v = 2))
-```
-
----
-### Encouragement Designs: Motivation
-
-- In many real‑world settings, we **cannot force** units to take the treatment.
-  - Example: a get‑out‑the‑vote drive can mail reminders, but cannot compel voting.
-- Random assignment of *encouragement* to take the treatment is still possible.
-  - Encouragement might be a mailer, a financial incentive, a reminder, etc.
-- This creates a situation with **noncompliance**:
-  - Some encouraged units will not take treatment (never‑takers).
-  - Some not encouraged may take treatment anyway (always‑takers).
-
----
-### Key Quantities in Encouragement Designs
-
-- **Intention‑to‑treat (ITT) effect**  
-  $$ \text{ITT} = E[Y_i | Z_i = 1] - E[Y_i | Z_i = 0] $$
-  where $Z_i$ is the random encouragement assignment.
-
----
-### Key Quantities in Encouragement Designs
-
-- **Complier Average Causal Effect (CACE)** / **Local Average Treatment Effect (LATE)**  
-  The average treatment effect for the subpopulation of *compliers* – those who take treatment if and only if encouraged.
-
-- In ideal situations (exclusion restriction, monotonicity, etc.),  
-  $$ \text{CACE} = \frac{\text{ITT}}{\text{ITT on treatment uptake}} $$
-
----
-### Example: GOTV Experiment
-
-- Units: registered voters.
-- $Z_i = 1$: received a mailer encouraging them to vote; $Z_i = 0$: no mailer.
-- $D_i = 1$: actually voted; $D_i = 0$: did not vote.
-- Outcome $Y_i$: some subsequent political behavior (e.g., turnout in next election).
-
----
-### Example: GOTV Experiment
-
-- **ITT** = difference in mean $Y$ between those mailed and those not.
-- **First stage** = difference in voting rates between those mailed and those not.
-- CACE = ITT / first stage (if no always‑takers and exclusion holds).
-
----
-### Estimation via Instrumental Variables
-
-- The encouragement $Z$ is an **instrument** for the treatment $D$.
-- Two‑stage least squares (2SLS) is commonly used:
-
-  1. Regress $D$ on $Z$ (and covariates) → predicted $\hat{D}$.
-  2. Regress $Y$ on $\hat{D}$ (and covariates).
-
-- We will talk about these estimators in weeks 3 and 4, but you can implement them in R using the `AER` package or `fixest`.
-
----
-
-```{r, eval=TRUE}
-library(AER)
-iv_model <- ivreg(outsidervote ~ enojado + age + Cuzco | simpletreat + age + Cuzco, data = peruemotions)
-summary(iv_model)
-```
-
----
-
-- Key identifying assumptions:
-  - Relevance: $Z$ predicts $D$.
-  - Exclusion restriction: $Z$ affects $Y$ only through $D$.
-  - Monotonicity (no defiers).
-  - Independence of instrument.
-
----
-### Assumptions in Plain Language
-
-- **Relevance**: The encouragement actually changes behavior.
-- **Exclusion**: No direct effect of encouragement on outcome (only via treatment).
-- **Monotonicity**: No one does the opposite of their encouragement (no defiers).
-- **Independence**: Random assignment ensures $Z$ is as good as randomized.
-
-These assumptions are **untestable** in most cases, so sensitivity analysis is advised.
-
----
-### Regression in Experiments
-
-Recall that $W_{i}$ as an indicator of treatment assignment in an
-experiment. A bivariate regression predicting the dependent variable based on $W$
-is algebraically the same as the difference in means we've looked at above, so it 
-is necessarily an okay causal inference.
-
----
-### Regression in Experiments
-
-Multivariate regression for experiments is *not* guaranteed to be
-unbiased in the way that bivariate regression is. Multivariate
-regression can be (even very badly) biased if:
-
-1.  Some control variable included in the model is caused by the
-    treatment, or
-
-2.  The causal effect of interest is very heterogeneous across cases and
-    the total number of cases is small
-    
----
-```{r, echo = TRUE, out.width="100%", fig.retina = 1}
-summary(lm(outsidervote ~ simpletreat, data=peruemotions))
-
-```
-
----
-```{r, echo = TRUE, out.width="90%", fig.retina = 1}
-summary(lm(outsidervote ~ simpletreat + risk, data=peruemotions))
-
-```
 ---
 ### Causal Mediation
 
@@ -769,26 +667,6 @@ perumedsens.out <- medsens(perumed.out, rho.by = 0.1, effect.type = "indirect", 
 plot(perumedsens.out)
 ```
 
----
-### Heterogeneous Treatment Effects: Why They Matter
-
-- The average treatment effect (ATE) tells us the **average** impact, but hides variation across individuals.
-- **Heterogeneous treatment effects** (HTEs) occur when the treatment effect differs across subgroups defined by observable characteristics or by unobserved latent traits.
-
----
-### From ATE to HTE: Key Questions
-
-Instead of asking only *"What is the average effect?"*, we ask:
-
-- Does the effect vary by **baseline characteristics** (age, gender, prior attitudes)?
-- Does it vary by **context** (region, time, setting)?
-- Can we identify **who responds** and **who does not**?
-
----
-
-In the Peruvian emotions study:
-- Does the emotion induction affect outsider voting differently for younger vs. older voters?
-- Are there unobserved types (e.g., emotionally responsive vs. unresponsive) that matter?
 
 ---
 ### Approaches to Exploring Heterogeneity
@@ -1016,7 +894,112 @@ barplot(t(var_imp), names.arg = colnames(X),
 - Subgroup analysis supports this inference.
 - Causal forests confirm the relative importance of age.
 
-**Key takeaway**: The ATE of ~0.07 masks potentially important variation. Understanding this variation could inform theory and targeting.
+**Key takeaway**: The ATE of ~0.12 masks potentially important variation. Understanding this variation could inform theory and targeting.
+
+
+---
+### Encouragement Designs: Motivation
+
+- In many real‑world settings, we **cannot force** units to take the treatment.
+  - Example: a get‑out‑the‑vote drive can mail reminders, but cannot compel voting.
+- Random assignment of *encouragement* to take the treatment is still possible.
+  - Encouragement might be a mailer, a financial incentive, a reminder, etc.
+- This creates a situation with **noncompliance**:
+  - Some encouraged units will not take treatment (never‑takers).
+  - Some not encouraged may take treatment anyway (always‑takers).
+
+---
+### Key Quantities in Encouragement Designs
+
+- **Intention‑to‑treat (ITT) effect**  
+  $$ \text{ITT} = E[Y_i | Z_i = 1] - E[Y_i | Z_i = 0] $$
+  where $Z_i$ is the random encouragement assignment.
+
+---
+### Key Quantities in Encouragement Designs
+
+- **Complier Average Causal Effect (CACE)** / **Local Average Treatment Effect (LATE)**  
+  The average treatment effect for the subpopulation of *compliers* – those who take treatment if and only if encouraged.
+
+- In ideal situations (exclusion restriction, monotonicity, etc.),  
+  $$ \text{CACE} = \frac{\text{ITT}}{\text{ITT on treatment uptake}} $$
+
+---
+### Example: GOTV Experiment
+
+- Units: registered voters.
+- $Z_i = 1$: received a mailer encouraging them to vote; $Z_i = 0$: no mailer.
+- $D_i = 1$: actually voted; $D_i = 0$: did not vote.
+- Outcome $Y_i$: some subsequent political behavior (e.g., turnout in next election).
+
+---
+### Example: GOTV Experiment
+
+- **ITT** = difference in mean $Y$ between those mailed and those not.
+- **First stage** = difference in voting rates between those mailed and those not.
+- CACE = ITT / first stage (if no always‑takers and exclusion holds).
+
+---
+### Estimation via Instrumental Variables
+
+- The encouragement $Z$ is an **instrument** for the treatment $D$.
+- Two‑stage least squares (2SLS) is commonly used:
+
+  1. Regress $D$ on $Z$ (and covariates) → predicted $\hat{D}$.
+  2. Regress $Y$ on $\hat{D}$ (and covariates).
+
+- We will talk about these estimators in weeks 3 and 4, but you can implement them in R using the `AER` package or `fixest`.
+
+---
+
+```{r, eval=TRUE}
+library(AER)
+iv_model <- ivreg(outsidervote ~ enojado + age + Cuzco | simpletreat + age + Cuzco, data = peruemotions)
+summary(iv_model)
+```
+
+---
+
+- Key identifying assumptions:
+  - Relevance: $Z$ predicts $D$.
+  - Exclusion restriction: $Z$ affects $Y$ only through $D$.
+  - Monotonicity (no defiers).
+  - Independence of instrument.
+
+---
+### Assumptions in Plain Language
+
+- **Relevance**: The encouragement actually changes behavior.
+- **Exclusion**: No direct effect of encouragement on outcome (only via treatment).
+- **Monotonicity**: No one does the opposite of their encouragement (no defiers).
+- **Independence**: Random assignment ensures $Z$ is as good as randomized.
+
+These assumptions are **untestable** in most cases, so sensitivity analysis is advised.
+
+
+---
+### Heterogeneous Treatment Effects: Why They Matter
+
+- The average treatment effect (ATE) tells us the **average** impact, but hides variation across individuals.
+- **Heterogeneous treatment effects** (HTEs) occur when the treatment effect differs across subgroups defined by observable characteristics or by unobserved latent traits.
+
+---
+### From ATE to HTE: Key Questions
+
+Instead of asking only *"What is the average effect?"*, we ask:
+
+- Does the effect vary by **baseline characteristics** (age, gender, prior attitudes)?
+- Does it vary by **context** (region, time, setting)?
+- Can we identify **who responds** and **who does not**?
+
+---
+
+In the Peruvian emotions study:
+- Does the emotion induction affect outsider voting differently for younger vs. older voters?
+- Are there unobserved types (e.g., emotionally responsive vs. unresponsive) that matter?
+
+---
+### APPENDIX: Optional Materials
 
 ---
 ### Next Steps: From Heterogeneity to Population Inference
