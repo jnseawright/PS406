@@ -465,6 +465,7 @@ df_colorado %&gt;% ggplot(aes(x = days_04, y = voted08, color = voted04)) +
 
 ![](5regressiondiscontinuitydesigns_files/figure-html/fuzzy_graph-1.png)&lt;!-- --&gt;
 
+---
 
 
 ``` r
@@ -473,8 +474,8 @@ df_colorado$voted08_meandev &lt;- df_colorado$voted08 - mean(df_colorado$voted08
 df_colorado$voted04_meandev &lt;- df_colorado$voted04 - mean(df_colorado$voted04)
 
 
-with(df_colorado, rdrobust(y = voted08_meandev, x = voted04_meandev,
-         c = 0, fuzzy = days_04)) %&gt;%
+with(df_colorado, rdrobust(y = voted08_meandev, x = days_04,
+         c = 0, fuzzy = voted04_meandev)) %&gt;%
   summary()
 ```
 
@@ -486,14 +487,14 @@ with(df_colorado, rdrobust(y = voted08_meandev, x = voted04_meandev,
 ## Kernel                   Triangular
 ## VCE method                       NN
 ## 
-## Number of Obs.                 2424         5534
-## Eff. Number of Obs.             586         2124
+## Number of Obs.                 6145         1813
+## Eff. Number of Obs.             375          376
 ## Order est. (p)                    1            1
 ## Order bias  (q)                   2            2
-## BW est. (h)                  13.318       13.318
-## BW bias (b)                  18.708       18.708
-## rho (h/b)                     0.712        0.712
-## Unique Obs.                      25           74
+## BW est. (h)                 375.858      375.858
+## BW bias (b)                 571.274      571.274
+## rho (h/b)                     0.658        0.658
+## Unique Obs.                    6145         1813
 ## 
 ## First-stage estimates.
 ## 
@@ -501,7 +502,7 @@ with(df_colorado, rdrobust(y = voted08_meandev, x = voted04_meandev,
 ##                    Point    Robust Inference
 ##                 Estimate         z     P&gt;|z|      [ 95% C.I. ]       
 ## =====================================================================
-##      Rd Effect  -167.963    -1.479     0.139  [-555.248 , 77.578]    
+##      Rd Effect   -68.471   -35.466     0.000   [-71.261 , -63.797]   
 ## =====================================================================
 ## 
 ## Treatment effect estimates.
@@ -510,7 +511,7 @@ with(df_colorado, rdrobust(y = voted08_meandev, x = voted04_meandev,
 ##                    Point    Robust Inference
 ##                 Estimate         z     P&gt;|z|      [ 95% C.I. ]       
 ## ---------------------------------------------------------------------
-##      RD Effect     0.008     0.457     0.648    [-0.017 , 0.027]     
+##      RD Effect     0.174     6.429     0.000     [0.151 , 0.284]     
 ## =====================================================================
 ```
 
@@ -1234,7 +1235,7 @@ results &lt;- data.frame(mult = mult, est = NA, ci_low = NA, ci_high = NA)
 for (i in seq_along(mult)) {
   rd_tmp &lt;- rdrobust(lmb_data$score, lmb_data$lagdemvoteshare, c = 0.5, 
                      h = bw_opt * mult[i])
-  results[i, "est"] &lt;- rd_tmp$Estimate[1]   # robust estimate
+  results[i, "est"] &lt;- rd_tmp$Estimate[2]   # robust estimate
   results[i, "ci_low"] &lt;- rd_tmp$ci[3, 1]
   results[i, "ci_high"] &lt;- rd_tmp$ci[3, 2]
 }

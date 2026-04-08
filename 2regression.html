@@ -34,7 +34,6 @@ class: center, middle
 
 
 
----
 ### Why Regression? From Experiments to Observational Studies
 
 - In an experiment, random assignment ensures that treatment is independent of potential outcomes.
@@ -74,9 +73,9 @@ coef(lm_adjusted)["TrumpShare"]
 ### When Does This Work? The Key Assumption
 
 **Unconfoundedness (selection on observables)**  
-\[
-D_i \perp (Y_i(0), Y_i(1)) \mid X_i
-\]
+
+`$$D_i \perp\!\!\!\perp (Y_i(0), Y_i(1)) \mid X_i$$`
+
 
 ---
 
@@ -86,23 +85,18 @@ D_i \perp (Y_i(0), Y_i(1)) \mid X_i
 ---
 
 **Overlap / Common Support**  
-For every value of \(X\), there must be both treated and control units.
+For every combination of values of \(X\), there must be both treated and control units.
 
 ---
 ### Visualizing Confounding with DAGs
-
-
-```
-## Warning: package 'dagitty' was built under R version 4.5.3
-```
 
 ![](2regression_files/figure-html/confounder_dag-1.png)&lt;!-- --&gt;
 
 ---
 
 - \(X\) is a confounder: it affects both treatment \(D\) and outcome \(Y\).
-- Controlling for \(X\) blocks the backdoor path \(D \leftarrow X \rightarrow Y\).
-- This gives us the causal effect of \(D\) on \(Y\).
+- Controlling for \(X\) blocks the backdoor path `\(D \leftarrow X \rightarrow Y\)`.
+- This gives us the causal effect of `\(D\)` on `\(Y\)`.
 
 
 ---
@@ -166,7 +160,7 @@ In the Peru study, if `enojado` (anger) is a mediator, we should **not** control
 
 ---
 
-Example: if we control for a variable that is itself affected by treatment and outcome (e.g., turnout in 2020 in the terrorism example), we can introduce bias.
+- Example: if we control for a variable that is itself affected by treatment and outcome (e.g., turnout in 2020 in the terrorism example), we can introduce bias.
 
 ---
 ### Bad Controls: Post‑Treatment Variables
@@ -253,10 +247,6 @@ LupuPeisahkinDAG1 &lt;- dagitty( "dag {Dekulakized -&gt; Victimization PreSoviet
 plot( LupuPeisahkinDAG1 )
 ```
 
-```
-## Plot coordinates for graph not supplied! Generating coordinates, see ?coordinates for how to set your own.
-```
-
 &lt;img src="2regression_files/figure-html/unnamed-chunk-8-1.png" width="50%" /&gt;
 
 
@@ -276,10 +266,6 @@ LupuPeisahkinDAG2 &lt;- dagitty( "dag {Dekulakized &lt;- Victimization PreSoviet
 
 ``` r
 plot( LupuPeisahkinDAG2 )
-```
-
-```
-## Plot coordinates for graph not supplied! Generating coordinates, see ?coordinates for how to set your own.
 ```
 
 &lt;img src="2regression_files/figure-html/unnamed-chunk-10-1.png" width="50%" /&gt;
@@ -339,22 +325,6 @@ Are presidential regimes especially vulnerable to democratic backsliding? Let's 
 
 ---
 
-
-```
-## Warning: package 'ggdag' was built under R version 4.5.3
-```
-
-```
-## 
-## Attaching package: 'ggdag'
-```
-
-```
-## The following object is masked from 'package:stats':
-## 
-##     filter
-```
-
 &lt;img src="2regression_files/figure-html/unnamed-chunk-13-1.png" width="50%" /&gt;
 
 ---
@@ -367,28 +337,7 @@ library(tidyverse)
 
 ``` r
 qog_std_ts_jan22 &lt;- read_csv("https://github.com/jnseawright/PS406/raw/main/data/qog_std_ts_jan22.csv")
-```
 
-```
-## Warning: One or more parsing issues, call `problems()` on your data frame for details,
-## e.g.:
-##   dat &lt;- vroom(...)
-##   problems(dat)
-```
-
-```
-## Rows: 15168 Columns: 1915
-## ── Column specification ────────────────────────────────────────────────────────
-## Delimiter: ","
-## chr    (7): cname, cname_qog, ccodealp, version, cname_year, ccodealp_year, ...
-## dbl (1905): ccode, year, ccode_qog, ccodecow, aid_cpnc, aid_cpsc, aid_crnc, ...
-## lgl    (3): psi_cpsi2, psi_edate2, psi_psi2
-## 
-## ℹ Use `spec()` to retrieve the full column specification for this data.
-## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-```
-
-``` r
 qogdems2000 &lt;- qog_std_ts_jan22 %&gt;% 
   filter(year==2000 &amp; vdem_libdem &gt; 0.5)
 
@@ -690,13 +639,7 @@ If there is causal heterogeneity, the OLS weights are a biased estimator of ATE,
 
 ``` r
 library(lmw)
-```
 
-```
-## Warning: package 'lmw' was built under R version 4.5.3
-```
-
-``` r
 qog2000demsin2020clean &lt;- qog2000demsin2020 %&gt;% filter(!is.na(br_pres) &amp; !is.na(ccp_systyear) &amp; 
                                                          !is.na(ht_colonial) &amp; !is.na(br_pvote))
 ```
@@ -708,15 +651,7 @@ preslmw.uri &lt;- lmw(~ br_pres + as.factor(ht_colonial) + br_pvote, data = qog2
                 estimand = "ATT", method = "URI", treat = "br_pres")
 
 preslmw.urifit &lt;- lmw_est(preslmw.uri, outcome = "vdem_libdem")
-```
 
-```
-## Warning in meatHC(x, type = type, omega = omega): HC3 covariances are
-## numerically unstable for hat values close to 1 (and undefined if exactly 1) as
-## for observation(s) 29, 44
-```
-
-``` r
 summary(preslmw.urifit)
 ```
 
@@ -736,15 +671,7 @@ preslmw.mri &lt;- lmw(~ br_pres + as.factor(ht_colonial) + br_pvote, data = qog2
                    estimand = "ATT", method = "MRI", treat = "br_pres")
 
 preslmw.mrifit &lt;- lmw_est(preslmw.mri, outcome = "vdem_libdem")
-```
 
-```
-## Warning in meatHC(x, type = type, omega = omega): HC3 covariances are
-## numerically unstable for hat values close to 1 (and undefined if exactly 1) as
-## for observation(s) 11, 29, 44
-```
-
-``` r
 summary(preslmw.mrifit)
 ```
 

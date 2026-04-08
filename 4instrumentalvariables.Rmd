@@ -49,6 +49,8 @@ BibOptions(check.entries = FALSE,
 # bibliography.
 
 peruemotions <- read.csv("https://github.com/jnseawright/PS406/raw/main/data/peruemotions.csv")
+
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
 ```
 ```{r xaringan-themer, include=FALSE, warning=FALSE}
 library(xaringanthemer,MnSymbol)
@@ -223,10 +225,15 @@ instrumentalVariables(hypotheticalinstruments.dag)
 -   The OLS estimate of $\beta$ is
     $(\mathbf{x}^{T}\mathbf{x})^{-1} \mathbf{x}^{T}\mathbf{y}$.
 
+---
+### Bivariate IV
+
 -   Consider instead the IV estimate of $\beta$:
     $(\mathbf{z}^{T}\mathbf{x})^{-1} \mathbf{z}^{T}\mathbf{y}$.
 
--   $E(\hat{\beta}_{IV}) = E((\mathbf{z}^{T}\mathbf{x})^{-1} \mathbf{z}^{T}\mathbf{y}) = E((\mathbf{z}^{T}\mathbf{x})^{-1} \mathbf{z}^{T} [\mathbf{x} \beta + \mathbf{\epsilon}]) $
+-   $E(\hat{\beta}_{IV}) = E((\mathbf{z}^{T}\mathbf{x})^{-1} \mathbf{z}^{T}\mathbf{y})$
+
+-   $E(\hat{\beta}_{IV}) = E((\mathbf{z}^{T}\mathbf{x})^{-1} \mathbf{z}^{T} (\mathbf{x} \beta + \mathbf{\epsilon}))$
 
 -   $E(\hat{\beta}_{IV}) = E((\mathbf{z}^{T}\mathbf{x})^{-1} \mathbf{z}^{T} \mathbf{x} \beta) + E((\mathbf{z}^{T}\mathbf{x})^{-1} \mathbf{z}^{T} \mathbf{\epsilon}) = \beta + 0$
 
@@ -269,10 +276,15 @@ instrumentalVariables(hypotheticalinstruments.dag)
 
 -   Wright faced a classic simultaneity problem: estimating supply and demand curves for flaxseed oil.
 
-    -   Price and quantity are jointly determined.
-    -   OLS would give a mixture of supply and demand elasticities.
+---
+### A Brief History of Instrumental Variables
 
--   His solution: use exogenous shifters of supply (e.g., weather) to trace out the demand curve, and shifters of demand (e.g., tariff changes) to trace out the supply curve.
+
+-   Price and quantity are jointly determined.
+
+-   OLS would give a mixture of supply and demand elasticities.
+
+-   Wright's solution: use exogenous shifters of supply (e.g., weather) to trace out the demand curve, and shifters of demand (e.g., tariff changes) to trace out the supply curve.
 
 ---
 ### Wright's Insight
@@ -280,6 +292,9 @@ instrumentalVariables(hypotheticalinstruments.dag)
 -   Wright realized that if you have a variable that shifts one curve but not the other, you can identify the other curve's parameters.
 
 -   This is exactly the modern IV intuition: an instrument $Z$ affects $X$ (e.g., quantity supplied) but has no direct effect on $Y$ (e.g., price) except through $X$.
+
+---
+### Wright's Insight
 
 -   Wright's work remained largely unknown for decades; it was rediscovered by econometricians in the 1970s and 1980s.
 
@@ -306,18 +321,31 @@ income <- rnorm(n)  # unobserved confounder?
 # Solve for equilibrium Q and P (simplified)
 Q <- 5 + 0.2*income - 0.3*weather + rnorm(n)
 P <- 8 - 0.4*Q + 0.3*income + rnorm(n)
+```
 
+
+---
+### Wright's Flaxseed Oil Example: A Simple Simulation
+
+```{r wright_sim_2, echo = TRUE, fig.height = 4}
 # OLS of P on Q (tries to estimate demand, but biased)
 summary(lm(P ~ Q))
+```
 
+---
+### Wright's Flaxseed Oil Example: A Simple Simulation
+
+```{r wright_sim_3, echo = TRUE, fig.height = 4}
 # IV using weather as instrument for Q
 library(ivreg)
 summary(ivreg(P ~ Q | weather))
 ```
 
+---
+### Wright's Flaxseed Oil Example: A Simple Simulation
+
 -   OLS gives a biased estimate of the demand elasticity (price-quantity relationship).
 -   IV using weather (a supply shifter) recovers the demand curve.
-
 
 ---
 ### Intuition: Two-Stage Least Squares
@@ -422,13 +450,17 @@ summary(migueliv)
 
 Key elements to examine:
 
-1. **Coefficient on endogenous variable**: `gdp_g` = 0.064 — a 1 percentage point increase in growth increases conflict probability by 6.4 points? (Check units—growth is in percent, conflict is binary)
+1\. **Coefficient on endogenous variable**: `gdp_g` = 0.064 — a 1 percentage point increase in growth increases conflict probability by 6.4 points? (Check units—growth is in percent, conflict is binary)
 
-2. **Standard errors**: Clustered SEs are larger (0.038 vs. 0.027) — accounting for within-country correlation matters
+2\. **Standard errors**: Clustered SEs are larger (0.038 vs. 0.027) — accounting for within-country correlation matters
 
-3. **First-stage statistics** (not shown here but available via `summary(..., diagnostics=TRUE)`): Check instrument strength
+---
+### Reading IV Regression Output
 
-4. **Model fit**: IV $R^2$ can be negative—don't interpret as usual
+
+3\. **First-stage statistics** (not shown here but available via `summary(..., diagnostics=TRUE)`): Check instrument strength
+
+4\. **Model fit**: IV $R^2$ can be negative—don't interpret as usual
 
 ---
 ```{r, echo = TRUE, out.width="40%", fig.retina = 1, fig.align='center'}
@@ -504,6 +536,9 @@ summary(miguellm2)
 
 -   After estimating an IV model, we must diagnose whether the instrument(s) are valid and strong enough.
 
+---
+### Diagnostics in Instrumental Variables
+
 -   Four key diagnostic families:
 
     1.  **First‑stage diagnostics**: relevance of instruments.
@@ -514,8 +549,6 @@ summary(miguellm2)
 
     4.  **Endogeneity tests**: whether IV is actually needed.
 
--   Each addresses a different threat to IV consistency.
-
 ---
 
 ### First‑Stage Diagnostics: Relevance
@@ -523,6 +556,11 @@ summary(miguellm2)
 -   The first stage is the regression of the endogenous variable(s) on all instruments (and exogenous covariates).
 
 -   For a single endogenous regressor, the **first‑stage F‑statistic** tests whether the instruments jointly have explanatory power.
+
+---
+
+### First‑Stage Diagnostics: Relevance
+
 
 -   A common rule of thumb (Stock & Yogo, 2005): F < 10 indicates weak instruments → IV bias can be large.
 
@@ -571,6 +609,10 @@ partial_r2
 
 -   The extra instruments allow us to test the joint validity of all instruments (the exclusion restriction) – under the assumption that at least $k$ instruments are valid.
 
+---
+
+### Overidentification Tests
+
 -   Common tests:
     -   **Sargan test** (homoskedastic errors)
     -   **Hansen J test** (heteroskedasticity‑robust)
@@ -585,10 +627,12 @@ partial_r2
 summary(migueliv, diagnostics = TRUE)
 ```
 
+---
+
 -   The diagnostic output includes:
     -   **Sargan test**: statistic `r round(summary(migueliv, diagnostics = TRUE)$diagnostics["Sargan", "statistic"], 3)`, p‑value `r round(summary(migueliv, diagnostics = TRUE)$diagnostics["Sargan", "p-value"], 3)`.
 
--   With p > 0.05, we do **not** reject the null. This is consistent with instrument validity, but we must remember the test’s limitations: low power, and it assumes at least one instrument is valid.
+-   With exactly the same number of instruments as endogenous variables, the Sargan test returns NA because it isn't defined. Even if it were available, we would have to remember the test’s limitations: low power, and it assumes at least one instrument is valid.
 
 ---
 
@@ -598,24 +642,35 @@ summary(migueliv, diagnostics = TRUE)
 
 -   **Weak‑instrument‑robust tests** provide inference that remains valid regardless of instrument strength.
 
+---
+
+### Weak Instrument Robust Tests
+
 -   Popular choices:
     -   **Anderson–Rubin (AR) test**: tests the structural parameter $\beta$ by examining the reduced form. It is robust to weak instruments but can have low power when many instruments are weak.
     -   **Conditional Likelihood Ratio (CLR) test** (Moreira, 2003): often more powerful than AR.
 
--   In R, the `ivreg` package does not implement these directly, but the `AER::ivreg` function (same as `ivreg`) can be used with the `diagnostics = TRUE` option, which includes a weak‑instrument test (Cragg–Donald F) and an AR confidence interval if requested.
+---
+
+### Weak Instrument Robust Tests
+
+-   In R, the `ivreg` package does not implement these directly, but the `AER::ivreg` function can be used with the `diagnostics = TRUE` option, which includes a weak‑instrument test (Cragg–Donald F) and an AR confidence interval if requested.
 
 ---
 ```{r weakrobust, echo = TRUE}
-# For AR confidence intervals, we can use the ivreg package with the `AR` option
-# This requires a model with one endogenous variable and possibly multiple instruments
-library(ivreg)
-ar_ci <- confint(migueliv, type = "AR")
+# For AR confidence intervals, we can use the AER package with the `AR` option
+library(AER)
+miguelweakinstiv <- AER::ivreg(any_prio ~ gdp_g + gdp_g_l + y_0 + polity2l + ethfrac + relfrac + Oil + lpopl1 + lmtnest | GPCP_g + GPCP_g_l+ y_0 + polity2l + ethfrac + relfrac + Oil + lpopl1 + lmtnest, data=mss_repdata_1_, diagnostics=TRUE)
+
+ar_ci <- confint(miguelweakinstiv, type = "AR")
 ar_ci
 ```
 
--   The Anderson–Rubin 95% confidence interval for `gdp_g` is `[`r round(ar_ci[1,1], 3)`, `r round(ar_ci[1,2], 3)`]`. This interval is valid even if instruments are weak.
+---
 
--   Compare with the conventional IV confidence interval: `r round(confint(migueliv)[2,1], 3)` to `r round(confint(migueliv)[2,2], 3)`. The AR interval is slightly wider, reflecting the additional uncertainty under weak‑instrument asymptotics.
+-   The Anderson–Rubin 95% confidence interval for `gdp_g` is `[`r round(ar_ci[2,1], 3)`, `r round(ar_ci[2,2], 3)`]`. This interval is valid even if instruments are weak.
+
+-   Compare with the conventional IV confidence interval: `r round(confint(migueliv)[2,1], 3)` to `r round(confint(migueliv)[2,2], 3)`. The AR interval is slightly wider when instruments are weak.
 
 ---
 
@@ -624,6 +679,10 @@ ar_ci
 -   If a variable is actually exogenous, OLS is more efficient than IV. Testing for endogeneity helps decide whether IV is necessary.
 
 -   **Hausman test** (original): compares OLS and IV estimates. Under the null of exogeneity, both are consistent but OLS is efficient; under the alternative, only IV is consistent. Large differences suggest endogeneity.
+
+---
+
+### Testing for Endogeneity
 
 -   **Durbin–Wu–Hausman (DWH) test** (regression‑based form): easier to implement and robust to heteroskedasticity.
 
@@ -643,6 +702,8 @@ dwh_model <- lm(any_prio ~ gdp_g + gdp_g_l + y_0 + polity2l + ethfrac + relfrac 
 summary(dwh_model)$coefficients["first_stage_resid", ]
 ```
 
+---
+
 -   The coefficient on the first‑stage residual is `r round(summary(dwh_model)$coefficients["first_stage_resid", "Estimate"], 4)` with p = `r round(summary(dwh_model)$coefficients["first_stage_resid", "Pr(>|t|)"], 4)`. A significant residual indicates that OLS would be inconsistent – i.e., `gdp_g` is endogenous.
 
 -   Here, the residual is not significant (p > 0.05), suggesting that OLS might actually be acceptable for this variable. But this test hinges on instrument validity.
@@ -656,29 +717,38 @@ The DWH test fails to reject the null that `gdp_g` is exogenous (p = 0.34).
 - The instrument is valid (that's a separate assumption)
 - IV is unnecessary (the test has low power)
 
+---
+### Interpreting the Endogeneity Test
+
+
 **This DOES mean**:
 - OLS and IV estimates are not statistically distinguishable
 - If you believe the instrument is valid, OLS might be preferred for efficiency
 - But the reduced form results suggest caution
 
 ---
-
-
 ### Summary: IV Diagnostics Checklist
 
-| Diagnostic | Purpose | R implementation | Caution |
-|------------|---------|------------------|---------|
-| First‑stage F | Check instrument strength | `linearHypothesis()` in first‑stage lm | F > 10 is only a rule of thumb |
-| Overidentification (Sargan/Hansen) | Test instrument validity | `summary(ivreg, diagnostics = TRUE)` | Assumes at least one instrument valid; low power |
-| Weak‑instrument robust CI | Valid inference under weak IV | `confint(..., type = "AR")` | May be wide; choose test based on power |
-| Endogeneity test (DWH) | Check if IV is needed | Regression of residuals | Requires valid instruments |
+| Diagnostic | Purpose | R implementation |
+|------------|---------|------------------|
+| First‑stage F | Check instrument strength | `linearHypothesis()` in first‑stage lm | 
+| Overidentification (Sargan/Hansen) | Test instrument validity | `summary(ivreg, diagnostics = TRUE)` | 
+
+---
+### Summary: IV Diagnostics Checklist
+
+| Diagnostic | Purpose | R implementation |
+|------------|---------|------------------|
+| Weak‑instrument robust CI | Valid inference under weak IV | `confint(..., type = "AR")` | 
+| Endogeneity test (DWH) | Check if IV is needed | Regression of residuals | 
+
+---
+### Summary: IV Diagnostics Checklist
+
 
 -   Always report first‑stage F and, if overidentified, an overidentification test.
 -   Consider weak‑instrument robust inference if F is low.
 -   Interpret all tests with caution: they are diagnostic tools, not definitive proof.
-```
-
-
 
 ---
 ### Encouragement Designs in Experiments
@@ -731,6 +801,10 @@ summary(lm(outsidervote~enojado+simpletreat, data=peruemotions))
 
 -   Each individual falls into one of four latent groups based on how they respond to the instrument:
 
+---
+### Four Compliance Types
+
+
 | Type           | Behavior                                                   |
 |----------------|------------------------------------------------------------|
 | **Compliers**  | $X=1$ when $Z=1$, $X=0$ when $Z=0$ (do as encouraged)     |
@@ -749,6 +823,10 @@ summary(lm(outsidervote~enojado+simpletreat, data=peruemotions))
 4.  **Monotonicity**: No defiers exist (or the proportion of defiers is zero).  
     *In a one‑sided encouragement design (e.g., only encouragement can increase treatment), monotonicity is automatically satisfied.*
 
+---
+### Key Assumptions for LATE
+
+
 Under these assumptions, the IV estimand (Wald estimator) equals the **average treatment effect for compliers** (LATE).
 
 ---
@@ -760,6 +838,9 @@ Under these assumptions, the IV estimand (Wald estimator) equals the **average t
 -   The **Compliance rate** (first stage): the effect of encouragement on treatment uptake:
     $$FS = E[X | Z=1] - E[X | Z=0]$$
 
+---
+### The Wald Estimator = ITT / Compliance Rate
+
 -   The Wald (IV) estimator is the ratio:
     $$\hat{\beta}_{IV} = \frac{ITT}{FS}$$
 
@@ -769,11 +850,18 @@ Under these assumptions, the IV estimand (Wald estimator) equals the **average t
 ### Why LATE? A Decomposition
 
 -   Under monotonicity and exclusion, the ITT can be written as:
-    $$ITT = \text{(Effect on compliers)} \times \text{(Proportion compliers)}$$
-    because always‑takers and never‑takers are unaffected by $Z$ (exclusion) and defiers are absent.
+
+
+$$\small ITT = \text{(Effect on compliers)} \times \text{(Proportion compliers)}$$
+
+because always‑takers and never‑takers are unaffected by $Z$ (exclusion) and defiers are absent.
+
+---
+### Why LATE? A Decomposition
 
 -   Hence:
-    $$\text{LATE} = \frac{ITT}{\text{Proportion compliers}} = \frac{ITT}{FS}$$
+    
+$$\small\text{LATE} = \frac{ITT}{\text{Proportion compliers}} = \frac{ITT}{FS}$$
 
 -   This shows that IV isolates the treatment effect **only for compliers**—not for always‑takers or never‑takers.
 
@@ -785,6 +873,9 @@ Under these assumptions, the IV estimand (Wald estimator) equals the **average t
     -   Never‑takers might also differ.
 
 -   The instrument defines the subpopulation of compliers. Different instruments can identify different LATEs.
+
+---
+### Limitations of LATE
 
 -   External validity: we cannot automatically extrapolate the LATE to other settings or populations without additional assumptions.
 
@@ -872,7 +963,7 @@ wald_iv
 ```
 
 -   The manual IV estimate is `r round(wald_iv, 3)`.  
-    This suggests that for compliers, feeling anger increases the probability of outsider voting by about 7.1 percentage points.
+    This suggests that for compliers, feeling anger increases the probability of outsider voting by about 157 percentage points. This is obviously too high, and we probably have either some measurement error in the compliance rate or a huge standard error.
 
 ---
 ### Step 4: Compare with `ivreg` Output
@@ -889,13 +980,19 @@ iv_coef <- coef(iv_fit)["enojado"]
 iv_coef
 ```
 
+---
+
 -   The `ivreg` coefficient on `enojado` is `r round(iv_coef, 3)`, matching the manual Wald estimate.  
-    (Small differences may arise due to covariate adjustment—here we included Cuzco and age in both stages, which is correct.)
+    (Small differences may arise due to covariate adjustment; here we included Cuzco and age in both stages, which is correct.)
+-   We can see that there is indeed a very large standard error, suggesting lots of uncertainty and not necessarily a causal effect actually over 100%.
 
 ---
 ### Step 5: Interpret as LATE
 
--   Under monotonicity (no defiers) and exclusion (simpletreat affects voting only through anger), the IV estimate of 0.071 is the **average treatment effect of anger on outsider voting for compliers**.
+-   Under monotonicity (no defiers) and exclusion (simpletreat affects voting only through anger), the IV estimate of 1.57 is the **average treatment effect of anger on outsider voting for compliers**.
+
+---
+### Step 5: Interpret as LATE
 
 -   Who are the compliers?  
     People who become angry **only if** they are in the treatment group (i.e., their anger is triggered by the experimental prime). They are not always angry, nor never angry—they respond to encouragement.
@@ -909,14 +1006,13 @@ iv_coef
 
 -   The Wald estimator is the ratio of ITT to first stage.
 
+---
+### Summary: LATE in a Nutshell
+
 -   Always report:
     -   First‑stage strength (F‑statistic, compliance rate)
     -   Interpretation of the complier group
     -   Caveats about external validity
-
--   In the Peru example, the complier group is those whose anger is activated by the treatment prime. The estimated effect is about 7 percentage points.
-
-```
 
 ---
 ### Beyond LATE: Estimating the ATE
@@ -924,6 +1020,9 @@ iv_coef
 -   LATE is useful but limited: it only gives the treatment effect for compliers.
 
 -   Often we want the **Average Treatment Effect (ATE)** for the entire population.
+
+---
+### Beyond LATE: Estimating the ATE
 
 -   Aronow and Carnegie (2013) show that under certain assumptions, we can recover the ATE by reweighting using the **compliance score**.
 
@@ -938,6 +1037,9 @@ iv_coef
 
     where $X_i(1)$ is potential treatment when $Z=1$, $X_i(0)$ when $Z=0$, and $\mathbf{W}_i$ are covariates.
 
+---
+### What Is the Compliance Score?
+
 -   For binary treatment and binary instrument, the compliance score is simply the probability of being a **complier**, conditional on covariates.
 
 -   Intuition: Units with high compliance scores are likely compliers; those with low scores are likely always‑takers or never‑takers.
@@ -948,6 +1050,9 @@ iv_coef
 -   Aronow and Carnegie show that if we weight observations by the inverse of the compliance score (for the treated) and by the inverse of $(1 - \pi_i)$ (for the controls), we can recover the ATE.
 
 -   Intuition: Reweighting creates a pseudo‑population where everyone looks like a complier in terms of their compliance propensity—effectively undoing the LATE restriction.
+
+---
+### How Does Reweighting Estimate the ATE?
 
 -   The estimator requires:
     1.  A model for the compliance score (e.g., probit or logit).
@@ -960,6 +1065,9 @@ iv_coef
 -   The `icsw` package provides functions for inverse compliance score weighting.
 
 -   Key function: `icsw.tsls()` (two‑stage least squares with inverse compliance score weighting).
+
+---
+### Implementation in R: `icsw` Package
 
 -   Steps:
     1.  Estimate compliance scores from a model of treatment on instrument and covariates.
@@ -1012,13 +1120,16 @@ exp.reweight$coefficients
 exp.reweight$coefs.se.boot
 ```
 
--   The ATE estimate for the effect of anger on outsider voting is `r round(exp.reweight$coefficients, 4)`.
+---
+### Interpreting the Results
+
+-   The ATE estimate for the effect of anger on outsider voting is `r round(exp.reweight$coefficients, 3)`.
 
 -   Compare with the LATE estimate from IV: `r round(iv_coef, 4)`.
 
--   The ATE is slightly larger than the LATE. This could mean:
-    -   Always‑takers and never‑takers have larger effects than compliers (or opposite signs).
-    -   Sampling variability (check confidence intervals).
+-   The ATE is pretty different from the LATE. This could mean:
+    -   Always‑takers and never‑takers have different effects than compliers (or opposite signs).
+    -   Sampling variability (a real possibility given the enormous standard error).
     -   Model misspecification in the compliance score.
 
 ---
@@ -1028,6 +1139,9 @@ exp.reweight$coefs.se.boot
 |----------|----------|----------------|
 | LATE (IV) | `r round(iv_coef, 4)` | Effect for compliers—those whose anger is activated by the prime. |
 | ATE (ICSW) | `r round(exp.reweight$coefficients, 4)` | Effect for the entire population, assuming the compliance score model is correct. |
+
+---
+### Comparison: LATE vs. ATE
 
 -   The difference suggests possible treatment effect heterogeneity: compliers may respond differently than always‑takers/never‑takers.
 
@@ -1041,6 +1155,9 @@ exp.reweight$coefs.se.boot
     -   Correctly specified model for the compliance score.
     -   Overlap: compliance scores bounded away from 0 and 1 (no units with $\pi_i = 0$ or $1$).
     -   Consistency of the compliance score estimator.
+
+---
+### Assumptions and Limitations of ICSW
 
 -   **Practical limitations**:
     -   Can be sensitive to model choice.
@@ -1056,13 +1173,15 @@ exp.reweight$coefs.se.boot
 
 -   In settings with rich covariates that can reliably predict compliance.
 
-
 ---
 ### Common Mistake 1: Lagged Dependent Variables as Instruments
 
 -   A tempting but usually invalid instrument: using a lag of an endogenous variable as an instrument for itself.
 
 -   Example: In a panel model with $Y_{it} = \beta X_{it} + \gamma Y_{i,t-1} + \epsilon_{it}$, using $X_{i,t-1}$ as an instrument for $X_{it}$.
+
+---
+### Common Mistake 1: Lagged Dependent Variables as Instruments
 
 -   Why this fails:
     -   If $X$ is serially correlated (it usually is), then $X_{i,t-1}$ is correlated with past shocks, which may persist and affect current $Y$.
@@ -1076,6 +1195,9 @@ exp.reweight$coefs.se.boot
 -   Using many weak instruments can actually **increase** bias in 2SLS.
 
 -   With many instruments, the first stage overfits, and 2SLS converges to OLS (which is biased).
+
+---
+### Common Mistake 2: "Many Weak Instruments" Bias
 
 -   Rule of thumb: the number of instruments should be small relative to the sample size, and first-stage F should be large.
 
@@ -1115,6 +1237,9 @@ library(sandwich)
 
 -   Researchers often slip into language like "the effect of X on Y" without specifying "for compliers."
 
+---
+### Common Mistake 4: Interpreting IV as ATE Without Justification
+
 -   Be precise: "Among those whose treatment status is changed by the instrument, the estimated effect is ..."
 
 ---
@@ -1124,6 +1249,12 @@ library(sandwich)
 |---------|----------------------|-----------------|
 | Lagged DV as instrument | Usually violates exclusion | Use external instruments or GMM |
 | Many weak instruments | Increases bias | LIML, JIVE, weak-IV robust tests |
+
+---
+### Summary: IV Pitfalls to Avoid
+
+| Mistake | Why It's Problematic | Better Approach |
+|---------|----------------------|-----------------|
 | Ignoring clustering | SEs too small | Cluster at instrument level |
 | Interpreting as ATE | Overgeneralization | Be precise: LATE for compliers |
 

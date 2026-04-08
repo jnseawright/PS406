@@ -421,21 +421,6 @@ Ask these questions:
 - Consider **field experiments** as the gold standard for realism.
 - Acknowledge limitations and discuss how they might affect generalizability.
 
-
----
-### Balance Testing
-
-A balance test is an analysis of the degree to which the distribution of side variables across treatment groups is near its expectation. It is a potentially useful test of the hypothesis that randomization has balanced variables across groups.
-
----
-```{r, echo = TRUE, out.width="100%", fig.retina = 1}
-
-library(cobalt)
-peruemotionscovs <- subset(peruemotions, select = c(Cuzco, age))
-bal.tab(peruemotionscovs, treat=peruemotions$simpletreat, 
-        thresholds = c(m = .1, v = 2))
-```
-
 ---
 ### Randomization Inference
 
@@ -498,6 +483,21 @@ ri2_emotionsresult <- conduct_ri(
 ```{r, echo = TRUE, out.width="100%", fig.retina = 1}
 ri2_emotionsresult
 ```
+
+---
+### Balance Testing
+
+A balance test is an analysis of the degree to which the distribution of side variables across treatment groups is near its expectation. It is a potentially useful test of the hypothesis that randomization has balanced variables across groups.
+
+---
+```{r, echo = TRUE, out.width="100%", fig.retina = 1}
+
+library(cobalt)
+peruemotionscovs <- subset(peruemotions, select = c(Cuzco, age))
+bal.tab(peruemotionscovs, treat=peruemotions$simpletreat, 
+        thresholds = c(m = .1, v = 2))
+```
+
 
 ---
 ### Causal Mediation

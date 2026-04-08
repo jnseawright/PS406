@@ -97,6 +97,36 @@ The estimator:
 &lt;img src="images/marielconclusions.JPG" width="90%" style="display: block; margin: auto;" /&gt;
 
 ---
+
+
+``` r
+mariel &lt;- read.csv("data/mariel.csv")
+
+did1 &lt;- (mariel$MiamiWhite[mariel$Year==1981] - mariel$MiamiWhite[mariel$Year==1979]) - 
+        (mariel$OtherWhite[mariel$Year==1981] - mariel$OtherWhite[mariel$Year==1979])
+
+did1
+```
+
+```
+## [1] 0.02
+```
+
+---
+
+
+``` r
+did2 &lt;- (mean(mariel$MiamiWhite[mariel$Year %in% 1981:1985]) - mariel$MiamiWhite[mariel$Year==1979]) - 
+        (mean(mariel$OtherWhite[mariel$Year %in% 1981:1985]) - mariel$OtherWhite[mariel$Year==1979])
+
+did2
+```
+
+```
+## [1] -0.004
+```
+
+---
 ### Analysis
 
 Starting simple, if we think *all* the confounding variables are constant either in time or space, then the model we want may be something like:
@@ -147,8 +177,8 @@ summary(clfe)
 ### Interpreting the Organ Donations DiD Results
 
 - The coefficient on `Treated` is about **NA**.
-- **Interpretation**: California's policy change increased the organ donation rate by approximately NA percentage points relative to what would have happened without the policy, under the parallel trends assumption.
-- The p-value is 0.2752 – this is above conventional significance levels, suggesting no evidence of an effect.
+- **Interpretation**: California's policy change may have decreased the organ donation rate by approximately NA percentage points relative to what would have happened without the policy, under the parallel trends assumption.
+- The p-value is 0.2752. This is above conventional significance levels, suggesting no evidence of an effect.
 - The confidence interval can be extracted: `confint(clfe)["Treated",]`.
 
 ---
@@ -206,6 +236,8 @@ summary(odparalleltrends.lm)
 ---
 
 **Interpretation**: The p-value &gt; 0.05 suggests that we cannot reject the null hypothesis of parallel pre-treatment trends. This provides some support for the parallel trends assumption.
+
+- This linear trend test is a simple diagnostic; event‑study plots provide a more flexible check of parallel trends.
 
 ---
 ### Visualizing the Pre-Trends
@@ -410,7 +442,7 @@ summary(bacon_out)
 ---
 ### Bacon Decomposition
 
-The output shows the weight and estimate for each 2×2 comparison, highlighting which groups contribute negatively.
+The output shows the weight and estimate for each 2×2 comparison, highlighting which groups contribute negatively. Look for comparisons with negative weights; these indicate potential bias.
 
 ---
 ### Intuition for Negative Weights
@@ -636,8 +668,8 @@ eufect &lt;- fect(v2x_libdem ~ accession, index = c("country_name", "year"), for
 ## might be invalid. To fix this, use '%dorng%' from the 'doRNG' package instead
 ## of '%dopar%'. This ensures that proper, parallel-safe random numbers are
 ## produced. To disable this check, set option 'doFuture.rng.onMisuse' to
-## "ignore". [future 'doFuture-1' (2f67b3c15a23aa9b0c3457c02c6bdfc5-1); on
-## 2f67b3c15a23aa9b0c3457c02c6bdfc5@WITPOLD2GQD2Z3&lt;16072&gt;]
+## "ignore". [future 'doFuture-1' (dc0db54f59303dabc8c576d190d36950-1); on
+## dc0db54f59303dabc8c576d190d36950@WITPOLD2GQD2Z3&lt;10004&gt;]
 ```
 
 ```
@@ -647,8 +679,8 @@ eufect &lt;- fect(v2x_libdem ~ accession, index = c("country_name", "year"), for
 ## might be invalid. To fix this, use '%dorng%' from the 'doRNG' package instead
 ## of '%dopar%'. This ensures that proper, parallel-safe random numbers are
 ## produced. To disable this check, set option 'doFuture.rng.onMisuse' to
-## "ignore". [future 'doFuture-2' (2f67b3c15a23aa9b0c3457c02c6bdfc5-2); on
-## 2f67b3c15a23aa9b0c3457c02c6bdfc5@WITPOLD2GQD2Z3&lt;16072&gt;]
+## "ignore". [future 'doFuture-2' (dc0db54f59303dabc8c576d190d36950-2); on
+## dc0db54f59303dabc8c576d190d36950@WITPOLD2GQD2Z3&lt;10004&gt;]
 ```
 
 ```
@@ -658,8 +690,8 @@ eufect &lt;- fect(v2x_libdem ~ accession, index = c("country_name", "year"), for
 ## might be invalid. To fix this, use '%dorng%' from the 'doRNG' package instead
 ## of '%dopar%'. This ensures that proper, parallel-safe random numbers are
 ## produced. To disable this check, set option 'doFuture.rng.onMisuse' to
-## "ignore". [future 'doFuture-3' (2f67b3c15a23aa9b0c3457c02c6bdfc5-3); on
-## 2f67b3c15a23aa9b0c3457c02c6bdfc5@WITPOLD2GQD2Z3&lt;16072&gt;]
+## "ignore". [future 'doFuture-3' (dc0db54f59303dabc8c576d190d36950-3); on
+## dc0db54f59303dabc8c576d190d36950@WITPOLD2GQD2Z3&lt;10004&gt;]
 ```
 
 ```
@@ -669,8 +701,8 @@ eufect &lt;- fect(v2x_libdem ~ accession, index = c("country_name", "year"), for
 ## might be invalid. To fix this, use '%dorng%' from the 'doRNG' package instead
 ## of '%dopar%'. This ensures that proper, parallel-safe random numbers are
 ## produced. To disable this check, set option 'doFuture.rng.onMisuse' to
-## "ignore". [future 'doFuture-4' (2f67b3c15a23aa9b0c3457c02c6bdfc5-4); on
-## 2f67b3c15a23aa9b0c3457c02c6bdfc5@WITPOLD2GQD2Z3&lt;16072&gt;]
+## "ignore". [future 'doFuture-4' (dc0db54f59303dabc8c576d190d36950-4); on
+## dc0db54f59303dabc8c576d190d36950@WITPOLD2GQD2Z3&lt;10004&gt;]
 ```
 
 ```
@@ -680,8 +712,8 @@ eufect &lt;- fect(v2x_libdem ~ accession, index = c("country_name", "year"), for
 ## might be invalid. To fix this, use '%dorng%' from the 'doRNG' package instead
 ## of '%dopar%'. This ensures that proper, parallel-safe random numbers are
 ## produced. To disable this check, set option 'doFuture.rng.onMisuse' to
-## "ignore". [future 'doFuture-5' (2f67b3c15a23aa9b0c3457c02c6bdfc5-5); on
-## 2f67b3c15a23aa9b0c3457c02c6bdfc5@WITPOLD2GQD2Z3&lt;16072&gt;]
+## "ignore". [future 'doFuture-5' (dc0db54f59303dabc8c576d190d36950-5); on
+## dc0db54f59303dabc8c576d190d36950@WITPOLD2GQD2Z3&lt;10004&gt;]
 ```
 
 ```
@@ -691,8 +723,8 @@ eufect &lt;- fect(v2x_libdem ~ accession, index = c("country_name", "year"), for
 ## might be invalid. To fix this, use '%dorng%' from the 'doRNG' package instead
 ## of '%dopar%'. This ensures that proper, parallel-safe random numbers are
 ## produced. To disable this check, set option 'doFuture.rng.onMisuse' to
-## "ignore". [future 'doFuture-6' (2f67b3c15a23aa9b0c3457c02c6bdfc5-6); on
-## 2f67b3c15a23aa9b0c3457c02c6bdfc5@WITPOLD2GQD2Z3&lt;16072&gt;]
+## "ignore". [future 'doFuture-6' (dc0db54f59303dabc8c576d190d36950-6); on
+## dc0db54f59303dabc8c576d190d36950@WITPOLD2GQD2Z3&lt;10004&gt;]
 ```
 
 ```
@@ -702,8 +734,8 @@ eufect &lt;- fect(v2x_libdem ~ accession, index = c("country_name", "year"), for
 ## might be invalid. To fix this, use '%dorng%' from the 'doRNG' package instead
 ## of '%dopar%'. This ensures that proper, parallel-safe random numbers are
 ## produced. To disable this check, set option 'doFuture.rng.onMisuse' to
-## "ignore". [future 'doFuture-7' (2f67b3c15a23aa9b0c3457c02c6bdfc5-7); on
-## 2f67b3c15a23aa9b0c3457c02c6bdfc5@WITPOLD2GQD2Z3&lt;16072&gt;]
+## "ignore". [future 'doFuture-7' (dc0db54f59303dabc8c576d190d36950-7); on
+## dc0db54f59303dabc8c576d190d36950@WITPOLD2GQD2Z3&lt;10004&gt;]
 ```
 
 ```
@@ -713,8 +745,8 @@ eufect &lt;- fect(v2x_libdem ~ accession, index = c("country_name", "year"), for
 ## might be invalid. To fix this, use '%dorng%' from the 'doRNG' package instead
 ## of '%dopar%'. This ensures that proper, parallel-safe random numbers are
 ## produced. To disable this check, set option 'doFuture.rng.onMisuse' to
-## "ignore". [future 'doFuture-8' (2f67b3c15a23aa9b0c3457c02c6bdfc5-8); on
-## 2f67b3c15a23aa9b0c3457c02c6bdfc5@WITPOLD2GQD2Z3&lt;16072&gt;]
+## "ignore". [future 'doFuture-8' (dc0db54f59303dabc8c576d190d36950-8); on
+## dc0db54f59303dabc8c576d190d36950@WITPOLD2GQD2Z3&lt;10004&gt;]
 ```
 
 ```
@@ -749,8 +781,8 @@ euife &lt;- fect(v2x_libdem ~ accession, index = c("country_name", "year"), forc
 ## might be invalid. To fix this, use '%dorng%' from the 'doRNG' package instead
 ## of '%dopar%'. This ensures that proper, parallel-safe random numbers are
 ## produced. To disable this check, set option 'doFuture.rng.onMisuse' to
-## "ignore". [future 'doFuture-1' (2f67b3c15a23aa9b0c3457c02c6bdfc5-9); on
-## 2f67b3c15a23aa9b0c3457c02c6bdfc5@WITPOLD2GQD2Z3&lt;16072&gt;]
+## "ignore". [future 'doFuture-1' (dc0db54f59303dabc8c576d190d36950-9); on
+## dc0db54f59303dabc8c576d190d36950@WITPOLD2GQD2Z3&lt;10004&gt;]
 ```
 
 ```
@@ -760,8 +792,8 @@ euife &lt;- fect(v2x_libdem ~ accession, index = c("country_name", "year"), forc
 ## might be invalid. To fix this, use '%dorng%' from the 'doRNG' package instead
 ## of '%dopar%'. This ensures that proper, parallel-safe random numbers are
 ## produced. To disable this check, set option 'doFuture.rng.onMisuse' to
-## "ignore". [future 'doFuture-2' (2f67b3c15a23aa9b0c3457c02c6bdfc5-10); on
-## 2f67b3c15a23aa9b0c3457c02c6bdfc5@WITPOLD2GQD2Z3&lt;16072&gt;]
+## "ignore". [future 'doFuture-2' (dc0db54f59303dabc8c576d190d36950-10); on
+## dc0db54f59303dabc8c576d190d36950@WITPOLD2GQD2Z3&lt;10004&gt;]
 ```
 
 ```
@@ -771,8 +803,8 @@ euife &lt;- fect(v2x_libdem ~ accession, index = c("country_name", "year"), forc
 ## might be invalid. To fix this, use '%dorng%' from the 'doRNG' package instead
 ## of '%dopar%'. This ensures that proper, parallel-safe random numbers are
 ## produced. To disable this check, set option 'doFuture.rng.onMisuse' to
-## "ignore". [future 'doFuture-3' (2f67b3c15a23aa9b0c3457c02c6bdfc5-11); on
-## 2f67b3c15a23aa9b0c3457c02c6bdfc5@WITPOLD2GQD2Z3&lt;16072&gt;]
+## "ignore". [future 'doFuture-3' (dc0db54f59303dabc8c576d190d36950-11); on
+## dc0db54f59303dabc8c576d190d36950@WITPOLD2GQD2Z3&lt;10004&gt;]
 ```
 
 ```
@@ -782,8 +814,8 @@ euife &lt;- fect(v2x_libdem ~ accession, index = c("country_name", "year"), forc
 ## might be invalid. To fix this, use '%dorng%' from the 'doRNG' package instead
 ## of '%dopar%'. This ensures that proper, parallel-safe random numbers are
 ## produced. To disable this check, set option 'doFuture.rng.onMisuse' to
-## "ignore". [future 'doFuture-4' (2f67b3c15a23aa9b0c3457c02c6bdfc5-12); on
-## 2f67b3c15a23aa9b0c3457c02c6bdfc5@WITPOLD2GQD2Z3&lt;16072&gt;]
+## "ignore". [future 'doFuture-4' (dc0db54f59303dabc8c576d190d36950-12); on
+## dc0db54f59303dabc8c576d190d36950@WITPOLD2GQD2Z3&lt;10004&gt;]
 ```
 
 ```
@@ -793,8 +825,8 @@ euife &lt;- fect(v2x_libdem ~ accession, index = c("country_name", "year"), forc
 ## might be invalid. To fix this, use '%dorng%' from the 'doRNG' package instead
 ## of '%dopar%'. This ensures that proper, parallel-safe random numbers are
 ## produced. To disable this check, set option 'doFuture.rng.onMisuse' to
-## "ignore". [future 'doFuture-5' (2f67b3c15a23aa9b0c3457c02c6bdfc5-13); on
-## 2f67b3c15a23aa9b0c3457c02c6bdfc5@WITPOLD2GQD2Z3&lt;16072&gt;]
+## "ignore". [future 'doFuture-5' (dc0db54f59303dabc8c576d190d36950-13); on
+## dc0db54f59303dabc8c576d190d36950@WITPOLD2GQD2Z3&lt;10004&gt;]
 ```
 
 ```
@@ -804,8 +836,8 @@ euife &lt;- fect(v2x_libdem ~ accession, index = c("country_name", "year"), forc
 ## might be invalid. To fix this, use '%dorng%' from the 'doRNG' package instead
 ## of '%dopar%'. This ensures that proper, parallel-safe random numbers are
 ## produced. To disable this check, set option 'doFuture.rng.onMisuse' to
-## "ignore". [future 'doFuture-6' (2f67b3c15a23aa9b0c3457c02c6bdfc5-14); on
-## 2f67b3c15a23aa9b0c3457c02c6bdfc5@WITPOLD2GQD2Z3&lt;16072&gt;]
+## "ignore". [future 'doFuture-6' (dc0db54f59303dabc8c576d190d36950-14); on
+## dc0db54f59303dabc8c576d190d36950@WITPOLD2GQD2Z3&lt;10004&gt;]
 ```
 
 ```
@@ -815,8 +847,8 @@ euife &lt;- fect(v2x_libdem ~ accession, index = c("country_name", "year"), forc
 ## might be invalid. To fix this, use '%dorng%' from the 'doRNG' package instead
 ## of '%dopar%'. This ensures that proper, parallel-safe random numbers are
 ## produced. To disable this check, set option 'doFuture.rng.onMisuse' to
-## "ignore". [future 'doFuture-7' (2f67b3c15a23aa9b0c3457c02c6bdfc5-15); on
-## 2f67b3c15a23aa9b0c3457c02c6bdfc5@WITPOLD2GQD2Z3&lt;16072&gt;]
+## "ignore". [future 'doFuture-7' (dc0db54f59303dabc8c576d190d36950-15); on
+## dc0db54f59303dabc8c576d190d36950@WITPOLD2GQD2Z3&lt;10004&gt;]
 ```
 
 ```
@@ -826,8 +858,8 @@ euife &lt;- fect(v2x_libdem ~ accession, index = c("country_name", "year"), forc
 ## might be invalid. To fix this, use '%dorng%' from the 'doRNG' package instead
 ## of '%dopar%'. This ensures that proper, parallel-safe random numbers are
 ## produced. To disable this check, set option 'doFuture.rng.onMisuse' to
-## "ignore". [future 'doFuture-8' (2f67b3c15a23aa9b0c3457c02c6bdfc5-16); on
-## 2f67b3c15a23aa9b0c3457c02c6bdfc5@WITPOLD2GQD2Z3&lt;16072&gt;]
+## "ignore". [future 'doFuture-8' (dc0db54f59303dabc8c576d190d36950-16); on
+## dc0db54f59303dabc8c576d190d36950@WITPOLD2GQD2Z3&lt;10004&gt;]
 ```
 
 ```
@@ -856,8 +888,8 @@ eufect
 ## 
 ## ATT:
 ##                               ATT    S.E. CI.lower CI.upper   p.value
-## Tr obs equally weighted   -0.2067 0.06235  -0.3289 -0.08451 9.152e-04
-## Tr units equally weighted -0.2188 0.05175  -0.3202 -0.11736 2.363e-05
+## Tr obs equally weighted   -0.2067 0.06935  -0.3426 -0.07079 0.0028750
+## Tr units equally weighted -0.2188 0.06533  -0.3468 -0.09075 0.0008109
 ```
 
 ---
@@ -874,8 +906,8 @@ euife
 ## 
 ## ATT:
 ##                               ATT    S.E. CI.lower CI.upper   p.value
-## Tr obs equally weighted   -0.2067 0.06315  -0.3305 -0.08295 1.062e-03
-## Tr units equally weighted -0.2188 0.05564  -0.3278 -0.10974 8.416e-05
+## Tr obs equally weighted   -0.2067 0.05321  -0.3110  -0.1024 1.024e-04
+## Tr units equally weighted -0.2188 0.04462  -0.3062  -0.1313 9.417e-07
 ```
 
 ---

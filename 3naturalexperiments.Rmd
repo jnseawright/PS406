@@ -45,6 +45,8 @@ BibOptions(check.entries = FALSE,
 # bibliography.
 
 peruemotions <- read.csv("https://github.com/jnseawright/PS406/raw/main/data/peruemotions.csv")
+
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
 ```
 ```{r xaringan-themer, include=FALSE, warning=FALSE}
 library(xaringanthemer,MnSymbol)

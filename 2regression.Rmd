@@ -64,9 +64,10 @@ election2016$TrumpShare <- as.numeric(str_replace(election2016$TrumpShare, "%", 
 
 election2016$D12Margin <- as.numeric(str_replace(election2016$D12Margin, "%", ""))
 
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+
 ```
 
----
 ### Why Regression? From Experiments to Observational Studies
 
 - In an experiment, random assignment ensures that treatment is independent of potential outcomes.
@@ -93,9 +94,9 @@ coef(lm_adjusted)["TrumpShare"]
 ### When Does This Work? The Key Assumption
 
 **Unconfoundedness (selection on observables)**  
-\[
-D_i \perp (Y_i(0), Y_i(1)) \mid X_i
-\]
+
+$$D_i \perp\!\!\!\perp (Y_i(0), Y_i(1)) \mid X_i$$
+
 
 ---
 
@@ -105,7 +106,7 @@ D_i \perp (Y_i(0), Y_i(1)) \mid X_i
 ---
 
 **Overlap / Common Support**  
-For every value of \(X\), there must be both treated and control units.
+For every combination of values of \(X\), there must be both treated and control units.
 
 ---
 ### Visualizing Confounding with DAGs
@@ -125,8 +126,8 @@ plot(g)
 ---
 
 - \(X\) is a confounder: it affects both treatment \(D\) and outcome \(Y\).
-- Controlling for \(X\) blocks the backdoor path \(D \leftarrow X \rightarrow Y\).
-- This gives us the causal effect of \(D\) on \(Y\).
+- Controlling for \(X\) blocks the backdoor path $D \leftarrow X \rightarrow Y$.
+- This gives us the causal effect of $D$ on $Y$.
 
 
 ---
@@ -218,7 +219,7 @@ plot(g)
 
 ---
 
-Example: if we control for a variable that is itself affected by treatment and outcome (e.g., turnout in 2020 in the terrorism example), we can introduce bias.
+- Example: if we control for a variable that is itself affected by treatment and outcome (e.g., turnout in 2020 in the terrorism example), we can introduce bias.
 
 ---
 ### Bad Controls: Post‑Treatment Variables
