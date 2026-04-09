@@ -77,6 +77,12 @@ style_mono_accent(
 | Treatment assigned by | Researcher | Nature, policy, accident |
 | Randomization | Controlled by researcher | "As‑if random" – must be argued |
 | Setting | Often lab or field | Real‑world |
+
+---
+### Natural Experiments vs. True Experiments
+
+| Feature | True Experiment | Natural Experiment |
+|--------|-----------------|---------------------|
 | Internal validity | High (by design) | Requires strong assumptions |
 | External validity | May be limited | Often high (real‑world context) |
 
@@ -120,8 +126,12 @@ We will explore five common designs:
 1. **Classic natural experiment**: A single treatment is as‑if randomly assigned (e.g., Snow’s cholera study, draft lottery).
 2. **Instrumental‑variables natural experiment**: An as‑if random variable affects treatment, but not outcome directly (e.g., settler mortality as instrument for institutions).
 3. **Regression‑discontinuity design**: Treatment is determined by a cutoff on a continuous variable (e.g., Maimonides' rule).
-4.  **Difference-in-differences design**: treatment changes at unpredictable or meaningless times in some units but not others (e.g., minimum-wage study)
-5.  **Synthetic-control design**: weight control cases to estimate the trajectory over time of the treatment case if it were in the control condition (e.g., Brexit study)
+
+---
+### Five Types of Natural Experiments
+
+4\.  **Difference-in-differences design**: treatment changes at unpredictable or meaningless times in some units but not others (e.g., minimum-wage study)
+5\.  **Synthetic-control design**: weight control cases to estimate the trajectory over time of the treatment case if it were in the control condition (e.g., Brexit study)
 
 ---
 ### Classic Natural Experiment
@@ -288,9 +298,7 @@ Do we think that randomized earnings have the same causal effect as nonrandomize
 
 **In Potential Outcomes Terms**:
 
-\[
-(Y_i(1), Y_i(0)) \perp\!\!\!\perp D_i \mid X_i
-\]
+$$(Y_i(1), Y_i(0)) \perp\!\!\!\perp D_i \mid X_i$$
 
 - Treatment assignment \(D_i\) is independent of potential outcomes, **conditional on covariates** \(X_i\) (if needed).
 - This is exactly the **unconfoundedness (selection on observables)** assumption from Week 2.
@@ -386,8 +394,26 @@ AJR's argument:
 | Assumption | Meaning | In the AJR Setting |
 |------------|---------|---------------------|
 | **Relevance** | $Z$ predicts $D$ | High settler mortality → extractive institutions → weaker property rights today. First stage is strong. |
+
+---
+### How the IV Assumptions Are Met (or Argued)
+
+| Assumption | Meaning | In the AJR Setting |
+|------------|---------|---------------------|
 | **Exclusion** | $Z$ affects $Y$ only through $D$ | Settler mortality centuries ago has no direct effect on modern GDP, except via the institutions it shaped. (Must defend: no effect through culture, disease environment, etc.) |
+
+---
+### How the IV Assumptions Are Met (or Argued)
+
+| Assumption | Meaning | In the AJR Setting |
+|------------|---------|---------------------|
 | **Independence** | $Z$ is as‑good‑as randomly assigned | Conditional on covariates? Settler mortality is argued to be a historical accident, not correlated with other determinants of development. |
+
+---
+### How the IV Assumptions Are Met (or Argued)
+
+| Assumption | Meaning | In the AJR Setting |
+|------------|---------|---------------------|
 | **Monotonicity** | No defiers | Implicit: Higher mortality doesn't lead to better institutions in some places and worse in others – the effect is consistent in direction. |
 
 ---
@@ -539,9 +565,7 @@ include_graphics("images/Angrist2019-2.PNG")
 
 **In Potential Outcomes Terms**:
 
-\[
-\lim_{x \downarrow c} E[Y(0) | X=x] = \lim_{x \uparrow c} E[Y(0) | X=x]
-\]
+$$\lim_{x \downarrow c} E[Y(0) | X=x] = \lim_{x \uparrow c} E[Y(0) | X=x]$$
 
 - This is the **continuity assumption**: Potential outcomes are continuous at the cutoff.
 - Under continuity, any jump in the observed outcome at \(c\) is the causal effect.
@@ -551,14 +575,12 @@ include_graphics("images/Angrist2019-2.PNG")
 ### What RDD Estimates
 
 - **Sharp RDD**: The average treatment effect for units at the cutoff:
-  \[
-  \tau_{SRD} = E[Y(1) - Y(0) | X = c]
-  \]
+
+$$\tau_{SRD} = E[Y(1) - Y(0) | X = c]$$
 
 - **Fuzzy RDD**: The LATE for compliers at the cutoff:
-  \[
-  \tau_{FRD} = \frac{\lim_{x\downarrow c} E[Y|X=x] - \lim_{x\uparrow c} E[Y|X=x]}{\lim_{x\downarrow c} E[D|X=x] - \lim_{x\uparrow c} E[D|X=x]}
-  \]
+
+$$\tau_{FRD} = \frac{\lim_{x\downarrow c} E[Y|X=x] - \lim_{x\uparrow c} E[Y|X=x]}{\lim_{x\downarrow c} E[D|X=x] - \lim_{x\uparrow c} E[D|X=x]}$$
 
 ---
 
@@ -613,23 +635,17 @@ When reading or conducting an RDD study, ask:
 
 In potential outcomes notation:
 
-\[
-ATT = E[Y_{i,2}(1) - Y_{i,2}(0) | D_i = 1]
-\]
+$$ATT = E[Y_{i,2}(1) - Y_{i,2}(0) | D_i = 1]$$
 
 But \(Y_{i,2}(0)\) is unobserved for treated units. DiD imputes it using:
 
-\[
-\hat{Y}_{i,2}(0) = Y_{i,1} + \underbrace{(E[Y_{j,2}|D=0] - E[Y_{j,1}|D=0])}_{\text{common trend}}
-\]
+$$\hat{Y}_{i,2}(0) = Y_{i,1} + \underbrace{(E[Y_{j,2}|D=0] - E[Y_{j,1}|D=0])}_{\text{common trend}}$$
 
 ---
 
 **The DiD estimator**:
 
-\[
-\hat{\tau}_{DiD} = (\bar{Y}_{T,2} - \bar{Y}_{T,1}) - (\bar{Y}_{C,2} - \bar{Y}_{C,1})
-\]
+$$\hat{\tau}_{DiD} = (\bar{Y}_{T,2} - \bar{Y}_{T,1}) - (\bar{Y}_{C,2} - \bar{Y}_{C,1})$$
 
 ---
 ### The Parallel Trends Assumption
@@ -637,9 +653,8 @@ But \(Y_{i,2}(0)\) is unobserved for treated units. DiD imputes it using:
 **Core identifying assumption**: In the absence of treatment, the treated and control groups would have followed the same trend.
 
 Formally:
-\[
-E[Y_{i,2}(0) - Y_{i,1}(0) | D_i = 1] = E[Y_{i,2}(0) - Y_{i,1}(0) | D_i = 0]
-\]
+
+$$\small E[Y_{i,2}(0) - Y_{i,1}(0) | D_i = 1] = E[Y_{i,2}(0) - Y_{i,1}(0) | D_i = 0]$$
 
 ---
 
@@ -680,11 +695,18 @@ text(1.5, 125, "Treatment effect")
 - **Setting**: New Jersey raised minimum wage; Pennsylvania did not.
 - **Data**: Fast food restaurants in both states, before and after the policy.
 
+---
+### The Canonical DiD Example: Card and Krueger (1994)
+
+
 | Group | Pre-treatment | Post-treatment | Change |
 |-------|---------------|----------------|--------|
 | NJ (treated) | 20.44 | 21.03 | +0.59 |
 | PA (control) | 23.33 | 21.17 | -2.16 |
 | **DiD estimate** | | | **+2.76** |
+
+---
+### The Canonical DiD Example: Card and Krueger (1994)
 
 - Result: Employment **increased** in NJ relative to PA – contrary to traditional economic theory.
 - Sparked decades of debate about the parallel trends assumption.
@@ -717,9 +739,7 @@ text(1.5, 125, "Treatment effect")
 
 For a treated unit \(j=1\) and donor units \(j=2,...,J+1\):
 
-\[
-\hat{Y}_{1t}(0) = \sum_{j=2}^{J+1} w_j Y_{jt}
-\]
+$$\hat{Y}_{1t}(0) = \sum_{j=2}^{J+1} w_j Y_{jt}$$
 
 where weights \(w_j \geq 0\) and \(\sum w_j = 1\).
 
@@ -727,9 +747,7 @@ where weights \(w_j \geq 0\) and \(\sum w_j = 1\).
 
 We choose weights to minimize:
 
-\[
-\sum_{m=1}^{M} v_m (X_{1m} - \sum_{j=2}^{J+1} w_j X_{jm})^2
-\]
+$$\sum_{m=1}^{M} v_m (X_{1m} - \sum_{j=2}^{J+1} w_j X_{jm})^2$$
 
 - \(X\) includes pre-treatment outcomes and covariates
 - \(v_m\) are predictor importance weights (chosen to minimize pre-treatment MSPE)
@@ -781,6 +799,9 @@ smoking_out %>% plot_weights()
 smoking_out %>% grab_balance_table()
 ```
 
+---
+### Visualizing the Synthetic Control
+
 - **Pre-treatment fit**: Synthetic and observed California should track closely.
 - **Post-treatment divergence**: The gap is the estimated treatment effect.
 - **Weights**: Which states contribute to the synthetic control? (Often just a few.)
@@ -819,6 +840,9 @@ smoking_out %>% grab_balance_table()
 | **RDD** | Discontinuity at cutoff | Maimonides' Rule |
 | **DiD** | Parallel trends | Card & Krueger (min wage) |
 | **Synthetic Control** | Weighted donor pool | CA Prop 99 (tobacco tax) |
+
+---
+### Natural Experiments: Key Takeaways
 
 **Common thread**: Each design uses **design** rather than statistical adjustment to approximate randomization. The credibility of any natural experiment rests on the plausibility of its identifying assumptions.
 
