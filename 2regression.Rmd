@@ -133,8 +133,8 @@ plot(g)
 ---
 ### What Does "Controlling For" Mean?
 
-- Intuitively: we are asking what the relationship between treatment and outcome would be if age were held constant.
-- Mathematically: regression uses the variation in treatment that is **not explained by age** to estimate the effect.
+- Intuitively: we are asking what the relationship between treatment and outcome would be if past elections were held constant.
+- Mathematically: regression uses the variation in treatment that is **not explained by past elections** to estimate the effect.
 
 **Key idea**: Including a confounder removes its influence from both treatment and outcome, reducing bias.
 
@@ -145,29 +145,6 @@ A confounder is a variable that:
 1.  Affects the treatment,
 2.  Affects the outcome,
 3.  Is not itself affected by the treatment.
-
-We can represent this with a **Directed Acyclic Graph (DAG)**.
-
----
-### DAG: A Simple Confounder
-
-```{r confounder_dag_2, echo = FALSE, fig.width = 4, fig.height = 3}
-library(dagitty)
-g <- dagitty('dag {
-  X [pos="0,1"]
-  D [pos="1,0"]
-  Y [pos="1,2"]
-  X -> D
-  X -> Y
-}')
-plot(g)
-```
-
----
-
-- $X$ (age) influences both treatment $D$ and outcome $Y$.
-- This opens a **backdoor path** $D \leftarrow X \rightarrow Y$.
-- Controlling for $X$ **blocks** this path, giving us the direct effect $D \rightarrow Y$.
 
 ---
 ### Good Controls: Block Backdoor Paths
