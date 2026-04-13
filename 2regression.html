@@ -84,8 +84,58 @@ coef(lm_adjusted)["TrumpShare"]
 
 ---
 
+How reasonable is this assumption in observational studies? For example, does the Trump and terrorism regression plausibly meet this standard? (What would need to be true?)
+
+---
+
 **Overlap / Common Support**  
 For every combination of values of \(X\), there must be both treated and control units.
+
+---
+
+Let's use a dichotomous version of TrumpSupport, splitting states into majority/minority Trump states, and consider the distributions of D12Margin in each category.
+
+---
+
+
+``` r
+# Side-by-side histograms using facet_wrap
+election2016 &lt;- election2016 %&gt;%
+  mutate(TrumpGroup = ifelse(TrumpShare &gt;= 50, "Trump Share ≥ 50%", "Trump Share &lt; 50%"))
+
+
+p &lt;- ggplot(election2016, aes(x = D12Margin)) +
+  geom_histogram(
+    aes(y = after_stat(density)),   # use density for easy comparison
+    bins = 30,                      # adjust bin width as needed
+    fill = "steelblue",             # attractive fill color
+    color = "white",                # white border for bins
+    alpha = 0.8                     # slight transparency
+  ) +
+  facet_wrap(~ TrumpGroup, ncol = 2) +  # two panels side by side
+  labs(
+    title = "Common Support",
+    x = "Democrats' Margin in 2012",
+    y = "Density",
+    caption = "Source: election2016 dataset"
+  ) +
+  theme_minimal(base_size = 14) +        # clean minimal theme
+  theme(
+    strip.background = element_rect(fill = "lightgray", color = NA),
+    strip.text = element_text(face = "bold"),
+    plot.title = element_text(hjust = 0.5, face = "bold")
+  )
+```
+
+---
+
+![](2regression_files/figure-html/common_support_2-1.png)&lt;!-- --&gt;
+
+---
+
+-   Clearly, states with strong Democratic margins in 2012 are only in the control group and states with very negative Democratic margins in 2012 are basically only in the treatment group. We don't have real common support here!
+
+-   We should focus mostly on swing states where counterfactuals actually make sense.
 
 ---
 ### Visualizing Confounding with DAGs
@@ -195,7 +245,7 @@ This is why **sensitivity analysis** is crucial – we need to ask: how strong w
 
 ---
 
-Let's see how this works in practice in an excellent application.
+Let's see how this works in practice in an excellent application, the study of long-term effects of victimization that is one of the optional readings for this week.
 
 ---
 &lt;img src="images/luputitleauthor.JPG" width="90%" /&gt;
@@ -567,8 +617,15 @@ These two sources of bias can point in the same direction, in which scenario the
 &lt;img src="images/Clarke2.png" width="90%" /&gt;
 
 ---
+## When Does Adding a Control Variable Help?
 
-As we can see, there are in principle about as many situations where leaving out partial sets of control variables is the right choice as there are situations where including them is the right choice.
+-   Adding a control variable reduces overall bias when the still-omitted variables and the newly added variable have effects on the outcome that point in the same direction and are positively correlated with each other.
+
+-   Adding it increases bias when those two quantities have opposite signs, or when they have the same sign but are negatively correlated. The new control pulls the estimate the wrong way relative to what's still missing.
+
+---
+
+-   Since we rarely know the signs and correlations of unmeasured confounders, this is largely a judgment call. As Clarke emphasizes, the two scenarios are roughly equally common in principle.
 
 ---
 ### Regression for Causal Inference
