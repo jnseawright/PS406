@@ -5,6 +5,8 @@
     <meta charset="utf-8" />
     <meta name="author" content="Jaye Seawright" />
     <script src="3naturalexperiments_files/header-attrs-2.30/header-attrs.js"></script>
+    <script src="3naturalexperiments_files/kePrint-0.0.1/kePrint.js"></script>
+    <link href="3naturalexperiments_files/lightable-0.0.1/lightable.css" rel="stylesheet" />
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
   </head>
   <body>
@@ -117,6 +119,7 @@ We will explore five common designs:
 ### Five Types of Natural Experiments
 
 4\.  **Difference-in-differences design**: treatment changes at unpredictable or meaningless times in some units but not others (e.g., minimum-wage study)
+
 5\.  **Synthetic-control design**: weight control cases to estimate the trajectory over time of the treatment case if it were in the control condition (e.g., Brexit study)
 
 ---
@@ -436,6 +439,10 @@ Were randomization issues fixed?
 Do we think that randomized earnings have the same causal effect as nonrandomized earnings?
 
 ---
+
+If not, this may be a SUTVA violation; different individuals may be receiving causally different versions of the treatment.
+
+---
 ### Classic Natural Experiments: Summary
 
 **The Big Idea**: Treatment is **"as‑if randomly assigned"** by nature, policy, or accident.
@@ -576,15 +583,15 @@ This is exactly the set of countries where colonial settlement patterns mattered
 
 ---
 
-&lt;img src="images/settlers1.png" height="100%" style="display: block; margin: auto;" /&gt;
+&lt;img src="images/settlers1.png" width="520" height="100%" style="display: block; margin: auto;" /&gt;
 
 ---
 
-&lt;img src="images/settlers2.png" height="100%" style="display: block; margin: auto;" /&gt;
+&lt;img src="images/settlers2.png" width="968" height="100%" style="display: block; margin: auto;" /&gt;
 
 ---
 
-&lt;img src="images/settlers3.png" height="100%" style="display: block; margin: auto;" /&gt;
+&lt;img src="images/settlers3.png" width="948" height="100%" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -653,6 +660,10 @@ If the RDD is a success, then the groups just above and below the cutpoint on `\
 1. It may be a good idea to do a balance test between treatment and control cases within a bandwidth around the cutpoint.
 
 2. At the very least, look at a histogram of cases to check that there are about the same number of cases just above and just below the threshold.
+
+---
+
+-   Can Maimonides' Rule be manipulated? What would manipulation look like here?
 
 ---
 
@@ -773,7 +784,7 @@ Formally:
 - Any violation (e.g., differential economic shocks) biases the estimate
 
 ---
-### Visualizing Parallel Trends
+### Visualizing Parallel Trends: A Simulation
 
 ![](3naturalexperiments_files/figure-html/did_plot-1.png)&lt;!-- --&gt;
 
@@ -793,11 +804,128 @@ Formally:
 ### The Canonical DiD Example: Card and Krueger (1994)
 
 
-| Group | Pre-treatment | Post-treatment | Change |
-|-------|---------------|----------------|--------|
-| NJ (treated) | 20.44 | 21.03 | +0.59 |
-| PA (control) | 23.33 | 21.17 | -2.16 |
-| **DiD estimate** | | | **+2.76** |
+
+``` r
+library(dplyr)
+library(tidyr)
+library(knitr)
+library(kableExtra)
+
+data_path &lt;- file.path("data", "CK1994.csv")
+ck &lt;- read.csv(data_path, na.strings = c(".", ""))   # missing values are coded as "."
+
+ck &lt;- ck %&gt;%
+  mutate(
+    total_emp = empft + emppt + nmgrs,
+    # Label groups
+    state_name = ifelse(state == 1, "New Jersey (treated)", "Pennsylvania (control)"),
+    period = ifelse(time == 0, "Before", "After")
+  )
+```
+
+---
+
+
+``` r
+# Keep only complete cases for the three employment components
+ck_clean &lt;- ck %&gt;%
+  filter(!is.na(empft) &amp; !is.na(emppt) &amp; !is.na(nmgrs))
+
+# Calculate mean employment by state and period
+means &lt;- ck_clean %&gt;%
+  group_by(state_name, period) %&gt;%
+  summarise(mean_emp = mean(total_emp, na.rm = TRUE), .groups = "drop")
+
+# Pivot to wide format for easy differencing
+means_wide &lt;- means %&gt;%
+  pivot_wider(names_from = period, values_from = mean_emp)
+```
+
+---
+
+
+``` r
+# Compute differences (After - Before)
+means_wide &lt;- means_wide %&gt;%
+  mutate(Difference = After - Before)
+
+# Extract DiD estimate
+did_estimate &lt;- means_wide$Difference[means_wide$state_name == "New Jersey (treated)"] -
+                means_wide$Difference[means_wide$state_name == "Pennsylvania (control)"]
+
+# Create a clean presentation table
+
+table_did &lt;- means_wide %&gt;%
+  select(state_name, Before, After, Difference) %&gt;%
+  rename(State = state_name)
+
+# Add a row for the DiD estimate
+table_did &lt;- bind_rows(
+  table_did,
+  tibble(
+    State = "Difference-in-Differences",
+    Before = NA,
+    After = NA,
+    Difference = did_estimate
+  )
+)
+```
+
+---
+
+
+``` r
+# Format numbers (round to one decimal)
+table_did &lt;- table_did %&gt;%
+  mutate(
+    Before = round(Before, 1),
+    After = round(After, 1),
+    Difference = round(Difference, 1)
+  )
+```
+
+---
+
+
+``` r
+# Display the table (for RMarkdown slide)
+kable(table_did,
+      caption = "Effect of Minimum Wage Increase on Employment (Card &amp; Krueger 1994)",
+      align = "lccc") %&gt;%
+  kable_styling(full_width = FALSE)   # optional, requires kableExtra package
+```
+
+&lt;table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+&lt;caption&gt;Effect of Minimum Wage Increase on Employment (Card &amp;amp; Krueger 1994)&lt;/caption&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; State &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Before &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; After &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Difference &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; New Jersey (treated) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 29.9 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 30.2 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.3 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Pennsylvania (control) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 33.2 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 31.2 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; -2.0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Difference-in-Differences &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 2.3 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
 
 ---
 ### The Canonical DiD Example: Card and Krueger (1994)
@@ -887,12 +1015,39 @@ smoking_out &lt;- smoking %&gt;%
 ``` r
 # Plot the results
 smoking_out %&gt;% plot_trends()
+```
 
+![](3naturalexperiments_files/figure-html/synth_plot_1-1.png)&lt;!-- --&gt;
+---
+### Visualizing the Synthetic Control
+
+
+``` r
 # Examine weights
 smoking_out %&gt;% plot_weights()
+```
 
+![](3naturalexperiments_files/figure-html/synth_plot_2-1.png)&lt;!-- --&gt;
+---
+### Visualizing the Synthetic Control
+
+
+``` r
 # Check balance
 smoking_out %&gt;% grab_balance_table()
+```
+
+```
+## # A tibble: 7 × 4
+##   variable     California synthetic_California donor_sample
+##   &lt;chr&gt;             &lt;dbl&gt;                &lt;dbl&gt;        &lt;dbl&gt;
+## 1 ln_income        10.1                  9.86         9.83 
+## 2 ret_price        89.4                 89.3         87.3  
+## 3 youth             0.174                0.174        0.173
+## 4 beer_sales       24.3                 24.1         23.7  
+## 5 cigsale_1975    127.                 127.         137.   
+## 6 cigsale_1980    120.                 120.         138.   
+## 7 cigsale_1988     90.1                 91.4        114.
 ```
 
 ---

@@ -131,6 +131,7 @@ We will explore five common designs:
 ### Five Types of Natural Experiments
 
 4\.  **Difference-in-differences design**: treatment changes at unpredictable or meaningless times in some units but not others (e.g., minimum-wage study)
+
 5\.  **Synthetic-control design**: weight control cases to estimate the trajectory over time of the treatment case if it were in the control condition (e.g., Brexit study)
 
 ---
@@ -290,6 +291,10 @@ include_graphics("images/Doherty3.png")
 ---
 
 Do we think that randomized earnings have the same causal effect as nonrandomized earnings?
+
+---
+
+If not, this may be a SUTVA violation; different individuals may be receiving causally different versions of the treatment.
 
 ---
 ### Classic Natural Experiments: Summary
@@ -541,6 +546,10 @@ If the RDD is a success, then the groups just above and below the cutpoint on $Z
 
 ---
 
+-   Can Maimonides' Rule be manipulated? What would manipulation look like here?
+
+---
+
 ```{r, echo = FALSE, out.width="85%", fig.retina = 1, fig.align='center'}
 include_graphics("images/Angrist2019title.PNG")
 ```
@@ -664,7 +673,7 @@ $$\small E[Y_{i,2}(0) - Y_{i,1}(0) | D_i = 1] = E[Y_{i,2}(0) - Y_{i,1}(0) | D_i 
 - Any violation (e.g., differential economic shocks) biases the estimate
 
 ---
-### Visualizing Parallel Trends
+### Visualizing Parallel Trends: A Simulation
 
 ```{r did_plot, echo = FALSE, fig.width = 6, fig.height = 4}
 # Simulate data for visualization
@@ -699,11 +708,91 @@ text(1.5, 125, "Treatment effect")
 ### The Canonical DiD Example: Card and Krueger (1994)
 
 
-| Group | Pre-treatment | Post-treatment | Change |
-|-------|---------------|----------------|--------|
-| NJ (treated) | 20.44 | 21.03 | +0.59 |
-| PA (control) | 23.33 | 21.17 | -2.16 |
-| **DiD estimate** | | | **+2.76** |
+```{r did_analysis_1, echo = TRUE, fig.width = 6, fig.height = 4}
+library(dplyr)
+library(tidyr)
+library(knitr)
+library(kableExtra)
+
+data_path <- file.path("data", "CK1994.csv")
+ck <- read.csv(data_path, na.strings = c(".", ""))   # missing values are coded as "."
+
+ck <- ck %>%
+  mutate(
+    total_emp = empft + emppt + nmgrs,
+    # Label groups
+    state_name = ifelse(state == 1, "New Jersey (treated)", "Pennsylvania (control)"),
+    period = ifelse(time == 0, "Before", "After")
+  )
+```
+
+---
+
+```{r did_analysis_2, echo = TRUE, fig.width = 6, fig.height = 4}
+# Keep only complete cases for the three employment components
+ck_clean <- ck %>%
+  filter(!is.na(empft) & !is.na(emppt) & !is.na(nmgrs))
+
+# Calculate mean employment by state and period
+means <- ck_clean %>%
+  group_by(state_name, period) %>%
+  summarise(mean_emp = mean(total_emp, na.rm = TRUE), .groups = "drop")
+
+# Pivot to wide format for easy differencing
+means_wide <- means %>%
+  pivot_wider(names_from = period, values_from = mean_emp)
+```
+
+---
+
+```{r did_analysis_3, echo = TRUE, fig.width = 6, fig.height = 4}
+# Compute differences (After - Before)
+means_wide <- means_wide %>%
+  mutate(Difference = After - Before)
+
+# Extract DiD estimate
+did_estimate <- means_wide$Difference[means_wide$state_name == "New Jersey (treated)"] -
+                means_wide$Difference[means_wide$state_name == "Pennsylvania (control)"]
+
+# Create a clean presentation table
+
+table_did <- means_wide %>%
+  select(state_name, Before, After, Difference) %>%
+  rename(State = state_name)
+
+# Add a row for the DiD estimate
+table_did <- bind_rows(
+  table_did,
+  tibble(
+    State = "Difference-in-Differences",
+    Before = NA,
+    After = NA,
+    Difference = did_estimate
+  )
+)
+```
+
+---
+
+```{r did_analysis_4, echo = TRUE, fig.width = 6, fig.height = 4}
+# Format numbers (round to one decimal)
+table_did <- table_did %>%
+  mutate(
+    Before = round(Before, 1),
+    After = round(After, 1),
+    Difference = round(Difference, 1)
+  )
+```
+
+---
+
+```{r did_analysis_5, echo = TRUE, fig.width = 6, fig.height = 4}
+# Display the table (for RMarkdown slide)
+kable(table_did,
+      caption = "Effect of Minimum Wage Increase on Employment (Card & Krueger 1994)",
+      align = "lccc") %>%
+  kable_styling(full_width = FALSE)   # optional, requires kableExtra package
+```
 
 ---
 ### The Canonical DiD Example: Card and Krueger (1994)
@@ -762,7 +851,7 @@ $$\sum_{m=1}^{M} v_m (X_{1m} - \sum_{j=2}^{J+1} w_j X_{jm})^2$$
 
 ---
 
-```{r synth_setup, echo = TRUE, eval = FALSE}
+```{r synth_setup, echo = TRUE, eval = TRUE}
 library(tidysynth)
 
 smoking_out <- smoking %>%
@@ -788,13 +877,21 @@ smoking_out <- smoking %>%
 ---
 ### Visualizing the Synthetic Control
 
-```{r synth_plot, echo = TRUE, eval = FALSE}
+```{r synth_plot_1, echo = TRUE, eval = TRUE}
 # Plot the results
 smoking_out %>% plot_trends()
+```
+---
+### Visualizing the Synthetic Control
 
+```{r synth_plot_2, echo = TRUE, eval = TRUE}
 # Examine weights
 smoking_out %>% plot_weights()
+```
+---
+### Visualizing the Synthetic Control
 
+```{r synth_plot_3, echo = TRUE, eval = TRUE}
 # Check balance
 smoking_out %>% grab_balance_table()
 ```
