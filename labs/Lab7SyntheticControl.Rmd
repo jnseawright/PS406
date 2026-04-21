@@ -36,8 +36,8 @@ Propose a synthetic control design to estimate the effect of Trump's 2016 electi
 
 *   What are the key assumptions?
 
-### Problem 2: Implement with Synth
-Load the data (you may need to assemble from World Bank or other sources). Use dataprep and synth to construct the synthetic US and estimate the effect. Plot the path.
+### Problem 2: Implement with tidysynth
+Load the data (you may need to assemble from World Bank or other sources). Use tidysynth to construct the synthetic US and estimate the effect. Plot the path.
 
 ### Problem 3: Placebo Tests
 Run placebo tests by applying the same method to each donor country (in‑space placebo). Create a plot showing the gap for the US and all placebos. Calculate the p‑value as the proportion of placebos with a post‑treatment gap as large as the US.

@@ -30,7 +30,7 @@ set.seed(27)             # make random results reproducible
 ### Problem 1: Democracy and Education: Classic 2×2 DiD
 
 In this analysis, I will ask you to use data from the Alvarez et al. data set on regimes and economic
-performance worldwide. The data are available as aclppanel.csv, and you can also access [a codebook](http://www.u.arizona.edu/~mishler/PrzeworskiCodebook.PDF).
+performance worldwide. The data are available as aclppanel.csv, and you can also access the codebook in the data directory as ACLP codebook.
 
 Using these data, try to determine whether dictatorship/democracy (REG) has a positive or negative
 causal effect on average education levels (EDT). Structure the analysis as a difference-in-differences setup using a two‑way fixed effects model (feols from fixest). Describe your findings.
@@ -40,7 +40,7 @@ causal effect on average education levels (EDT). Structure the analysis as a dif
 Create a plot of the mean education level over time for democracies and dictatorships. Run a pre‑treatment trend test by interacting time with treatment indicator using only pre‑regime-change data for countries that transition from dictatorship to democracy and countries that are continuously dicatorships. What do you conclude?
 
 ### Problem 3: Staggered Adoption and Modern Estimators
-The cross-national data have a staggered treatment (countries change regimes at different times). Use the did package (Callaway & Sant'Anna) to estimate the group‑time average treatment effects. Aggregate to an overall ATT. Compare with the TWFE estimate. Use bacondecomp to diagnose any negative weights in the TWFE estimate.
+The cross-national data have a staggered treatment (countries change regimes at different times). Use the did package (Callaway & Sant'Anna) to estimate the group‑time average treatment effects. Aggregate to an overall ATT. Compare with the TWFE estimate.
 
 ### Problem 4: Interactive Fixed Effects (Optional)
 

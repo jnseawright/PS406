@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2026-03-11" />
+<meta name="date" content="2026-04-21" />
 
 <title>Political Science 406 Lab 9: Missing Data</title>
 
@@ -220,6 +220,107 @@ ul.task-list{list-style: none;}
 
 
 
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ background-color: #f8f8f8; }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ef2929; } 
+code span.an { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.at { color: #204a87; } 
+code span.bn { color: #0000cf; } 
+code span.cf { color: #204a87; font-weight: bold; } 
+code span.ch { color: #4e9a06; } 
+code span.cn { color: #8f5902; } 
+code span.co { color: #8f5902; font-style: italic; } 
+code span.cv { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.do { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.dt { color: #204a87; } 
+code span.dv { color: #0000cf; } 
+code span.er { color: #a40000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #0000cf; } 
+code span.fu { color: #204a87; font-weight: bold; } 
+code span.im { } 
+code span.in { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.kw { color: #204a87; font-weight: bold; } 
+code span.op { color: #ce5c00; font-weight: bold; } 
+code span.ot { color: #8f5902; } 
+code span.pp { color: #8f5902; font-style: italic; } 
+code span.sc { color: #ce5c00; font-weight: bold; } 
+code span.ss { color: #4e9a06; } 
+code span.st { color: #4e9a06; } 
+code span.va { color: #000000; } 
+code span.vs { color: #4e9a06; } 
+code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
 
 
 
@@ -322,7 +423,7 @@ display: none;
 
 <h1 class="title toc-ignore">Political Science 406 Lab 9: Missing
 Data</h1>
-<h4 class="date">2026-03-11</h4>
+<h4 class="date">2026-04-21</h4>
 
 </div>
 
@@ -338,24 +439,145 @@ model (Gini ~ Polity * log(GDP)) after performing multiple imputation
 with mice (5 imputations). Compare the results with the complete‑case
 analysis from Lab 2. Are there meaningful differences? What does this
 suggest about the missingness mechanism?</p>
+<hr />
 </div>
-<div id="problem-2-missing-data-in-the-ajr-replication" class="section level3">
-<h3>Problem 2: Missing Data in the AJR Replication</h3>
-<p>Load the AJR replication data (ajrdata.csv). You can find <a href="https://doi.org/10.1257/aer.91.5">the original article</a>.
-Replication data are <a href="https://github.com/jnseawright/PS406/blob/main/data/ajrdata.csv">available</a>
-as well. Replicate the IV analysis from Lab 3 (or a simplified version)
-using listwise deletion. Then use multiple imputation (mice) to handle
-missing values in the covariates. Re‑estimate the IV model on each
-imputed dataset and pool the results using mitools or mice::pool.
-Compare the coefficients and standard errors. Discuss whether multiple
-imputation changes the substantive conclusions.</p>
+<div id="problem-2-simulating-missingness-mechanisms-in-the-ajr-data" class="section level2">
+<h2>Problem 2: Simulating Missingness Mechanisms in the AJR Data</h2>
+<p>The AJR replication data are fully observed. To understand the
+consequences of different missingness mechanisms and the performance of
+multiple imputation, we will artificially introduce missingness in two
+ways:</p>
+<ol style="list-style-type: decimal">
+<li><strong>MCAR (Missing Completely at Random)</strong> : Values are
+deleted entirely at random, independent of any observed or unobserved
+variables.</li>
+<li><strong>MAR (Missing at Random)</strong> : The probability of a
+value being missing depends on another fully observed variable (e.g.,
+latitude).</li>
+</ol>
+<p>We will then compare three estimation strategies: - <strong>Full
+data</strong> (the ground truth, before any deletion). -
+<strong>Listwise deletion</strong> (complete‑case analysis on the data
+with missingness). - <strong>Multiple imputation</strong> (using
+<code>mice</code> on the data with missingness).</p>
+<p>The outcome of interest is the IV estimate of the effect of
+institutions (<code>risk</code>) on log GDP (<code>loggdp</code>),
+instrumented by settler mortality (<code>logmort0</code>).</p>
+<div id="data-preparation" class="section level3">
+<h3>Data Preparation</h3>
+<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="fu">library</span>(AER)</span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="fu">library</span>(mice)</span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="fu">library</span>(broom)</span>
+<span id="cb1-5"><a href="#cb1-5"></a></span>
+<span id="cb1-6"><a href="#cb1-6"></a><span class="co"># Load AJR data</span></span>
+<span id="cb1-7"><a href="#cb1-7"></a>ajr <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;../data/ajrdata.csv&quot;</span>)</span>
+<span id="cb1-8"><a href="#cb1-8"></a></span>
+<span id="cb1-9"><a href="#cb1-9"></a><span class="co"># Create analysis variables</span></span>
+<span id="cb1-10"><a href="#cb1-10"></a>ajr_clean <span class="ot">&lt;-</span> ajr <span class="sc">%&gt;%</span></span>
+<span id="cb1-11"><a href="#cb1-11"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb1-12"><a href="#cb1-12"></a>    <span class="at">loggdp =</span> loggdp,</span>
+<span id="cb1-13"><a href="#cb1-13"></a>    <span class="at">institutions =</span> risk,</span>
+<span id="cb1-14"><a href="#cb1-14"></a>    <span class="at">logmort =</span> logmort0,</span>
+<span id="cb1-15"><a href="#cb1-15"></a>    <span class="at">lat_abst =</span> <span class="fu">abs</span>(latitude)</span>
+<span id="cb1-16"><a href="#cb1-16"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb1-17"><a href="#cb1-17"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(loggdp, institutions, logmort, lat_abst, neoeuro, asia, africa, other)</span>
+<span id="cb1-18"><a href="#cb1-18"></a></span>
+<span id="cb1-19"><a href="#cb1-19"></a><span class="co"># Full data IV (ground truth)</span></span>
+<span id="cb1-20"><a href="#cb1-20"></a>iv_full <span class="ot">&lt;-</span> <span class="fu">ivreg</span>(loggdp <span class="sc">~</span> institutions <span class="sc">+</span> lat_abst <span class="sc">+</span> neoeuro <span class="sc">+</span> asia <span class="sc">+</span> africa <span class="sc">|</span></span>
+<span id="cb1-21"><a href="#cb1-21"></a>                 logmort <span class="sc">+</span> lat_abst <span class="sc">+</span> neoeuro <span class="sc">+</span> asia <span class="sc">+</span> africa,</span>
+<span id="cb1-22"><a href="#cb1-22"></a>                 <span class="at">data =</span> ajr_clean)</span></code></pre></div>
+<hr />
 </div>
-<div id="problem-3-missingness-mechanisms" class="section level3">
-<h3>Problem 3: Missingness Mechanisms</h3>
-<p>For the AJR data, consider the variable logmort0 (settler mortality).
-Speculate on whether missingness in this variable is MCAR, MAR, or MNAR.
-Justify your answer. If it were MNAR, what additional analyses might you
-attempt?</p>
+<div id="part-a-mcar-missingness" class="section level3">
+<h3>Part A: MCAR Missingness</h3>
+<p>We randomly delete 20% of the values in <code>institutions</code> and
+<code>logmort</code> completely at random.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">set.seed</span>(<span class="dv">27</span>)</span>
+<span id="cb2-2"><a href="#cb2-2"></a>ajr_mcar <span class="ot">&lt;-</span> ajr_clean</span>
+<span id="cb2-3"><a href="#cb2-3"></a></span>
+<span id="cb2-4"><a href="#cb2-4"></a><span class="co"># Introduce 20% missingness in institutions and logmort (MCAR)</span></span>
+<span id="cb2-5"><a href="#cb2-5"></a>n <span class="ot">&lt;-</span> <span class="fu">nrow</span>(ajr_mcar)</span>
+<span id="cb2-6"><a href="#cb2-6"></a>ajr_mcar<span class="sc">$</span>institutions[<span class="fu">sample</span>(n, <span class="at">size =</span> <span class="fu">round</span>(<span class="fl">0.2</span> <span class="sc">*</span> n))] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb2-7"><a href="#cb2-7"></a>ajr_mcar<span class="sc">$</span>logmort[<span class="fu">sample</span>(n, <span class="at">size =</span> <span class="fu">round</span>(<span class="fl">0.2</span> <span class="sc">*</span> n))] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb2-8"><a href="#cb2-8"></a></span>
+<span id="cb2-9"><a href="#cb2-9"></a><span class="co"># Listwise deletion</span></span>
+<span id="cb2-10"><a href="#cb2-10"></a>ajr_mcar_cc <span class="ot">&lt;-</span> <span class="fu">na.omit</span>(ajr_mcar)</span>
+<span id="cb2-11"><a href="#cb2-11"></a>iv_mcar_cc <span class="ot">&lt;-</span> <span class="fu">ivreg</span>(loggdp <span class="sc">~</span> institutions <span class="sc">+</span> lat_abst <span class="sc">+</span> neoeuro <span class="sc">+</span> asia <span class="sc">+</span> africa <span class="sc">|</span></span>
+<span id="cb2-12"><a href="#cb2-12"></a>                    logmort <span class="sc">+</span> lat_abst <span class="sc">+</span> neoeuro <span class="sc">+</span> asia <span class="sc">+</span> africa,</span>
+<span id="cb2-13"><a href="#cb2-13"></a>                    <span class="at">data =</span> ajr_mcar_cc)</span>
+<span id="cb2-14"><a href="#cb2-14"></a></span>
+<span id="cb2-15"><a href="#cb2-15"></a><span class="co"># Multiple imputation</span></span>
+<span id="cb2-16"><a href="#cb2-16"></a><span class="co"># YOUR JOB IS TO ADD CODE HERE THAT CARRIES OUT MULTIPLE IMPUTATION TO REVERSE THE EFFECTS OF THE MISSINGNESS THAT WE HAVE ADDED</span></span></code></pre></div>
+<p>What happens when we use multiple imputation in this simulation? How
+close is it to the original results, both in terms of the estimate and
+the standard error?</p>
+<hr />
+</div>
+<div id="part-b-mar-missingness" class="section level3">
+<h3>Part B: MAR Missingness</h3>
+<p>Now we make missingness depend on <code>lat_abst</code> (absolute
+latitude). Specifically, observations with higher latitude are more
+likely to have missing values in <code>institutions</code> and
+<code>logmort</code>. This is a common MAR scenario where missingness is
+correlated with an observed covariate.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">set.seed</span>(<span class="dv">27</span>)</span>
+<span id="cb3-2"><a href="#cb3-2"></a>ajr_mar <span class="ot">&lt;-</span> ajr_clean</span>
+<span id="cb3-3"><a href="#cb3-3"></a></span>
+<span id="cb3-4"><a href="#cb3-4"></a>n <span class="ot">&lt;-</span> <span class="fu">nrow</span>(ajr_mar)   <span class="co"># &lt;-- add this line</span></span>
+<span id="cb3-5"><a href="#cb3-5"></a></span>
+<span id="cb3-6"><a href="#cb3-6"></a><span class="co"># Probability of missingness increases with latitude</span></span>
+<span id="cb3-7"><a href="#cb3-7"></a><span class="co"># We&#39;ll create a logistic probability: p(missing) = plogis(scale(lat_abst))</span></span>
+<span id="cb3-8"><a href="#cb3-8"></a><span class="co"># This creates missingness probabilities ranging from ~0.2 to ~0.8,</span></span>
+<span id="cb3-9"><a href="#cb3-9"></a><span class="co"># averaging about 20% missing overall.</span></span>
+<span id="cb3-10"><a href="#cb3-10"></a><span class="co"># This ensures higher latitude =&gt; higher chance of missing</span></span>
+<span id="cb3-11"><a href="#cb3-11"></a>p_miss <span class="ot">&lt;-</span> <span class="fu">plogis</span>(<span class="fu">scale</span>(ajr_mar<span class="sc">$</span>lat_abst))</span>
+<span id="cb3-12"><a href="#cb3-12"></a>miss_institutions <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, p_miss)</span>
+<span id="cb3-13"><a href="#cb3-13"></a>miss_logmort    <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, p_miss)</span>
+<span id="cb3-14"><a href="#cb3-14"></a></span>
+<span id="cb3-15"><a href="#cb3-15"></a>ajr_mar<span class="sc">$</span>institutions[miss_institutions <span class="sc">==</span> <span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb3-16"><a href="#cb3-16"></a>ajr_mar<span class="sc">$</span>logmort[miss_logmort <span class="sc">==</span> <span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb3-17"><a href="#cb3-17"></a></span>
+<span id="cb3-18"><a href="#cb3-18"></a><span class="co"># Listwise deletion</span></span>
+<span id="cb3-19"><a href="#cb3-19"></a>ajr_mar_cc <span class="ot">&lt;-</span> <span class="fu">na.omit</span>(ajr_mar)</span>
+<span id="cb3-20"><a href="#cb3-20"></a>iv_mar_cc <span class="ot">&lt;-</span> <span class="fu">ivreg</span>(loggdp <span class="sc">~</span> institutions <span class="sc">+</span> lat_abst <span class="sc">+</span> neoeuro <span class="sc">+</span> asia <span class="sc">+</span> africa <span class="sc">|</span></span>
+<span id="cb3-21"><a href="#cb3-21"></a>                   logmort <span class="sc">+</span> lat_abst <span class="sc">+</span> neoeuro <span class="sc">+</span> asia <span class="sc">+</span> africa,</span>
+<span id="cb3-22"><a href="#cb3-22"></a>                   <span class="at">data =</span> ajr_mar_cc)</span>
+<span id="cb3-23"><a href="#cb3-23"></a></span>
+<span id="cb3-24"><a href="#cb3-24"></a><span class="co"># Multiple imputation</span></span>
+<span id="cb3-25"><a href="#cb3-25"></a><span class="co"># YOUR JOB IS TO ADD CODE HERE THAT CARRIES OUT MULTIPLE IMPUTATION TO REVERSE THE EFFECTS OF THE MISSINGNESS THAT WE HAVE ADDED</span></span></code></pre></div>
+<p>What happens when we use multiple imputation in this simulation? How
+close is it to the original results, both in terms of the estimate and
+the standard error?</p>
+<hr />
+</div>
+<div id="comparison-table" class="section level3">
+<h3>Comparison Table</h3>
+<p>We compile the coefficient on <code>institutions</code> from each
+analysis.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode numberSource r numberLines"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>results <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb4-2"><a href="#cb4-2"></a>  <span class="at">Scenario =</span> <span class="fu">c</span>(<span class="st">&quot;Full Data&quot;</span>, </span>
+<span id="cb4-3"><a href="#cb4-3"></a>               <span class="st">&quot;MCAR: Listwise&quot;</span>, <span class="st">&quot;MCAR: MI&quot;</span>, </span>
+<span id="cb4-4"><a href="#cb4-4"></a>               <span class="st">&quot;MAR: Listwise&quot;</span>, <span class="st">&quot;MAR: MI&quot;</span>),</span>
+<span id="cb4-5"><a href="#cb4-5"></a>  <span class="at">Estimate =</span> <span class="fu">c</span>(<span class="fu">coef</span>(iv_full)[<span class="st">&quot;institutions&quot;</span>],</span>
+<span id="cb4-6"><a href="#cb4-6"></a>               <span class="fu">coef</span>(iv_mcar_cc)[<span class="st">&quot;institutions&quot;</span>],</span>
+<span id="cb4-7"><a href="#cb4-7"></a>               <span class="fu">summary</span>(iv_mcar_mi)<span class="sc">$</span>estimate[<span class="st">&quot;institutions&quot;</span>],</span>
+<span id="cb4-8"><a href="#cb4-8"></a>               <span class="fu">coef</span>(iv_mar_cc)[<span class="st">&quot;institutions&quot;</span>],</span>
+<span id="cb4-9"><a href="#cb4-9"></a>               <span class="fu">summary</span>(iv_mar_mi)<span class="sc">$</span>estimate[<span class="st">&quot;institutions&quot;</span>]),</span>
+<span id="cb4-10"><a href="#cb4-10"></a>  <span class="at">SE =</span> <span class="fu">c</span>(<span class="fu">sqrt</span>(<span class="fu">vcov</span>(iv_full)[<span class="st">&quot;institutions&quot;</span>, <span class="st">&quot;institutions&quot;</span>]),</span>
+<span id="cb4-11"><a href="#cb4-11"></a>         <span class="fu">sqrt</span>(<span class="fu">vcov</span>(iv_mcar_cc)[<span class="st">&quot;institutions&quot;</span>, <span class="st">&quot;institutions&quot;</span>]),</span>
+<span id="cb4-12"><a href="#cb4-12"></a>         <span class="fu">summary</span>(iv_mcar_mi)<span class="sc">$</span>std.error[<span class="st">&quot;institutions&quot;</span>],</span>
+<span id="cb4-13"><a href="#cb4-13"></a>         <span class="fu">sqrt</span>(<span class="fu">vcov</span>(iv_mar_cc)[<span class="st">&quot;institutions&quot;</span>, <span class="st">&quot;institutions&quot;</span>]),</span>
+<span id="cb4-14"><a href="#cb4-14"></a>         <span class="fu">summary</span>(iv_mar_mi)<span class="sc">$</span>std.error[<span class="st">&quot;institutions&quot;</span>])</span>
+<span id="cb4-15"><a href="#cb4-15"></a>)</span>
+<span id="cb4-16"><a href="#cb4-16"></a></span>
+<span id="cb4-17"><a href="#cb4-17"></a>results</span></code></pre></div>
+<p>What do we conclude about the value of imputation? What happens to
+the standard errors with each simulation? If you see anything notable in
+the standard errors, can you diagnose and explain the reason why it
+happens and explain its implications for multiple imputation and causal
+inference?</p>
+</div>
 </div>
 </div>
 

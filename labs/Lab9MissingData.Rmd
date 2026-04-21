@@ -30,8 +30,137 @@ set.seed(27)             # make random results reproducible
 ### Problem 1: Democracy and Inequality with Multiple Imputation
 Return to the inequality dataset from Lab 2. Fit the interaction model (Gini ~ Polity * log(GDP)) after performing multiple imputation with mice (5 imputations). Compare the results with the complete‑case analysis from Lab 2. Are there meaningful differences? What does this suggest about the missingness mechanism?
 
-### Problem 2: Missing Data in the AJR Replication
-Load the AJR replication data (ajrdata.csv). You can find [the original article](https://doi.org/10.1257/aer.91.5). Replication data are [available](https://github.com/jnseawright/PS406/blob/main/data/ajrdata.csv) as well. Replicate the IV analysis from Lab 3 (or a simplified version) using listwise deletion. Then use multiple imputation (mice) to handle missing values in the covariates. Re‑estimate the IV model on each imputed dataset and pool the results using mitools or mice::pool. Compare the coefficients and standard errors. Discuss whether multiple imputation changes the substantive conclusions.
+---
 
-### Problem 3: Missingness Mechanisms
-For the AJR data, consider the variable logmort0 (settler mortality). Speculate on whether missingness in this variable is MCAR, MAR, or MNAR. Justify your answer. If it were MNAR, what additional analyses might you attempt?
+## Problem 2: Simulating Missingness Mechanisms in the AJR Data
+
+The AJR replication data are fully observed. To understand the consequences of different missingness mechanisms and the performance of multiple imputation, we will artificially introduce missingness in two ways:
+
+1. **MCAR (Missing Completely at Random)** : Values are deleted entirely at random, independent of any observed or unobserved variables.
+2. **MAR (Missing at Random)** : The probability of a value being missing depends on another fully observed variable (e.g., latitude).
+
+We will then compare three estimation strategies:
+- **Full data** (the ground truth, before any deletion).
+- **Listwise deletion** (complete‑case analysis on the data with missingness).
+- **Multiple imputation** (using `mice` on the data with missingness).
+
+The outcome of interest is the IV estimate of the effect of institutions (`risk`) on log GDP (`loggdp`), instrumented by settler mortality (`logmort0`).
+
+### Data Preparation
+
+```{r ajr-prep, echo=TRUE}
+library(AER)
+library(mice)
+library(tidyverse)
+library(broom)
+
+# Load AJR data
+ajr <- read.csv("../data/ajrdata.csv")
+
+# Create analysis variables
+ajr_clean <- ajr %>%
+  mutate(
+    loggdp = loggdp,
+    institutions = risk,
+    logmort = logmort0,
+    lat_abst = abs(latitude)
+  ) %>%
+  dplyr::select(loggdp, institutions, logmort, lat_abst, neoeuro, asia, africa, other)
+
+# Full data IV (ground truth)
+iv_full <- ivreg(loggdp ~ institutions + lat_abst + neoeuro + asia + africa |
+                 logmort + lat_abst + neoeuro + asia + africa,
+                 data = ajr_clean)
+```
+
+---
+
+### Part A: MCAR Missingness
+
+We randomly delete 20% of the values in `institutions` and `logmort` completely at random.
+
+```{r mcar-simulate, echo=TRUE, eval=FALSE}
+set.seed(27)
+ajr_mcar <- ajr_clean
+
+# Introduce 20% missingness in institutions and logmort (MCAR)
+n <- nrow(ajr_mcar)
+ajr_mcar$institutions[sample(n, size = round(0.2 * n))] <- NA
+ajr_mcar$logmort[sample(n, size = round(0.2 * n))] <- NA
+
+# Listwise deletion
+ajr_mcar_cc <- na.omit(ajr_mcar)
+iv_mcar_cc <- ivreg(loggdp ~ institutions + lat_abst + neoeuro + asia + africa |
+                    logmort + lat_abst + neoeuro + asia + africa,
+                    data = ajr_mcar_cc)
+
+# Multiple imputation
+# YOUR JOB IS TO ADD CODE HERE THAT CARRIES OUT MULTIPLE IMPUTATION TO REVERSE THE EFFECTS OF THE MISSINGNESS THAT WE HAVE ADDED
+
+```
+
+What happens when we use multiple imputation in this simulation? How close is it to the original results, both in terms of the estimate and the standard error?
+
+---
+
+### Part B: MAR Missingness
+
+Now we make missingness depend on `lat_abst` (absolute latitude). Specifically, observations with higher latitude are more likely to have missing values in `institutions` and `logmort`. This is a common MAR scenario where missingness is correlated with an observed covariate.
+
+```{r mar-simulate, echo=TRUE, eval=FALSE}
+set.seed(27)
+ajr_mar <- ajr_clean
+
+n <- nrow(ajr_mar)   # <-- add this line
+
+# Probability of missingness increases with latitude
+# We'll create a logistic probability: p(missing) = plogis(scale(lat_abst))
+# This creates missingness probabilities ranging from ~0.2 to ~0.8,
+# averaging about 20% missing overall.
+# This ensures higher latitude => higher chance of missing
+p_miss <- plogis(scale(ajr_mar$lat_abst))
+miss_institutions <- rbinom(n, 1, p_miss)
+miss_logmort    <- rbinom(n, 1, p_miss)
+
+ajr_mar$institutions[miss_institutions == 1] <- NA
+ajr_mar$logmort[miss_logmort == 1] <- NA
+
+# Listwise deletion
+ajr_mar_cc <- na.omit(ajr_mar)
+iv_mar_cc <- ivreg(loggdp ~ institutions + lat_abst + neoeuro + asia + africa |
+                   logmort + lat_abst + neoeuro + asia + africa,
+                   data = ajr_mar_cc)
+
+# Multiple imputation
+# YOUR JOB IS TO ADD CODE HERE THAT CARRIES OUT MULTIPLE IMPUTATION TO REVERSE THE EFFECTS OF THE MISSINGNESS THAT WE HAVE ADDED
+```
+
+What happens when we use multiple imputation in this simulation? How close is it to the original results, both in terms of the estimate and the standard error?
+
+---
+
+### Comparison Table
+
+We compile the coefficient on `institutions` from each analysis.
+
+```{r comparison-table, echo=TRUE, eval=FALSE}
+results <- tibble(
+  Scenario = c("Full Data", 
+               "MCAR: Listwise", "MCAR: MI", 
+               "MAR: Listwise", "MAR: MI"),
+  Estimate = c(coef(iv_full)["institutions"],
+               coef(iv_mcar_cc)["institutions"],
+               summary(iv_mcar_mi)$estimate["institutions"],
+               coef(iv_mar_cc)["institutions"],
+               summary(iv_mar_mi)$estimate["institutions"]),
+  SE = c(sqrt(vcov(iv_full)["institutions", "institutions"]),
+         sqrt(vcov(iv_mcar_cc)["institutions", "institutions"]),
+         summary(iv_mcar_mi)$std.error["institutions"],
+         sqrt(vcov(iv_mar_cc)["institutions", "institutions"]),
+         summary(iv_mar_mi)$std.error["institutions"])
+)
+
+results
+```
+
+What do we conclude about the value of imputation? What happens to the standard errors with each simulation? If you see anything notable in the standard errors, can you diagnose and explain the reason why it happens and explain its implications for multiple imputation and causal inference?

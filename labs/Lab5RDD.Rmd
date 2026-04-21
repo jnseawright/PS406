@@ -1,5 +1,5 @@
 ---
-title: "Political Science 406 Lab 5: Natural Experiments, Part 2"
+title: "Political Science 406 Lab 5: Regression Discontinuity Designs"
 date: "`r Sys.Date()`"
 output:
   html_document:
