@@ -493,7 +493,7 @@ summary(migueliv)
 
 Key elements to examine:
 
-1\. **Coefficient on endogenous variable**: `gdp_g` = 0.064 — a 1 percentage point increase in growth increases conflict probability by 6.4 points? (Check units—growth is in percent, conflict is binary)
+1\. **Coefficient on endogenous variable**: `gdp_g` = 0.064 — a 1 percentage point increase in growth increases conflict probability by 6.4 points
 
 2\. **Standard errors**: Clustered SEs are larger (0.038 vs. 0.027) — accounting for within-country correlation matters
 
@@ -1644,9 +1644,11 @@ exp.reweight$coefs.se.boot
 ---
 ### Interpreting the Results
 
--   The ATE estimate for the effect of anger on outsider voting is 0.561, -0.169, -0.514.
+-   The ATE estimate for the effect of anger on outsider voting is -0.514.
 
 -   Compare with the LATE estimate from IV: 1.5743.
+
+---
 
 -   The ATE is pretty different from the LATE. This could mean:
     -   Always‑takers and never‑takers have different effects than compliers (or opposite signs).
@@ -1659,7 +1661,7 @@ exp.reweight$coefs.se.boot
 | Estimand | Estimate | Interpretation |
 |----------|----------|----------------|
 | LATE (IV) | 1.5743 | Effect for compliers—those whose anger is activated by the prime. |
-| ATE (ICSW) | 0.5612, -0.1694, -0.5144 | Effect for the entire population, assuming the compliance score model is correct. |
+| ATE (ICSW) | -0.5144 | Effect for the entire population, assuming the compliance score model is correct. |
 
 ---
 ### Comparison: LATE vs. ATE
