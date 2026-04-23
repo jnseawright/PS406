@@ -123,6 +123,13 @@ then `\(\mathbf{z}\)` meets the mathematical definition of an *instrument*.
 3.  Independence / exogeneity: `\(Z\)` is as good as randomly assigned (or at least uncorrelated with unobservables)
 
 ---
+### Assumptions Aren't Created Equal
+
+- We can typically just test relevance.
+- Independence can sometimes have partial or full justification.
+- The exclusion restriction is usually exceptionally challenging.
+
+---
 ### Relevance Failure
 
 &lt;img src="4instrumentalvariables_files/figure-html/unnamed-chunk-2-1.png" width="70%" /&gt;
@@ -165,6 +172,10 @@ instrumentalVariables(hypotheticalinstruments.dag)
 ##  PrimaryElections |  ElitePower
 ##  SocialMedia
 ```
+
+---
+
+Obviously, the output from a DAG relies on the causal structure put into the DAG!
 
 ---
 ### Bivariate IV
@@ -251,37 +262,42 @@ instrumentalVariables(hypotheticalinstruments.dag)
 
 -   Today, IV is one of the most widely used methods for causal inference with observational data.
 
----
 ### Wright's Flaxseed Oil Example: A Simple Simulation
-
 
 ``` r
 # Simulate a supply-demand system with an instrument
 set.seed(2026)
 n &lt;- 1000
 
-# Instrument: weather shock (shifts supply)
+# Instrument: weather shock (shifts supply only)
 weather &lt;- rnorm(n)
 
-# Supply shifter (weather) and demand shifter (income) 
-# but we only observe weather as instrument
-income &lt;- rnorm(n)  # unobserved confounder?
+# Unobserved demand shifter (income shifts demand but NOT supply)
+# This is the confounder that makes OLS biased
+income &lt;- rnorm(n)
 
-# True demand: P = 10 - 0.5*Q + income*0.3 + epsilon_d
-# True supply: P = 2 + 0.8*Q - weather*0.4 + epsilon_s
+# Structural equations:
+# Demand: P = 10 - 0.5*Q + 0.3*income + e_d  (income shifts demand curve)
+# Supply:  P = 2  + 0.8*Q - 0.4*weather + e_s (weather shifts supply curve)
+#
+# Solve for equilibrium Q and P:
+# 10 - 0.5*Q + 0.3*income + e_d = 2 + 0.8*Q - 0.4*weather + e_s
+# =&gt; 1.3*Q = 8 + 0.3*income + 0.4*weather + (e_d - e_s)
+# =&gt; Q = (8 + 0.3*income + 0.4*weather + u) / 1.3
 
-# Solve for equilibrium Q and P (simplified)
-Q &lt;- 5 + 0.2*income - 0.3*weather + rnorm(n)
-P &lt;- 8 - 0.4*Q + 0.3*income + rnorm(n)
+e_d &lt;- rnorm(n)
+e_s &lt;- rnorm(n)
+
+Q &lt;- (8 + 0.3*income + 0.4*weather + (e_d - e_s)) / 1.3
+# Equilibrium P from the demand curve (true demand slope = -0.5)
+P &lt;- 10 - 0.5*Q + 0.3*income + e_d
 ```
 
-
 ---
-### Wright's Flaxseed Oil Example: A Simple Simulation
 
 
 ``` r
-# OLS of P on Q (tries to estimate demand, but biased)
+# OLS of P on Q (biased: income is unobserved, correlated with both Q and P)
 summary(lm(P ~ Q))
 ```
 
@@ -291,27 +307,27 @@ summary(lm(P ~ Q))
 ## lm(formula = P ~ Q)
 ## 
 ## Residuals:
-##     Min      1Q  Median      3Q     Max 
-## -2.7809 -0.6878  0.0094  0.6924  3.5134 
+##      Min       1Q   Median       3Q      Max 
+## -2.60393 -0.50202  0.00584  0.52191  2.34754 
 ## 
 ## Coefficients:
 ##             Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)  7.71724    0.15514   49.74   &lt;2e-16 ***
-## Q           -0.34427    0.03059  -11.26   &lt;2e-16 ***
+## (Intercept)  6.17201    0.12916  47.786  &lt; 2e-16 ***
+## Q            0.11832    0.02071   5.714 1.46e-08 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
-## Residual standard error: 1.025 on 998 degrees of freedom
-## Multiple R-squared:  0.1126,	Adjusted R-squared:  0.1117 
-## F-statistic: 126.7 on 1 and 998 DF,  p-value: &lt; 2.2e-16
+## Residual standard error: 0.7515 on 998 degrees of freedom
+## Multiple R-squared:  0.03168,	Adjusted R-squared:  0.0307 
+## F-statistic: 32.65 on 1 and 998 DF,  p-value: 1.459e-08
 ```
 
 ---
-### Wright's Flaxseed Oil Example: A Simple Simulation
 
 
 ``` r
 # IV using weather as instrument for Q
+# Weather satisfies exclusion: it enters Q (via supply) but not P directly
 library(ivreg)
 summary(ivreg(P ~ Q | weather))
 ```
@@ -323,24 +339,24 @@ summary(ivreg(P ~ Q | weather))
 ## 
 ## Residuals:
 ##      Min       1Q   Median       3Q      Max 
-## -2.79041 -0.68276  0.00907  0.69759  3.49947 
+## -4.09368 -0.74977 -0.00313  0.75565  2.90942 
 ## 
 ## Coefficients:
 ##             Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)   7.6264     0.5172  14.745  &lt; 2e-16 ***
-## Q            -0.3260     0.1041  -3.132  0.00179 ** 
+## (Intercept)  10.2898     0.6837  15.050  &lt; 2e-16 ***
+## Q            -0.5534     0.1114  -4.968 7.95e-07 ***
 ## 
 ## Diagnostic tests:
 ##                  df1 df2 statistic p-value    
-## Weak instruments   1 998    94.402  &lt;2e-16 ***
-## Wu-Hausman         1 997     0.034   0.854    
+## Weak instruments   1 998     76.28  &lt;2e-16 ***
+## Wu-Hausman         1 997     87.37  &lt;2e-16 ***
 ## Sargan             0  NA        NA      NA    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
-## Residual standard error: 1.025 on 998 degrees of freedom
-## Multiple R-Squared: 0.1123,	Adjusted R-squared: 0.1114 
-## Wald test:  9.81 on 1 and 998 DF,  p-value: 0.001786
+## Residual standard error: 1.077 on 998 degrees of freedom
+## Multiple R-Squared: -0.9891,	Adjusted R-squared: -0.9911 
+## Wald test: 24.68 on 1 and 998 DF,  p-value: 7.953e-07
 ```
 
 ---
@@ -493,9 +509,9 @@ summary(migueliv)
 
 Key elements to examine:
 
-1\. **Coefficient on endogenous variable**: `gdp_g` = 0.064 — a 1 percentage point increase in growth increases conflict probability by 6.4 points
+1\. **Coefficient on endogenous variable**: `gdp_g` = -0.053 — a 1 percentage point increase in growth reduces conflict probability by 5.3 points
 
-2\. **Standard errors**: Clustered SEs are larger (0.038 vs. 0.027) — accounting for within-country correlation matters
+2\. **Standard errors**: We have very large standard errors and aren't getting significant results. This is probably due to country clustering.
 
 ---
 ### Reading IV Regression Output
@@ -629,140 +645,36 @@ The bias formula for instrumental variables is:
 - If `\(\mathrm{Cov}(Z,X)\)` is large but `\(\mathrm{Cov}(Z,u)\)` is also large (invalid instrument) we can also end up with large bias.
 
 ---
+### Probing the Exclusion Restriction: A Falsification Check
+
+The exclusion restriction requires that rainfall affects conflict only through its effect on economic growth — not directly.
+-  We can probe this by asking: does rainfall predict conflict even after we control for growth itself?
+The regression below includes both rainfall and growth, plus country-specific time trends to absorb slow-moving country characteristics. If the exclusion restriction holds, the rainfall coefficients (GPCP_g, GPCP_g_l) should be small and statistically insignificant.
+
+---
 
 ``` r
 miguellm2 &lt;- lm(any_prio ~ gdp_g + gdp_g_l +GPCP_g + GPCP_g_l + y_0 + polity2l + ethfrac + relfrac + Oil + lpopl1 + lmtnest + year:country_name, data=mss_repdata_1_)
 
-summary(miguellm2)
+coef(summary(miguellm2))[1:5, ]
 ```
 
 ```
-## 
-## Call:
-## lm(formula = any_prio ~ gdp_g + gdp_g_l + GPCP_g + GPCP_g_l + 
-##     y_0 + polity2l + ethfrac + relfrac + Oil + lpopl1 + lmtnest + 
-##     year:country_name, data = mss_repdata_1_)
-## 
-## Residuals:
-##      Min       1Q   Median       3Q      Max 
-## -0.92987 -0.12503 -0.02391  0.08826  1.07344 
-## 
-## Coefficients:
-##                                                 Estimate Std. Error t value
-## (Intercept)                                   -1.240e+02  2.551e+01  -4.861
-## gdp_g                                         -4.108e-01  1.620e-01  -2.536
-## gdp_g_l                                       -8.588e-02  1.574e-01  -0.546
-## GPCP_g                                        -2.773e-02  5.904e-02  -0.470
-## GPCP_g_l                                      -1.315e-01  5.968e-02  -2.204
-## y_0                                            1.216e+01  4.717e+00   2.577
-## polity2l                                      -4.581e-03  2.999e-03  -1.528
-## ethfrac                                        8.706e+01  2.119e+01   4.108
-## relfrac                                        7.141e+01  2.700e+01   2.645
-## Oil                                           -2.507e-02  1.285e-01  -0.195
-## lpopl1                                         5.051e-02  3.375e-01   0.150
-## lmtnest                                        2.545e+00  3.513e+00   0.724
-## year:country_nameAngola                       -7.233e-04  9.982e-03  -0.072
-## year:country_nameBenin                         1.192e-02  1.037e-02   1.150
-## year:country_nameBotswana                      1.147e-02  1.019e-02   1.126
-## year:country_nameBurkina Faso                  8.857e-03  1.097e-02   0.808
-## year:country_nameBurundi                       3.250e-02  1.112e-02   2.921
-## year:country_nameCameroon                     -1.018e-02  1.014e-02  -1.004
-## year:country_nameCentral African Republic     -2.671e-03  1.023e-02  -0.261
-## year:country_nameChad                         -2.422e-03  1.002e-02  -0.242
-## year:country_nameCongo                         4.287e-03  9.966e-03   0.430
-## year:country_nameDjibouti                      1.642e-02  1.079e-02   1.522
-## year:country_nameEthiopia                      2.734e-03  1.078e-02   0.254
-## year:country_nameGabon                        -1.396e-02  1.164e-02  -1.200
-## year:country_nameGambia                        1.752e-02  1.073e-02   1.633
-## year:country_nameGhana                         2.581e-04  1.101e-02   0.023
-## year:country_nameGuinea                        1.332e-02  1.066e-02   1.249
-## year:country_nameGuinea-Bissau                 4.076e-03  1.038e-02   0.393
-## year:country_nameIvory Coast                  -9.641e-03  1.001e-02  -0.964
-## year:country_nameKenya                        -9.574e-03  1.023e-02  -0.936
-## year:country_nameLesotho                       2.928e-02  1.056e-02   2.772
-## year:country_nameLiberia                      -3.840e-03  1.008e-02  -0.381
-## year:country_nameMadagascar                    2.880e-02  1.095e-02   2.630
-## year:country_nameMalawi                        6.579e-03  9.954e-03   0.661
-## year:country_nameMali                          1.777e-02  1.141e-02   1.557
-## year:country_nameMauritania                    4.175e-02  1.195e-02   3.495
-## year:country_nameMozambique                    3.336e-03  1.003e-02   0.333
-## year:country_nameNamibia                       2.909e-03  1.051e-02   0.277
-## year:country_nameNiger                         1.295e-02  1.048e-02   1.236
-## year:country_nameNigeria                      -6.873e-03  1.022e-02  -0.672
-## year:country_nameRwanda                        2.860e-02  1.065e-02   2.685
-## year:country_nameSenegal                       1.812e-02  1.112e-02   1.629
-## year:country_nameSierra Leone                  7.694e-04  9.732e-03   0.079
-## year:country_nameSomalia                       5.019e-02  1.219e-02   4.117
-## year:country_nameSouth Africa                 -1.563e-02  1.090e-02  -1.433
-## year:country_nameSudan                         6.611e-03  1.016e-02   0.651
-## year:country_nameSwaziland                     4.874e-03  9.863e-03   0.494
-## year:country_nameTanzania, United Republic of -8.465e-03  1.069e-02  -0.792
-## year:country_nameTogo                          1.040e-02  1.048e-02   0.993
-## year:country_nameUganda                       -9.301e-03  1.038e-02  -0.896
-## year:country_nameZaire                        -6.586e-03  1.058e-02  -0.623
-## year:country_nameZambia                        3.918e-03  1.033e-02   0.379
-## year:country_nameZimbabwe                      1.104e-02  9.847e-03   1.121
-##                                               Pr(&gt;|t|)    
-## (Intercept)                                   1.45e-06 ***
-## gdp_g                                         0.011436 *  
-## gdp_g_l                                       0.585406    
-## GPCP_g                                        0.638763    
-## GPCP_g_l                                      0.027882 *  
-## y_0                                           0.010172 *  
-## polity2l                                      0.127025    
-## ethfrac                                       4.47e-05 ***
-## relfrac                                       0.008363 ** 
-## Oil                                           0.845362    
-## lpopl1                                        0.881061    
-## lmtnest                                       0.469024    
-## year:country_nameAngola                       0.942250    
-## year:country_nameBenin                        0.250668    
-## year:country_nameBotswana                     0.260520    
-## year:country_nameBurkina Faso                 0.419562    
-## year:country_nameBurundi                      0.003601 ** 
-## year:country_nameCameroon                     0.315773    
-## year:country_nameCentral African Republic     0.794020    
-## year:country_nameChad                         0.809158    
-## year:country_nameCongo                        0.667215    
-## year:country_nameDjibouti                     0.128539    
-## year:country_nameEthiopia                     0.799902    
-## year:country_nameGabon                        0.230639    
-## year:country_nameGambia                       0.102895    
-## year:country_nameGhana                        0.981304    
-## year:country_nameGuinea                       0.212049    
-## year:country_nameGuinea-Bissau                0.694642    
-## year:country_nameIvory Coast                  0.335632    
-## year:country_nameKenya                        0.349712    
-## year:country_nameLesotho                      0.005715 ** 
-## year:country_nameLiberia                      0.703479    
-## year:country_nameMadagascar                   0.008726 ** 
-## year:country_nameMalawi                       0.508872    
-## year:country_nameMali                         0.119819    
-## year:country_nameMauritania                   0.000505 ***
-## year:country_nameMozambique                   0.739436    
-## year:country_nameNamibia                      0.782099    
-## year:country_nameNiger                        0.216902    
-## year:country_nameNigeria                      0.501709    
-## year:country_nameRwanda                       0.007420 ** 
-## year:country_nameSenegal                      0.103800    
-## year:country_nameSierra Leone                 0.937016    
-## year:country_nameSomalia                      4.31e-05 ***
-## year:country_nameSouth Africa                 0.152185    
-## year:country_nameSudan                        0.515574    
-## year:country_nameSwaziland                    0.621312    
-## year:country_nameTanzania, United Republic of 0.428587    
-## year:country_nameTogo                         0.321189    
-## year:country_nameUganda                       0.370670    
-## year:country_nameZaire                        0.533638    
-## year:country_nameZambia                       0.704701    
-## year:country_nameZimbabwe                     0.262781    
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 0.2992 on 690 degrees of freedom
-## Multiple R-squared:  0.576,	Adjusted R-squared:  0.5441 
-## F-statistic: 18.03 on 52 and 690 DF,  p-value: &lt; 2.2e-16
+##                  Estimate  Std. Error    t value     Pr(&gt;|t|)
+## (Intercept) -124.01197898 25.51197476 -4.8609322 1.447644e-06
+## gdp_g         -0.41076801  0.16198183 -2.5358895 1.143572e-02
+## gdp_g_l       -0.08587699  0.15735236 -0.5457623 5.854057e-01
+## GPCP_g        -0.02772879  0.05904314 -0.4696362 6.387633e-01
+## GPCP_g_l      -0.13151155  0.05968035 -2.2035987 2.788218e-02
 ```
+
+---
+
+What the Falsification Check Shows
+
+The coefficient on `GPCP_g` (current rainfall) in this model is small in magnitude insignificant at conventional levels, consistent with the exclusion restriction holding. This isn't equally true for `GPCP_g_l`, which has a moderately negative coefficient, and which is significant at the 0.05 level.
+
+-   This may tend to undermine the exclusion restriction.
 
 ---
 ### Diagnostics in Instrumental Variables
@@ -852,9 +764,13 @@ partial_r2
 ## [1] 0.0220067
 ```
 
+---
+
 -   The F‑statistic on the instrument is 16.56 with a p‑value of 10^{-4}.
 
--   This F is well above 10, suggesting the instrument is reasonably strong. (But recall: strength alone does not guarantee validity.)
+-   This F is well above 10, suggesting the instruments are reasonably strong. (But recall: strength alone does not guarantee validity.)
+
+-   There were weak-instrument test results reported in the main IV table above, in which both instruments were individually significant. This means they may be weak. This is a bit ambiguous, and we may want to treat them with caution.
 
 ---
 
@@ -1027,7 +943,7 @@ summary(dwh_model)$coefficients["first_stage_resid", ]
 ---
 ### Interpreting the Endogeneity Test
 
-The DWH test fails to reject the null that `gdp_g` is exogenous (p = 0.34).
+The DWH test fails to reject the null that `gdp_g` is exogenous (p = 0.82).
 
 **This does NOT mean**: 
 - The instrument is valid (that's a separate assumption)
@@ -1230,6 +1146,34 @@ summary(lm(outsidervote~enojado+simpletreat, data=peruemotions))
     *In a one‑sided encouragement design (e.g., only encouragement can increase treatment), monotonicity is automatically satisfied.*
 
 ---
+### When Is Monotonicity Plausible?
+
+- Monotonicity requires that the instrument moves everyone in the same direction — no unit does the opposite of what the instrument "pushes." 
+
+This is automatically satisfied when:
+
+- The instrument can only increase (or only decrease) treatment — one-sided design (E.g., a lottery that offers treatment to winners; losers can't access it)
+
+- But in most observational IV applications, monotonicity is a substantive assumption that requires justification, not just assertion.
+
+---
+### Monotonicity in the MSS Rainfall Example
+
+Does negative rainfall growth always reduce GDP growth in sub-Saharan Africa?
+
+- For rain-fed agricultural economies heavily dependent on staple crops, the answer is plausibly yes — drought hurts output
+
+- But consider: some countries might benefit from low rainfall (reduced flooding, pest control, different crop mixes), or have irrigation infrastructure that inverts the relationship
+
+- A country with a large export sector in water-intensive mining might respond differently than a subsistence-farming economy
+
+---
+
+The monotonicity question here: Is there any country for which more rainfall would reduce GDP growth? If yes, that country is a defier, and the Wald estimator is no longer LATE for compliers — it's a weighted mixture that can be hard to interpret.
+
+**Practical guidance: Look for heterogeneity in the first stage. If the first-stage coefficient on rainfall flips sign in meaningful subsamples (e.g., by region, income level, or crop type), monotonicity may be violated.**
+
+---
 ### Key Assumptions for LATE
 
 
@@ -1373,7 +1317,7 @@ compliance_rate
 ```
 
 -   The estimated compliance rate is 0.068.  
-    Being in the treatment group increases the probability of feeling anger by about 8.6 percentage points.
+    Being in the treatment group increases the probability of feeling anger by about 6.8 percentage points.
 
 ---
 ### Step 2: Compute the Intention‑to‑Treat (Reduced Form)
@@ -1438,8 +1382,8 @@ wald_iv
 ```
 
 -   The manual IV estimate is 1.574.  
-    This suggests that for compliers, feeling anger increases the probability of outsider voting by about 157 percentage points. This is obviously too high, and we probably have either some measurement error in the compliance rate or a huge standard error.
-
+    This suggests that for compliers, feeling anger increases the probability of outsider voting by about 157 percentage points. This is obviously too high.
+-   The small compliance rate (0.068) means we're dividing the ITT by a small number, inflating the point estimate. That same weak first stage produces the large standard error.
 ---
 ### Step 4: Compare with `ivreg` Output
 
@@ -1797,7 +1741,7 @@ library(sandwich)
 
 -   Never without attention to assumptions.
 
--   If a reviewer demands it of you? (Even then, it can make things worse unless it's intellectually justified.)
+-   IV is most compelling when the instrument reflects genuine exogenous variation in the world, not when it's chosen instrumentally (pun intended) to satisfy a reviewer.
 
 
 

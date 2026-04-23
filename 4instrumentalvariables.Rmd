@@ -139,6 +139,13 @@ then $\mathbf{z}$ meets the mathematical definition of an *instrument*.
 3.  Independence / exogeneity: $Z$ is as good as randomly assigned (or at least uncorrelated with unobservables)
 
 ---
+### Assumptions Aren't Created Equal
+
+- We can typically just test relevance.
+- Independence can sometimes have partial or full justification.
+- The exclusion restriction is usually exceptionally challenging.
+
+---
 ### Relevance Failure
 
 ```{r, echo = FALSE, out.width="70%", fig.retina = 1}
@@ -214,6 +221,10 @@ plot( hypotheticalinstruments.dag )
 ```{r, echo = TRUE, out.width="50%", fig.retina = 1}
 instrumentalVariables(hypotheticalinstruments.dag)
 ```
+
+---
+
+Obviously, the output from a DAG relies on the causal structure put into the DAG!
 
 ---
 ### Bivariate IV
@@ -300,43 +311,48 @@ instrumentalVariables(hypotheticalinstruments.dag)
 
 -   Today, IV is one of the most widely used methods for causal inference with observational data.
 
----
 ### Wright's Flaxseed Oil Example: A Simple Simulation
-
 ```{r wright_sim, echo = TRUE, fig.height = 4}
 # Simulate a supply-demand system with an instrument
 set.seed(2026)
 n <- 1000
 
-# Instrument: weather shock (shifts supply)
+# Instrument: weather shock (shifts supply only)
 weather <- rnorm(n)
 
-# Supply shifter (weather) and demand shifter (income) 
-# but we only observe weather as instrument
-income <- rnorm(n)  # unobserved confounder?
+# Unobserved demand shifter (income shifts demand but NOT supply)
+# This is the confounder that makes OLS biased
+income <- rnorm(n)
 
-# True demand: P = 10 - 0.5*Q + income*0.3 + epsilon_d
-# True supply: P = 2 + 0.8*Q - weather*0.4 + epsilon_s
+# Structural equations:
+# Demand: P = 10 - 0.5*Q + 0.3*income + e_d  (income shifts demand curve)
+# Supply:  P = 2  + 0.8*Q - 0.4*weather + e_s (weather shifts supply curve)
+#
+# Solve for equilibrium Q and P:
+# 10 - 0.5*Q + 0.3*income + e_d = 2 + 0.8*Q - 0.4*weather + e_s
+# => 1.3*Q = 8 + 0.3*income + 0.4*weather + (e_d - e_s)
+# => Q = (8 + 0.3*income + 0.4*weather + u) / 1.3
 
-# Solve for equilibrium Q and P (simplified)
-Q <- 5 + 0.2*income - 0.3*weather + rnorm(n)
-P <- 8 - 0.4*Q + 0.3*income + rnorm(n)
+e_d <- rnorm(n)
+e_s <- rnorm(n)
+
+Q <- (8 + 0.3*income + 0.4*weather + (e_d - e_s)) / 1.3
+# Equilibrium P from the demand curve (true demand slope = -0.5)
+P <- 10 - 0.5*Q + 0.3*income + e_d
 ```
 
-
 ---
-### Wright's Flaxseed Oil Example: A Simple Simulation
 
-```{r wright_sim_2, echo = TRUE, fig.height = 4}
-# OLS of P on Q (tries to estimate demand, but biased)
+```{r wright_sim_2, echo = TRUE}
+# OLS of P on Q (biased: income is unobserved, correlated with both Q and P)
 summary(lm(P ~ Q))
 ```
 
 ---
-### Wright's Flaxseed Oil Example: A Simple Simulation
 
-```{r wright_sim_3, echo = TRUE, fig.height = 4}
+```{r wright_sim_3, echo = TRUE}
 # IV using weather as instrument for Q
+# Weather satisfies exclusion: it enters Q (via supply) but not P directly
 library(ivreg)
 summary(ivreg(P ~ Q | weather))
 ```
@@ -450,9 +466,9 @@ summary(migueliv)
 
 Key elements to examine:
 
-1\. **Coefficient on endogenous variable**: `gdp_g` = 0.064 — a 1 percentage point increase in growth increases conflict probability by 6.4 points
+1\. **Coefficient on endogenous variable**: `gdp_g` = -0.053 — a 1 percentage point increase in growth reduces conflict probability by 5.3 points
 
-2\. **Standard errors**: Clustered SEs are larger (0.038 vs. 0.027) — accounting for within-country correlation matters
+2\. **Standard errors**: We have very large standard errors and aren't getting significant results. This is probably due to country clustering.
 
 ---
 ### Reading IV Regression Output
@@ -525,11 +541,26 @@ $$\mathrm{plim} \hat{\beta}_{IV} = \beta + \frac{\mathrm{Cov}(Z,u)/\mathrm{Var}(
 - If $\mathrm{Cov}(Z,X)$ is large but $\mathrm{Cov}(Z,u)$ is also large (invalid instrument) we can also end up with large bias.
 
 ---
+### Probing the Exclusion Restriction: A Falsification Check
+
+The exclusion restriction requires that rainfall affects conflict only through its effect on economic growth — not directly.
+-  We can probe this by asking: does rainfall predict conflict even after we control for growth itself?
+The regression below includes both rainfall and growth, plus country-specific time trends to absorb slow-moving country characteristics. If the exclusion restriction holds, the rainfall coefficients (GPCP_g, GPCP_g_l) should be small and statistically insignificant.
+
+---
 ```{r, echo = TRUE, fig.retina = 1, fig.align='center'}
 miguellm2 <- lm(any_prio ~ gdp_g + gdp_g_l +GPCP_g + GPCP_g_l + y_0 + polity2l + ethfrac + relfrac + Oil + lpopl1 + lmtnest + year:country_name, data=mss_repdata_1_)
 
-summary(miguellm2)
+coef(summary(miguellm2))[1:5, ]
 ```
+
+---
+
+What the Falsification Check Shows
+
+The coefficient on `GPCP_g` (current rainfall) in this model is small in magnitude insignificant at conventional levels, consistent with the exclusion restriction holding. This isn't equally true for `GPCP_g_l`, which has a moderately negative coefficient, and which is significant at the 0.05 level.
+
+-   This may tend to undermine the exclusion restriction.
 
 ---
 ### Diagnostics in Instrumental Variables
@@ -597,9 +628,13 @@ partial_r2 <- r2_full - r2_noZ
 partial_r2
 ```
 
+---
+
 -   The F‑statistic on the instrument is `r round(f_test[2, "F"], 2)` with a p‑value of `r round(f_test[2, "Pr(>F)"], 4)`.
 
--   This F is well above 10, suggesting the instrument is reasonably strong. (But recall: strength alone does not guarantee validity.)
+-   This F is well above 10, suggesting the instruments are reasonably strong. (But recall: strength alone does not guarantee validity.)
+
+-   There were weak-instrument test results reported in the main IV table above, in which both instruments were individually significant. This means they may be weak. This is a bit ambiguous, and we may want to treat them with caution.
 
 ---
 
@@ -711,7 +746,7 @@ summary(dwh_model)$coefficients["first_stage_resid", ]
 ---
 ### Interpreting the Endogeneity Test
 
-The DWH test fails to reject the null that `gdp_g` is exogenous (p = 0.34).
+The DWH test fails to reject the null that `gdp_g` is exogenous (p = `r round(summary(dwh_model)$coefficients["first_stage_resid", "Pr(>|t|)"], 2)`).
 
 **This does NOT mean**: 
 - The instrument is valid (that's a separate assumption)
@@ -822,6 +857,34 @@ summary(lm(outsidervote~enojado+simpletreat, data=peruemotions))
 3.  **First stage**: $Z$ has a nonzero average effect on $X$ (relevance).
 4.  **Monotonicity**: No defiers exist (or the proportion of defiers is zero).  
     *In a one‑sided encouragement design (e.g., only encouragement can increase treatment), monotonicity is automatically satisfied.*
+
+---
+### When Is Monotonicity Plausible?
+
+- Monotonicity requires that the instrument moves everyone in the same direction — no unit does the opposite of what the instrument "pushes." 
+
+This is automatically satisfied when:
+
+- The instrument can only increase (or only decrease) treatment — one-sided design (E.g., a lottery that offers treatment to winners; losers can't access it)
+
+- But in most observational IV applications, monotonicity is a substantive assumption that requires justification, not just assertion.
+
+---
+### Monotonicity in the MSS Rainfall Example
+
+Does negative rainfall growth always reduce GDP growth in sub-Saharan Africa?
+
+- For rain-fed agricultural economies heavily dependent on staple crops, the answer is plausibly yes — drought hurts output
+
+- But consider: some countries might benefit from low rainfall (reduced flooding, pest control, different crop mixes), or have irrigation infrastructure that inverts the relationship
+
+- A country with a large export sector in water-intensive mining might respond differently than a subsistence-farming economy
+
+---
+
+The monotonicity question here: Is there any country for which more rainfall would reduce GDP growth? If yes, that country is a defier, and the Wald estimator is no longer LATE for compliers — it's a weighted mixture that can be hard to interpret.
+
+**Practical guidance: Look for heterogeneity in the first stage. If the first-stage coefficient on rainfall flips sign in meaningful subsamples (e.g., by region, income level, or crop type), monotonicity may be violated.**
 
 ---
 ### Key Assumptions for LATE
@@ -935,7 +998,7 @@ compliance_rate
 ```
 
 -   The estimated compliance rate is `r round(compliance_rate, 3)`.  
-    Being in the treatment group increases the probability of feeling anger by about 8.6 percentage points.
+    Being in the treatment group increases the probability of feeling anger by about `r round(compliance_rate*100, 1)` percentage points.
 
 ---
 ### Step 2: Compute the Intention‑to‑Treat (Reduced Form)
@@ -963,8 +1026,8 @@ wald_iv
 ```
 
 -   The manual IV estimate is `r round(wald_iv, 3)`.  
-    This suggests that for compliers, feeling anger increases the probability of outsider voting by about 157 percentage points. This is obviously too high, and we probably have either some measurement error in the compliance rate or a huge standard error.
-
+    This suggests that for compliers, feeling anger increases the probability of outsider voting by about 157 percentage points. This is obviously too high.
+-   The small compliance rate (0.068) means we're dividing the ITT by a small number, inflating the point estimate. That same weak first stage produces the large standard error.
 ---
 ### Step 4: Compare with `ivreg` Output
 
@@ -1275,7 +1338,7 @@ library(sandwich)
 
 -   Never without attention to assumptions.
 
--   If a reviewer demands it of you? (Even then, it can make things worse unless it's intellectually justified.)
+-   IV is most compelling when the instrument reflects genuine exogenous variation in the world, not when it's chosen instrumentally (pun intended) to satisfy a reviewer.
 
 
 
