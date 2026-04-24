@@ -961,7 +961,6 @@ rd_ll &lt;- rdrobust(y = lmb_data$score,
     -   **Bandwidth sensitivity**: Do results hold for different bandwidths?
 
 ---
-### Next Steps: Diagnostics
 
 Below are RMarkdown slides covering the essential diagnostics for RDD, designed to follow the estimation methods section. They use the Lee (2008) data and modern R packages (`rdrobust`, `rddensity`, `rdd`) to implement each test, with clear interpretation.
 
@@ -977,14 +976,12 @@ Below are RMarkdown slides covering the essential diagnostics for RDD, designed 
     4.  **Bandwidth sensitivity**: Are results robust to different bandwidth choices?
 
 ---
-### Next Steps: Diagnostics
 
 -   If the RDD is valid, covariates that were determined **before** the treatment should not jump at the cutoff.
 
 -   Idea: Run the same RD analysis on each covariate as the outcome.
 
 ---
-### Next Steps: Diagnostics
 
 -   Covariates in the Lee data:
     -   `lagdemocrat`: whether Democrat won previous election (the treatment itself—should jump! Not a balance test.)
@@ -1029,6 +1026,10 @@ summary(rd_cov)
 ---
 
 -   If the estimate is small and not significant (robust `\((p &gt; 0.05)\)`), then covariate is smooth.
+-   The results here are borderline, and probably should raise some concerns.
+
+---
+
 -   In practice, test all available pre-treatment covariates and report a table. Think about multiple comparisons.
 -   If any covariate shows a discontinuity, the design is suspect.
 
@@ -1089,42 +1090,10 @@ summary(density_test)
 
 ``` r
 # Plot the density with confidence intervals
-rdplotdensity(density_test, lmb_data$lagdemvoteshare)
+density_plot &lt;- rdplotdensity(density_test, lmb_data$lagdemvoteshare)
 ```
 
 ![](5regressiondiscontinuitydesigns_files/figure-html/rddensity_example-1.png)&lt;!-- --&gt;
-
-```
-## $Estl
-## Call: lpdensity
-## 
-## Sample size                                      5670
-## Polynomial order for point estimation    (p=)    2
-## Order of derivative estimated            (v=)    1
-## Polynomial order for confidence interval (q=)    3
-## Kernel function                                  triangular
-## Scaling factor                                   0.417648791985857
-## Bandwidth method                                 user provided
-## 
-## Use summary(...) to show estimates.
-## 
-## $Estr
-## Call: lpdensity
-## 
-## Sample size                                      7907
-## Polynomial order for point estimation    (p=)    2
-## Order of derivative estimated            (v=)    1
-## Polynomial order for confidence interval (q=)    3
-## Kernel function                                  triangular
-## Scaling factor                                   0.582424867413082
-## Bandwidth method                                 user provided
-## 
-## Use summary(...) to show estimates.
-## 
-## $Estplot
-```
-
-![](5regressiondiscontinuitydesigns_files/figure-html/rddensity_example-2.png)&lt;!-- --&gt;
 
 ---
 
@@ -1167,7 +1136,6 @@ rdplotdensity(density_test, lmb_data$lagdemvoteshare)
 ```
 
 ---
-![](5regressiondiscontinuitydesigns_files/figure-html/rddensity_example3-1.png)&lt;!-- --&gt;
 
 ```
 ## $Estl
@@ -1199,7 +1167,7 @@ rdplotdensity(density_test, lmb_data$lagdemvoteshare)
 ## $Estplot
 ```
 
-![](5regressiondiscontinuitydesigns_files/figure-html/rddensity_example3-2.png)&lt;!-- --&gt;
+![](5regressiondiscontinuitydesigns_files/figure-html/rddensity_example3-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -1432,13 +1400,6 @@ Table: RDD Estimates of Incumbency Advantage
 ### 3. Include Diagnostic Results
 
 -   The plots from the diagnostics section should be included in your paper or appendix.
-
----
-### Example: Is US Elite Polarization Symmetric?
-
-Is ideological polarization in the US happening equally on both sides of the party system, or do the parties behave differently in terms of their distance from the ideological middle? Let's try to get an answer to this that cleans up some of the background noise by using a regression-discontinuity design. We'll compare close elections that Republicans just barely win to close elections that Democrats just barely win and look at the absolute value of the resulting ideological distance from the middle of the elected representatives.
-
-Use [this resource sheet](https://jnseawright.github.io/PS312/InClass/Regression_Discontinuity_Designs.html) to find data and for some coding hints.
 
 ---
 ### How Reliable Are RDD Applications?

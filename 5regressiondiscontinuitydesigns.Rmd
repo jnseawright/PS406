@@ -769,7 +769,6 @@ legend("topright", legend = c("True function", "Global linear fit"),
     -   **Bandwidth sensitivity**: Do results hold for different bandwidths?
 
 ---
-### Next Steps: Diagnostics
 
 Below are RMarkdown slides covering the essential diagnostics for RDD, designed to follow the estimation methods section. They use the Lee (2008) data and modern R packages (`rdrobust`, `rddensity`, `rdd`) to implement each test, with clear interpretation.
 
@@ -785,14 +784,12 @@ Below are RMarkdown slides covering the essential diagnostics for RDD, designed 
     4.  **Bandwidth sensitivity**: Are results robust to different bandwidth choices?
 
 ---
-### Next Steps: Diagnostics
 
 -   If the RDD is valid, covariates that were determined **before** the treatment should not jump at the cutoff.
 
 -   Idea: Run the same RD analysis on each covariate as the outcome.
 
 ---
-### Next Steps: Diagnostics
 
 -   Covariates in the Lee data:
     -   `lagdemocrat`: whether Democrat won previous election (the treatment itself—should jump! Not a balance test.)
@@ -811,6 +808,10 @@ summary(rd_cov)
 ---
 
 -   If the estimate is small and not significant (robust $(p > 0.05)$), then covariate is smooth.
+-   The results here are borderline, and probably should raise some concerns.
+
+---
+
 -   In practice, test all available pre-treatment covariates and report a table. Think about multiple comparisons.
 -   If any covariate shows a discontinuity, the design is suspect.
 
@@ -830,7 +831,7 @@ density_test <- rddensity(lmb_data$lagdemvoteshare, c = 0.5)
 summary(density_test)
 
 # Plot the density with confidence intervals
-rdplotdensity(density_test, lmb_data$lagdemvoteshare)
+density_plot <- rdplotdensity(density_test, lmb_data$lagdemvoteshare)
 ```
 
 ---
@@ -840,7 +841,7 @@ summary(density_test)
 
 ---
 ```{r rddensity_example3, echo = FALSE}
-rdplotdensity(density_test, lmb_data$lagdemvoteshare)
+density_plot
 ```
 
 ---
