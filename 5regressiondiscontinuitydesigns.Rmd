@@ -83,6 +83,13 @@ style_mono_accent(
     threshold.
 
 ---
+### The Key Assumption
+
+Recall from week 3: *Continuity Assumption*: The conditional expectations of potential outcomes $\text{E}[Y_C|X]$ and $\text{E}[Y_T|X]$ are continuous in the assignment variable $X$ in the neighborhood of the cutoff $c$.
+
+* Under this assumption, an observed discontinuity at $c$ is going to be a plausible estimator of the local treatment effect.
+
+---
 
 ```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
 library(knitr)
@@ -182,13 +189,6 @@ include_graphics("images/Dahlgaard1.png")
 ```{r, echo = FALSE, out.width="70%", fig.retina = 1, fig.align='center'}
 include_graphics("images/Dahlgaard2.png")
 ```
-
----
-### The Key Assumption
-
-*Continuity Assumption*: The conditional expectations of potential outcomes $\text{E}[Y_C|X]$ and $\text{E}[Y_T|X]$ are continuous in the assignment variable $X$ in the neighborhood of the cutoff $c$.
-
-* Under this assumption, an observed discontinuity at $c$ is going to be a plausible estimator of the local treatment effect.
 
 ---
 ### RDD Windows
@@ -367,15 +367,24 @@ df_colorado %>% ggplot(aes(x = days_04, y = voted08, color = voted04)) +
 ---
 
 ```{r fuzzy_result, echo = TRUE, fig.height = 4}
-df_colorado$voted08_meandev <- df_colorado$voted08 - mean(df_colorado$voted08)
-
-df_colorado$voted04_meandev <- df_colorado$voted04 - mean(df_colorado$voted04)
-
-
-with(df_colorado, rdrobust(y = voted08_meandev, x = days_04,
-         c = 0, fuzzy = voted04_meandev)) %>%
+with(df_colorado, rdrobust(y = voted08, x = days_04,
+         c = 0, fuzzy = voted04)) %>%
   summary()
 ```
+
+---
+### Reading the RDD Output: First Stage
+
+The first-stage RD effect is −66.239, which is obviously a large negative number. Why?
+
+The running variable days_04 measures days relative to the 18th birthday cutoff for the 2004 election, with larger values corresponding to younger individuals (born further after the cutoff date).
+Crossing from left to right therefore means going from just old enough to just too young to have voted in 2004.
+So the first stage is negative by construction: just to the right of the cutoff, 2004 turnout drops sharply — by about 66 percentage points among the effective observations near the threshold.
+
+---
+### Reading the RDD Output: Second Stage
+
+The treatment effect estimate of 0.185 is the fuzzy RD LATE: among compliers at the age-eligibility cutoff, voting in 2004 increases the probability of voting in 2008 by approximately 18.5 percentage points. This is the habit formation effect Coppock and Green are interested in.
 
 ---
 ### Visualizing RDD: Why Graphics Matter
@@ -434,6 +443,21 @@ rdplot(y = lmb_data$score,
        y.label = "Next Election Score")
 ```
 
+---
+### "Mass Points Detected": What Does This Mean?
+
+The warning "Mass points detected in the running variable" means that many observations share identical values of the running variable. Here, this happens because vote shares are recorded as rounded percentages, producing heaping at values like 0.50, 0.51, 0.52, etc.
+
+---
+
+This matters for two reasons:
+
+- Density testing: The McCrary/rddensity test for manipulation assumes the running variable is continuously distributed. With mass points, the density is lumpy by construction, which can produce false positives. rddensity handles this automatically by adjusting the estimator, but you should be aware the standard version of the test is unreliable here.
+- Bin construction: rdplot() adjusts its binning algorithm when mass points are detected, grouping at the level of unique values rather than constructing equal-width bins. The plot you see already reflects this adjustment.
+
+---
+
+**Practical guidance**: When you see this warning, ask whether the heaping is mechanical (rounding, as here) or behavioral (units sorting to specific values to cross the threshold). Mechanical heaping is generally benign for the continuity assumption. Behavioral heaping  (e.g., students retaking a test until they score exactly 70) is a sign of manipulation and a genuine threat to identification.
 
 ---
 ### Constructing Bins: Automation
@@ -564,7 +588,7 @@ lmb_narrow <- lmb_data %>%
   filter(lagdemvoteshare >= 0.48 & lagdemvoteshare <= 0.52)
 
 # Simple difference in means
-lm_narrow <- lm_robust(score ~ lagdemocrat, data = lmb_narrow, se_type = "HC1")
+lm_narrow <- lm_robust(score ~ I(lagdemocrat>0.5), data = lmb_narrow, se_type = "HC1")
 summary(lm_narrow)
 ```
 
@@ -831,20 +855,62 @@ rdplotdensity(density_test, lmb_data$lagdemvoteshare)
 
 -   Test for discontinuities at points where **no treatment should occur**.
 
--   Choose fake cutoffs (e.g., 0.4, 0.6) and run the same RD estimation.
+-   Choose fake cutoffs and run the same RD estimation.
 
 -   Ideally, we should see **no significant effects** at these placebo cutoffs.
 
+---
+
 ```{r placebo, echo = TRUE, warning = FALSE}
-placebo_0.4 <- rdrobust(lmb_data$score, lmb_data$lagdemvoteshare, c = 0.4)
-placebo_0.6 <- rdrobust(lmb_data$score, lmb_data$lagdemvoteshare, c = 0.6)
+# Run placebo tests at cutoffs spanning the range, excluding the true cutoff
+placebo_cutoffs <- seq(0.3, 0.7, by = 0.05)
+placebo_cutoffs <- placebo_cutoffs[placebo_cutoffs != 0.5]
 
-# Extract robust p-values
-p_0.4 <- placebo_0.4$pv[3]
-p_0.6 <- placebo_0.6$pv[3]
+placebo_results <- data.frame(
+  cutoff  = placebo_cutoffs,
+  est     = NA,
+  ci_low  = NA,
+  ci_high = NA,
+  p       = NA
+)
 
-data.frame(Placebo_Cutoff = c(0.4, 0.6), Robust_p = c(p_0.4, p_0.6))
+for (i in seq_along(placebo_cutoffs)) {
+  rd_tmp <- rdrobust(lmb_data$score, lmb_data$lagdemvoteshare,
+                     c = placebo_cutoffs[i])
+  placebo_results[i, "est"]     <- rd_tmp$Estimate[1, "tau.bc"]
+  placebo_results[i, "ci_low"]  <- rd_tmp$ci[3, 1]
+  placebo_results[i, "ci_high"] <- rd_tmp$ci[3, 2]
+  placebo_results[i, "p"]       <- rd_tmp$pv[3]
+}
+
+# Add the true cutoff estimate for visual reference
+true_est    <- rd_ll$Estimate[1, "tau.bc"]
+true_ci_low <- rd_ll$ci[3, 1]
+true_ci_high <- rd_ll$ci[3, 2]
+
+placeboplot <- ggplot(placebo_results, aes(x = cutoff, y = est)) +
+  geom_hline(yintercept = 0, linetype = "dotted", color = "grey50") +
+  geom_errorbar(aes(ymin = ci_low, ymax = ci_high), width = 0.01, color = "steelblue") +
+  geom_point(color = "steelblue", size = 2) +
+  # True cutoff shown separately in red
+  geom_errorbar(aes(x = 0.5, ymin = true_ci_low, ymax = true_ci_high),
+                width = 0.01, color = "firebrick") +
+  geom_point(aes(x = 0.5, y = true_est), color = "firebrick", size = 2) +
+  annotate("text", x = 0.5, y = true_ci_high + 2, label = "True cutoff",
+           color = "firebrick", size = 3.5) +
+  labs(x = "Placebo Cutoff",
+       y = "Estimated Treatment Effect (Robust)",
+       title = "Placebo Cutoff Tests") +
+  theme_minimal()
 ```
+
+---
+
+```{r placebo_plot, echo = FALSE, warning = FALSE}
+placeboplot
+```
+
+---
 
 -   If any placebo cutoff shows a significant effect, it suggests the outcome is discontinuous for reasons other than the treatment—perhaps due to model misspecification or other factors.
 
@@ -873,7 +939,7 @@ results <- data.frame(mult = mult, est = NA, ci_low = NA, ci_high = NA)
 for (i in seq_along(mult)) {
   rd_tmp <- rdrobust(lmb_data$score, lmb_data$lagdemvoteshare, c = 0.5, 
                      h = bw_opt * mult[i])
-  results[i, "est"] <- rd_tmp$Estimate[2]   # robust estimate
+  results[i, "est"] <- rd_tmp$Estimate[1, "tau.bc"]   
   results[i, "ci_low"] <- rd_tmp$ci[3, 1]
   results[i, "ci_high"] <- rd_tmp$ci[3, 2]
 }
@@ -972,12 +1038,10 @@ rd_quad <- rdrobust(lmb_data$score, lmb_data$lagdemvoteshare, c = 0.5, p = 2)
 # Extract key statistics into a data frame
 results_df <- data.frame(
   Specification = c("Optimal BW (linear)", "Half BW", "Double BW", "Optimal BW (quadratic)"),
-  Estimate = round(c(rd_opt$Estimate[3], rd_half$Estimate[3], rd_double$Estimate[3], rd_quad$Estimate[3]), 3),
+  Estimate = round(c(rd_opt$Estimate[2], rd_half$Estimate[2], rd_double$Estimate[2], rd_quad$Estimate[2]), 3),
   SE = round(c(rd_opt$se[3], rd_half$se[3], rd_double$se[3], rd_quad$se[3]), 3),
   CI_low = round(c(rd_opt$ci[3,1], rd_half$ci[3,1], rd_double$ci[3,1], rd_quad$ci[3,1]), 3),
-  CI_high = round(c(rd_opt$ci[3,2], rd_half$ci[3,2], rd_double$ci[3,2], rd_quad$ci[3,2]), 3),
-  N_left = c(rd_opt$N[1], rd_half$N[1], rd_double$N[1], rd_quad$N[1]),
-  N_right = c(rd_opt$N[2], rd_half$N[2], rd_double$N[2], rd_quad$N[2])
+  CI_high = round(c(rd_opt$ci[3,2], rd_half$ci[3,2], rd_double$ci[3,2], rd_quad$ci[3,2]), 3)
 )
 
 ```

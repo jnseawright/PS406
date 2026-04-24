@@ -71,6 +71,13 @@ pre[class] {
     threshold.
 
 ---
+### The Key Assumption
+
+Recall from week 3: *Continuity Assumption*: The conditional expectations of potential outcomes `\(\text{E}[Y_C|X]\)` and `\(\text{E}[Y_T|X]\)` are continuous in the assignment variable `\(X\)` in the neighborhood of the cutoff `\(c\)`.
+
+* Under this assumption, an observed discontinuity at `\(c\)` is going to be a plausible estimator of the local treatment effect.
+
+---
 
 &lt;img src="images/Lee1.png" width="90%" style="display: block; margin: auto;" /&gt;
 
@@ -183,13 +190,6 @@ summary(lm_1)
 ---
 
 &lt;img src="images/Dahlgaard2.png" width="70%" style="display: block; margin: auto;" /&gt;
-
----
-### The Key Assumption
-
-*Continuity Assumption*: The conditional expectations of potential outcomes `\(\text{E}[Y_C|X]\)` and `\(\text{E}[Y_T|X]\)` are continuous in the assignment variable `\(X\)` in the neighborhood of the cutoff `\(c\)`.
-
-* Under this assumption, an observed discontinuity at `\(c\)` is going to be a plausible estimator of the local treatment effect.
 
 ---
 ### RDD Windows
@@ -469,13 +469,8 @@ df_colorado %&gt;% ggplot(aes(x = days_04, y = voted08, color = voted04)) +
 
 
 ``` r
-df_colorado$voted08_meandev &lt;- df_colorado$voted08 - mean(df_colorado$voted08)
-
-df_colorado$voted04_meandev &lt;- df_colorado$voted04 - mean(df_colorado$voted04)
-
-
-with(df_colorado, rdrobust(y = voted08_meandev, x = days_04,
-         c = 0, fuzzy = voted04_meandev)) %&gt;%
+with(df_colorado, rdrobust(y = voted08, x = days_04,
+         c = 0, fuzzy = voted04)) %&gt;%
   summary()
 ```
 
@@ -488,12 +483,12 @@ with(df_colorado, rdrobust(y = voted08_meandev, x = days_04,
 ## VCE method                       NN
 ## 
 ## Number of Obs.                 6145         1813
-## Eff. Number of Obs.             375          376
+## Eff. Number of Obs.             291          292
 ## Order est. (p)                    1            1
 ## Order bias  (q)                   2            2
-## BW est. (h)                 375.858      375.858
+## BW est. (h)                 291.735      291.735
 ## BW bias (b)                 571.274      571.274
-## rho (h/b)                     0.658        0.658
+## rho (h/b)                     0.511        0.511
 ## Unique Obs.                    6145         1813
 ## 
 ## First-stage estimates.
@@ -502,7 +497,7 @@ with(df_colorado, rdrobust(y = voted08_meandev, x = days_04,
 ##                    Point    Robust Inference
 ##                 Estimate         z     P&gt;|z|      [ 95% C.I. ]       
 ## =====================================================================
-##      Rd Effect   -68.471   -35.466     0.000   [-71.261 , -63.797]   
+##      Rd Effect   -66.239   -31.734     0.000   [-69.728 , -61.615]   
 ## =====================================================================
 ## 
 ## Treatment effect estimates.
@@ -511,9 +506,23 @@ with(df_colorado, rdrobust(y = voted08_meandev, x = days_04,
 ##                    Point    Robust Inference
 ##                 Estimate         z     P&gt;|z|      [ 95% C.I. ]       
 ## ---------------------------------------------------------------------
-##      RD Effect     0.174     6.429     0.000     [0.151 , 0.284]     
+##      RD Effect     0.185     5.800     0.000     [0.140 , 0.283]     
 ## =====================================================================
 ```
+
+---
+### Reading the RDD Output: First Stage
+
+The first-stage RD effect is −66.239, which is obviously a large negative number. Why?
+
+The running variable days_04 measures days relative to the 18th birthday cutoff for the 2004 election, with larger values corresponding to younger individuals (born further after the cutoff date).
+Crossing from left to right therefore means going from just old enough to just too young to have voted in 2004.
+So the first stage is negative by construction: just to the right of the cutoff, 2004 turnout drops sharply — by about 66 percentage points among the effective observations near the threshold.
+
+---
+### Reading the RDD Output: Second Stage
+
+The treatment effect estimate of 0.185 is the fuzzy RD LATE: among compliers at the age-eligibility cutoff, voting in 2004 increases the probability of voting in 2008 by approximately 18.5 percentage points. This is the habit formation effect Coppock and Green are interested in.
 
 ---
 ### Visualizing RDD: Why Graphics Matter
@@ -577,6 +586,21 @@ rdplot(y = lmb_data$score,
 
 &lt;img src="5regressiondiscontinuitydesigns_files/figure-html/rdplot_example2-1.png" width="90%" /&gt;
 
+---
+### "Mass Points Detected": What Does This Mean?
+
+The warning "Mass points detected in the running variable" means that many observations share identical values of the running variable. Here, this happens because vote shares are recorded as rounded percentages, producing heaping at values like 0.50, 0.51, 0.52, etc.
+
+---
+
+This matters for two reasons:
+
+- Density testing: The McCrary/rddensity test for manipulation assumes the running variable is continuously distributed. With mass points, the density is lumpy by construction, which can produce false positives. rddensity handles this automatically by adjusting the estimator, but you should be aware the standard version of the test is unreliable here.
+- Bin construction: rdplot() adjusts its binning algorithm when mass points are detected, grouping at the level of unique values rather than constructing equal-width bins. The plot you see already reflects this adjustment.
+
+---
+
+**Practical guidance**: When you see this warning, ask whether the heaping is mechanical (rounding, as here) or behavioral (units sorting to specific values to cross the threshold). Mechanical heaping is generally benign for the continuity assumption. Behavioral heaping  (e.g., students retaking a test until they score exactly 70) is a sign of manipulation and a genuine threat to identification.
 
 ---
 ### Constructing Bins: Automation
@@ -707,21 +731,25 @@ lmb_narrow &lt;- lmb_data %&gt;%
   filter(lagdemvoteshare &gt;= 0.48 &amp; lagdemvoteshare &lt;= 0.52)
 
 # Simple difference in means
-lm_narrow &lt;- lm_robust(score ~ lagdemocrat, data = lmb_narrow, se_type = "HC1")
+lm_narrow &lt;- lm_robust(score ~ I(lagdemocrat&gt;0.5), data = lmb_narrow, se_type = "HC1")
 summary(lm_narrow)
 ```
 
 ```
 ## 
 ## Call:
-## lm_robust(formula = score ~ lagdemocrat, data = lmb_narrow, se_type = "HC1")
+## lm_robust(formula = score ~ I(lagdemocrat &gt; 0.5), data = lmb_narrow, 
+##     se_type = "HC1")
 ## 
 ## Standard error type:  HC1 
 ## 
 ## Coefficients:
-##             Estimate Std. Error t value  Pr(&gt;|t|) CI Lower CI Upper  DF
-## (Intercept)    31.20      1.334   23.39 3.788e-95    28.58    33.81 913
-## lagdemocrat    21.28      1.951   10.91 3.987e-26    17.45    25.11 913
+##                          Estimate Std. Error t value  Pr(&gt;|t|) CI Lower
+## (Intercept)                 31.20      1.334   23.39 3.788e-95    28.58
+## I(lagdemocrat &gt; 0.5)TRUE    21.28      1.951   10.91 3.987e-26    17.45
+##                          CI Upper  DF
+## (Intercept)                 33.81 913
+## I(lagdemocrat &gt; 0.5)TRUE    25.11 913
 ## 
 ## Multiple R-squared:  0.1152 ,	Adjusted R-squared:  0.1142 
 ## F-statistic:   119 on 1 and 913 DF,  p-value: &lt; 2.2e-16
@@ -730,7 +758,7 @@ summary(lm_narrow)
 ---
 ### 1. Local Randomization View
 
--   Estimate: 21.284 with SE 1.951.
+-   Estimate: NA with SE NA.
 -   This is intuitive but:
     -   Comparatively small sample (915 observations).
     -   Sensitive to exact window choice.
@@ -1185,27 +1213,61 @@ rdplotdensity(density_test, lmb_data$lagdemvoteshare)
 
 -   Test for discontinuities at points where **no treatment should occur**.
 
--   Choose fake cutoffs (e.g., 0.4, 0.6) and run the same RD estimation.
+-   Choose fake cutoffs and run the same RD estimation.
 
 -   Ideally, we should see **no significant effects** at these placebo cutoffs.
 
+---
+
 
 ``` r
-placebo_0.4 &lt;- rdrobust(lmb_data$score, lmb_data$lagdemvoteshare, c = 0.4)
-placebo_0.6 &lt;- rdrobust(lmb_data$score, lmb_data$lagdemvoteshare, c = 0.6)
+# Run placebo tests at cutoffs spanning the range, excluding the true cutoff
+placebo_cutoffs &lt;- seq(0.3, 0.7, by = 0.05)
+placebo_cutoffs &lt;- placebo_cutoffs[placebo_cutoffs != 0.5]
 
-# Extract robust p-values
-p_0.4 &lt;- placebo_0.4$pv[3]
-p_0.6 &lt;- placebo_0.6$pv[3]
+placebo_results &lt;- data.frame(
+  cutoff  = placebo_cutoffs,
+  est     = NA,
+  ci_low  = NA,
+  ci_high = NA,
+  p       = NA
+)
 
-data.frame(Placebo_Cutoff = c(0.4, 0.6), Robust_p = c(p_0.4, p_0.6))
+for (i in seq_along(placebo_cutoffs)) {
+  rd_tmp &lt;- rdrobust(lmb_data$score, lmb_data$lagdemvoteshare,
+                     c = placebo_cutoffs[i])
+  placebo_results[i, "est"]     &lt;- rd_tmp$Estimate[1, "tau.bc"]
+  placebo_results[i, "ci_low"]  &lt;- rd_tmp$ci[3, 1]
+  placebo_results[i, "ci_high"] &lt;- rd_tmp$ci[3, 2]
+  placebo_results[i, "p"]       &lt;- rd_tmp$pv[3]
+}
+
+# Add the true cutoff estimate for visual reference
+true_est    &lt;- rd_ll$Estimate[1, "tau.bc"]
+true_ci_low &lt;- rd_ll$ci[3, 1]
+true_ci_high &lt;- rd_ll$ci[3, 2]
+
+placeboplot &lt;- ggplot(placebo_results, aes(x = cutoff, y = est)) +
+  geom_hline(yintercept = 0, linetype = "dotted", color = "grey50") +
+  geom_errorbar(aes(ymin = ci_low, ymax = ci_high), width = 0.01, color = "steelblue") +
+  geom_point(color = "steelblue", size = 2) +
+  # True cutoff shown separately in red
+  geom_errorbar(aes(x = 0.5, ymin = true_ci_low, ymax = true_ci_high),
+                width = 0.01, color = "firebrick") +
+  geom_point(aes(x = 0.5, y = true_est), color = "firebrick", size = 2) +
+  annotate("text", x = 0.5, y = true_ci_high + 2, label = "True cutoff",
+           color = "firebrick", size = 3.5) +
+  labs(x = "Placebo Cutoff",
+       y = "Estimated Treatment Effect (Robust)",
+       title = "Placebo Cutoff Tests") +
+  theme_minimal()
 ```
 
-```
-##   Placebo_Cutoff  Robust_p
-## 1            0.4 0.4697531
-## 2            0.6 0.1568794
-```
+---
+
+![](5regressiondiscontinuitydesigns_files/figure-html/placebo_plot-1.png)&lt;!-- --&gt;
+
+---
 
 -   If any placebo cutoff shows a significant effect, it suggests the outcome is discontinuous for reasons other than the treatment—perhaps due to model misspecification or other factors.
 
@@ -1235,7 +1297,7 @@ results &lt;- data.frame(mult = mult, est = NA, ci_low = NA, ci_high = NA)
 for (i in seq_along(mult)) {
   rd_tmp &lt;- rdrobust(lmb_data$score, lmb_data$lagdemvoteshare, c = 0.5, 
                      h = bw_opt * mult[i])
-  results[i, "est"] &lt;- rd_tmp$Estimate[2]   # robust estimate
+  results[i, "est"] &lt;- rd_tmp$Estimate[1, "tau.bc"]   
   results[i, "ci_low"] &lt;- rd_tmp$ci[3, 1]
   results[i, "ci_high"] &lt;- rd_tmp$ci[3, 2]
 }
@@ -1337,12 +1399,10 @@ rd_quad &lt;- rdrobust(lmb_data$score, lmb_data$lagdemvoteshare, c = 0.5, p = 2)
 # Extract key statistics into a data frame
 results_df &lt;- data.frame(
   Specification = c("Optimal BW (linear)", "Half BW", "Double BW", "Optimal BW (quadratic)"),
-  Estimate = round(c(rd_opt$Estimate[3], rd_half$Estimate[3], rd_double$Estimate[3], rd_quad$Estimate[3]), 3),
+  Estimate = round(c(rd_opt$Estimate[2], rd_half$Estimate[2], rd_double$Estimate[2], rd_quad$Estimate[2]), 3),
   SE = round(c(rd_opt$se[3], rd_half$se[3], rd_double$se[3], rd_quad$se[3]), 3),
   CI_low = round(c(rd_opt$ci[3,1], rd_half$ci[3,1], rd_double$ci[3,1], rd_quad$ci[3,1]), 3),
-  CI_high = round(c(rd_opt$ci[3,2], rd_half$ci[3,2], rd_double$ci[3,2], rd_quad$ci[3,2]), 3),
-  N_left = c(rd_opt$N[1], rd_half$N[1], rd_double$N[1], rd_quad$N[1]),
-  N_right = c(rd_opt$N[2], rd_half$N[2], rd_double$N[2], rd_quad$N[2])
+  CI_high = round(c(rd_opt$ci[3,2], rd_half$ci[3,2], rd_double$ci[3,2], rd_quad$ci[3,2]), 3)
 )
 ```
 
@@ -1356,12 +1416,12 @@ knitr::kable(results_df, caption = "RDD Estimates of Incumbency Advantage")
 
 Table: RDD Estimates of Incumbency Advantage
 
-|Specification          | Estimate|    SE| CI_low| CI_high| N_left| N_right|
-|:----------------------|--------:|-----:|------:|-------:|------:|-------:|
-|Optimal BW (linear)    |    1.692| 2.038| 14.455|  22.443|   5670|    7907|
-|Half BW                |    2.474| 3.711| 20.189|  34.737|   5670|    7907|
-|Double BW              |    1.171| 1.753| 14.252|  21.123|   5670|    7907|
-|Optimal BW (quadratic) |    2.614| 2.794| 19.070|  30.021|   5670|    7907|
+|Specification          | Estimate|    SE| CI_low| CI_high|
+|:----------------------|--------:|-----:|------:|-------:|
+|Optimal BW (linear)    |   18.449| 2.038| 14.455|  22.443|
+|Half BW                |   27.463| 3.711| 20.189|  34.737|
+|Double BW              |   17.688| 1.753| 14.252|  21.123|
+|Optimal BW (quadratic) |   24.545| 2.794| 19.070|  30.021|
 
 ---
 
