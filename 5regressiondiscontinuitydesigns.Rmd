@@ -1062,13 +1062,6 @@ knitr::kable(results_df, caption = "RDD Estimates of Incumbency Advantage")
 -   The plots from the diagnostics section should be included in your paper or appendix.
 
 ---
-### Example: Is US Elite Polarization Symmetric?
-
-Is ideological polarization in the US happening equally on both sides of the party system, or do the parties behave differently in terms of their distance from the ideological middle? Let's try to get an answer to this that cleans up some of the background noise by using a regression-discontinuity design. We'll compare close elections that Republicans just barely win to close elections that Democrats just barely win and look at the absolute value of the resulting ideological distance from the middle of the elected representatives.
-
-Use [this resource sheet](https://jnseawright.github.io/PS312/InClass/Regression_Discontinuity_Designs.html) to find data and for some coding hints.
-
----
 ### How Reliable Are RDD Applications?
 
 ```{r, echo = FALSE, out.width="70%", fig.retina = 1, fig.align='center'}
