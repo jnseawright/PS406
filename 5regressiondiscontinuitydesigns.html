@@ -61,15 +61,16 @@ pre[class] {
 8.  Reporting
 
 ---
-### RDD
+### Why RDD? Connecting to What We Know
 
--   An RDD can be analyzed by comparing simple average scores just above
-    and just below the threshold.
+- In week 3 we saw that RDD exploits a threshold rule to create a local natural experiment. Today we get into the details of how that actually works in practice.
+- Like IV, RDD sidesteps selection on unobservables, but instead of an instrument that shifts treatment probability, the threshold deterministically (or near-deterministically) assigns treatment.
 
--   Alternatively, a (simple or complex) statistical model may be used
-    to extrapolate from the data just above and just below the
-    threshold.
+---
+### Why RDD? (cont.)
 
+- The key tradeoff relative to IV: RDD doesn't require finding an external instrument, but the estimates are local to units near the cutoff. Whether that local effect is the one you care about is a substantive question worth asking about any application. (This is similar to whether the estimates local to the effects of an instrument are worthwhile.)
+- Unlike DiD (next week's topic), there's no parallel trends assumption — but there is the continuity assumption, which we'll examine carefully today.
 ---
 ### The Key Assumption
 
@@ -956,21 +957,7 @@ rd_ll &lt;- rdrobust(y = lmb_data$score,
     -   **Bandwidth sensitivity**: Do results hold for different bandwidths?
 
 ---
-
-Below are RMarkdown slides covering the essential diagnostics for RDD, designed to follow the estimation methods section. They use the Lee (2008) data and modern R packages (`rdrobust`, `rddensity`, `rdd`) to implement each test, with clear interpretation.
-
----
-### RDD Diagnostics: Validating the Design
-
--   After estimating the discontinuity, we must check whether the identifying assumptions hold.
-
--   Four key diagnostic families:
-    1.  **Covariate balance**: Are predetermined characteristics smooth at the cutoff?
-    2.  **Manipulation testing**: Is there evidence of sorting around the cutoff?
-    3.  **Placebo cutoffs**: Do we see effects at other (fake) thresholds?
-    4.  **Bandwidth sensitivity**: Are results robust to different bandwidth choices?
-
----
+### 1. Covariate Balance
 
 -   If the RDD is valid, covariates that were determined **before** the treatment should not jump at the cutoff.
 
@@ -1022,10 +1009,11 @@ summary(rd_cov)
 
 -   If the estimate is small and not significant (robust `\((p &gt; 0.05)\)`), then covariate is smooth.
 -   The results here are borderline, and probably should raise some concerns.
+-   If there is demographic sorting in terms of which kinds of districts just barely go to each party, we may be better off with a different research design.
 
 ---
 
--   In practice, test all available pre-treatment covariates and report a table. Think about multiple comparisons.
+-   In practice, test all available pre-treatment covariates and report a table. Think about multiple comparisons (remember, e.g., Benjamini-Hochberg from your regression class!).
 -   If any covariate shows a discontinuity, the design is suspect.
 
 ---
@@ -1399,6 +1387,11 @@ Table: RDD Estimates of Incumbency Advantage
 ---
 ### How Reliable Are RDD Applications?
 
+Stommes, Aronow, and Savje analyze the 45 most prominent RDDs published in political science. They find that there are often poor analytic methods and low power given sample sizes.
+
+---
+
+
 &lt;img src="images/Stommes1.png" width="70%" style="display: block; margin: auto;" /&gt;
 
 ---
@@ -1410,6 +1403,7 @@ Table: RDD Estimates of Incumbency Advantage
 &lt;img src="images/Stommes3.png" width="70%" style="display: block; margin: auto;" /&gt;
 
 ---
+### Implications for Practice
 
 -   If most RDD applications in political sciene have very low power, what does this mean for the credibility of effect estimates?
 -   What does it mean that p values are clustered just above 0.05?
