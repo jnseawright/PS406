@@ -220,37 +220,6 @@ text(dem.cart, use.n=TRUE)
 library(randomForest)
 ```
 
-```
-## randomForest 4.7-1.2
-```
-
-```
-## Type rfNews() to see new features/changes/bug fixes.
-```
-
-```
-## 
-## Attaching package: 'randomForest'
-```
-
-```
-## The following object is masked from 'package:gridExtra':
-## 
-##     combine
-```
-
-```
-## The following object is masked from 'package:dplyr':
-## 
-##     combine
-```
-
-```
-## The following object is masked from 'package:ggplot2':
-## 
-##     margin
-```
-
 ---
 
 ``` r
@@ -267,8 +236,8 @@ dem.rf
 ##                      Number of trees: 500
 ## No. of variables tried at each split: 2
 ## 
-##           Mean of squared residuals: 0.008603578
-##                     % Var explained: 70.12
+##           Mean of squared residuals: 0.008672284
+##                     % Var explained: 69.88
 ```
 
 ---
@@ -300,16 +269,6 @@ dem.mindepth &lt;- min_depth_distribution(dem.rf)
 plot_min_depth_distribution(dem.mindepth)
 ```
 
-```
-## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
-## ℹ Please use `linewidth` instead.
-## ℹ The deprecated feature was likely used in the randomForestExplainer package.
-##   Please report the issue to the authors.
-## This warning is displayed once per session.
-## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
-## generated.
-```
-
 &lt;img src="8machinelearning_files/figure-html/plot_min_depth-1.png" width="50%" style="display: block; margin: auto;" /&gt;
 
 ---
@@ -337,32 +296,6 @@ plot_min_depth_interactions(dem.rf)
 
 ```
 ## [1] "Warning: your forest does not contain information on local importance so 'mse_increase' measure cannot be extracted. To add it regrow the forest with the option localImp = TRUE and run this function again."
-```
-
-```
-## Warning: `funs()` was deprecated in dplyr 0.8.0.
-## ℹ Please use a list of either functions or lambdas:
-## 
-## # Simple named list: list(mean = mean, median = median)
-## 
-## # Auto named with `tibble::lst()`: tibble::lst(mean, median)
-## 
-## # Using lambdas list(~ mean(., trim = .2), ~ median(., na.rm = TRUE))
-## ℹ The deprecated feature was likely used in the randomForestExplainer package.
-##   Please report the issue to the authors.
-## This warning is displayed once per session.
-## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
-## generated.
-```
-
-```
-## Warning: There were 5557 warnings in `summarise()`.
-## The first warning was:
-## ℹ In argument: `bci_bci = min(bci_bci, na.rm = TRUE)`.
-## ℹ In group 41: `tree = 6` `split var = "bci_bci"`.
-## Caused by warning in `min()`:
-## ! no non-missing arguments to min; returning Inf
-## ℹ Run `dplyr::last_dplyr_warnings()` to see the 5556 remaining warnings.
 ```
 
 ![](8machinelearning_files/figure-html/min_depth_interactions-1.png)&lt;!-- --&gt;
@@ -490,7 +423,7 @@ dem.cf
 ## Number of training samples: 401 
 ## Variable importance: 
 ##     1     2     3     4     5     6     7 
-## 0.014 0.475 0.219 0.083 0.091 0.049 0.069
+## 0.017 0.488 0.204 0.095 0.086 0.047 0.063
 ```
 
 ---
@@ -512,11 +445,6 @@ p &lt;- demscores %&gt;%
 p
 ```
 
-```
-## Warning: Removed 14 rows containing non-finite outside the scale range
-## (`stat_bin()`).
-```
-
 &lt;img src="8machinelearning_files/figure-html/plot_hist-1.png" width="50%" style="display: block; margin: auto;" /&gt;
 
 ---
@@ -528,8 +456,8 @@ p
 ---
 ### What This Histogram Tells Us
 **Key observations**:
-- **Range**: The CATE estimates range from about -0.88 to 0.55. This is a wide spread.
-- **Average**: The ATE for treatment cases (from `average_treatment_effect`) is about -0.095. The ATE for control vases is about -0.176.
+- **Range**: The CATE estimates range from about -0.95 to 0.5. This is a wide spread.
+- **Average**: The ATE for treatment cases (from `average_treatment_effect`) is about -0.091. The ATE for control cases is about -0.174.
 - **Heterogeneity**: Some countries are estimated to have a **positive** effect (presidential system increases democracy), others a **negative** effect. This suggests the impact of presidential systems is not uniform – it depends on other characteristics.
 
 ---
@@ -538,25 +466,8 @@ p
 
 ``` r
 ate_treated &lt;- average_treatment_effect(dem.cf, target.sample = "treated")
-```
-
-```
-## Warning in average_treatment_effect(dem.cf, target.sample = "treated"):
-## Estimated treatment propensities go as high as 1 which means that treatment
-## effects for some treated units may not be well identified. In this case, using
-## `target.sample=control` may be helpful.
-```
-
-``` r
 ate_control &lt;- average_treatment_effect(dem.cf, target.sample = "control")
 ate_all     &lt;- average_treatment_effect(dem.cf, target.sample = "all")
-```
-
-```
-## Warning in average_treatment_effect(dem.cf, target.sample = "all"): Estimated
-## treatment propensities go as high as 1 which means that treatment effects for
-## some treated units may not be well identified. In this case, using
-## `target.sample=control` may be helpful.
 ```
 
 ---
@@ -568,7 +479,7 @@ ate_treated
 
 ```
 ##    estimate     std.err 
-## -0.09538377  0.01755882
+## -0.09098568  0.01755099
 ```
 
 ``` r
@@ -577,7 +488,7 @@ ate_control
 
 ```
 ##    estimate     std.err 
-## -0.17622657  0.02035411
+## -0.17362656  0.02062002
 ```
 
 ``` r
@@ -687,11 +598,6 @@ p2 &lt;- temp.df %&gt;% ggplot( aes(x=ht_colonial, y=demscore)) +
 p2
 ```
 
-```
-## Warning: Removed 14 rows containing non-finite outside the scale range
-## (`stat_ydensity()`).
-```
-
 &lt;img src="8machinelearning_files/figure-html/show_violin_plot-1.png" width="50%" style="display: block; margin: auto;" /&gt;
 
 ---
@@ -711,26 +617,16 @@ p3 &lt;- temp.df %&gt;% ggplot(aes(x=pop65, y=demscore)) +
 p3
 ```
 
-```
-## `geom_smooth()` using formula = 'y ~ x'
-```
-
-```
-## Warning: Removed 14 rows containing non-finite outside the scale range
-## (`stat_smooth()`).
-```
-
-```
-## Warning: Removed 14 rows containing missing values or values outside the scale range
-## (`geom_point()`).
-```
-
 &lt;img src="8machinelearning_files/figure-html/show_pop_plot-1.png" width="30%" style="display: block; margin: auto;" /&gt;
 
 
 
 ---
 ### Picking Control Variables
+
+- Now that we’ve seen how to discover effect heterogeneity, we turn to the complementary problem of selecting controls from a large set of covariates.
+
+---
 
 Our causal forest analysis assumed our set of controls was correctly chosen. But in many real-world settings, especially with many potential confounders, how do we make that choice in a principled way? This is the problem of high-dimensional confounding, and it leads us to a different set of ML tools designed for variable selection.
 
@@ -1092,14 +988,6 @@ In a standard adaptive LASSO, `\(\hat{w} = |\tilde{\beta}_{j}|^{-\gamma}\)`, whe
 library(glmnet)
 ```
 
-```
-## Loading required package: Matrix
-```
-
-```
-## Loaded glmnet 4.1-10
-```
-
 ---
 
 ``` r
@@ -1213,13 +1101,18 @@ Table: Variables selected by Outcome‑Adaptive LASSO for the treatment model
 |wdi_wombuslawi |wdi_wombuslawi |   0.0025    |
 
 ---
+### Turning to Text
+
+All the methods we’ve discussed assume we have a well‑defined set of numeric covariates; but what if our confounders or treatments are embedded in text? We now explore ML tools for text‑based causal inference.
+
+---
 ### Textual Data and Causal Inference
 
 &lt;img src="images/textcausal.JPG" width="70%" style="display: block; margin: auto;" /&gt;
 
 ---
 
-### 1. The Three Roles of Text in Causal Inference
+### The Three Roles of Text in Causal Inference
 
 According to Grimmer, Roberts &amp; Stewart (2022), text can play three distinct roles in causal analysis 
 
@@ -1236,7 +1129,7 @@ According to Grimmer, Roberts &amp; Stewart (2022), text can play three distinct
 
 ---
 
-### 2. Text as Outcome
+### Text as Outcome
 
 When text is the outcome, we're asking: **Does treatment cause changes in what people write or say?**
 
@@ -1366,7 +1259,7 @@ We see that women talk substantially more than men in some topics, but less in o
 
 ---
 
-### 3. Text as Treatment
+### Text as Treatment
 
 When text is the treatment, we're asking: **Does exposure to a particular text cause changes in outcomes?**
 
@@ -1399,7 +1292,7 @@ The treatment was as follows:
 
 ---
 
-### 4. Text as Confounder
+### Text as Confounder
 
 If text can be a treatment and also an outcome, it is perhaps obvious that: **text can measure otherwise unobserved confounders.**
 
@@ -1413,7 +1306,7 @@ If text can be a treatment and also an outcome, it is perhaps obvious that: **te
 
 **Article:** Roberts, M. E., Stewart, B. M., &amp; Nielsen, R. A. (2020). Adjusting for Confounding with Text Matching. *American Journal of Political Science*, 64(4), 887-903. 
 
-**Core Question (Application 1):** Does the perceived gender of an author causally affect the number of citations a academic paper receives? 
+**Core Question (Application 1):** Does the perceived gender of an author causally affect the number of citations an academic paper receives? 
 
 ---
 
@@ -1608,7 +1501,7 @@ By matching on the text-derived summaries, the authors aim to compare "apples to
 
 ---
 
-### 5. Modern Developments: Transformers and LLMs
+### Modern Developments: Transformers and LLMs
 
 Evans (2022) notes that the field is evolving rapidly :
 
@@ -1703,12 +1596,22 @@ This allows researchers to use these extracted relational statements as **variab
 
 ---
 
-### 7. Practical Guidance 
+### Practical Guidance 
 
 When incorporating text into causal research:
 
 *   Separate training models from causal inference.
 *   Remember that text models do measurement, and your causal inference design is still a separate step.
+
+---
+
+## Summary: Machine Learning for Causal Inference
+
+- **Doubly robust estimation** uses ML to estimate nuisance functions. As long as either the propensity score or the outcome model is correct, the treatment effect estimate s consistent.
+- **Causal forests** discover heterogeneous treatment effects without pre‑specifying interactions, using honest splitting and AIPW for valid inference.
+- **Variable selection** with double selection or outcome‑adaptive LASSO offers a principled way to choose confounders from many potential controls.
+- **Text as data** can play three roles: **outcome**, **treatment**, or **confounder**.
+- **Takeaway**: When models or confounders are high‑dimensional, machine learning can be an honest alternative to just picking an arbitrary parametric model.
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

@@ -5,6 +5,7 @@
     <meta charset="utf-8" />
     <meta name="author" content="Jaye Seawright" />
     <script src="7synthetic_files/header-attrs-2.30/header-attrs.js"></script>
+    <link href="7synthetic_files/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
   </head>
   <body>
@@ -156,15 +157,6 @@ Minimize `\(X_{i, t} -  \mathbb{X}_{j, t} W\)` for `\(t &lt; t_{treat}\)`.
 
 ``` r
 library(Synth)
-```
-
-```
-## ##
-## ## Synth Package: Implements Synthetic Control Methods.
-```
-
-```
-## ## See https://web.stanford.edu/~jhain/synthpage.html for additional information.
 ```
 
 ---
@@ -575,101 +567,97 @@ We ask: **At what value of `\(\Gamma\)` would our statistically significant resu
 If that happens at a small `\(\Gamma\)`, the result is sensitive; if it requires a large `\(\Gamma\)`, the result is robust.
 
 ---
+
 ### A Simple Numerical Example
 
-Imagine a matched study with 10 pairs. In each pair, one unit is treated, one is control. We observe a binary outcome (success/failure). Suppose we have 5 pairs where treated succeeded and control failed (1,0), 2 pairs where control succeeded and treated failed (0,1), 1 pair where both succeeded, and 2 where both failed.
+Imagine a matched study with 10 pairs. In each pair, one unit is treated, one is control. We observe a binary outcome (success/failure). Suppose we have 8 pairs where treated succeeded and control failed (1,0), 1 pair where control succeeded and treated failed (0,1), 0 pair where both succeeded, and 1 where both failed.
 
 ---
+
 ### Test Statistic
 
 A common test is **McNemar's test**, which uses only the discordant pairs (those where outcomes differ: (1,0) and (0,1)). Let:
-- `\(n_{10}\)` = number of pairs with (treated=1, control=0) = 5
-- `\(n_{01}\)` = number of pairs with (treated=0, control=1) = 2
+- `\(n_a\)` = number of pairs with (treated=1, control=0) = 8  
+- `\(n_b\)` = number of pairs with (treated=0, control=1) = 1  
 
-Under the null of no effect, the treated unit in each discordant pair is equally likely to be the success. The test statistic is binomial with `\(n = n_{10}+n_{01} = 7\)` and `\(p = 0.5\)`.
-
----
-### Without Hidden Bias (`\(\Gamma = 1\)`)
-
-The probability of observing `\(n_{10} \geq 5\)` under the null is:
-
-`$$P(X \geq 5) = \sum_{k=5}^{7} \binom{7}{k} (0.5)^7 \approx 0.227$$`
-
-This p-value &gt; 0.05 – the result is **not significant** even without hidden bias. (So in this example, the treatment effect is weak.)
-
-But suppose the result were significant at `\(\Gamma = 1\)`. How would hidden bias affect it?
+Under the null of no effect, the treated unit in each discordant pair is equally likely to be the success. The test statistic is binomial with `\(n = n_a + n_b = 9\)` and `\(p = 0.5\)`.
 
 ---
+
+### Without Hidden Bias `\(\Gamma = 1\)`
+
+The probability of observing `\(n_a \geq 8\)` under the null is:
+
+
+`$$P(X \geq 8) = \sum_{k=8}^{9} \binom{9}{k} (0.5)^9
+= \binom{9}{8}(0.5)^9 + \binom{9}{9}(0.5)^9
+\approx 0.0195$$`
+
+This p‑value &lt; 0.05 – the result is **statistically significant** when there is no hidden bias.
+
+---
+
 ### Introducing Hidden Bias
 
-If `\(\Gamma &gt; 1\)`, the treated unit in a discordant pair could be up to `\(\Gamma\)` times more likely to be the success even under the null.
+If `\(\Gamma &gt; 1\)`, the treated unit in a discordant pair could be up to `\(\Gamma\)` times more likely to be the success even under the null.  
+Under the worst‑case (upper bound), the null probability becomes:
 
-The exact distribution becomes more complicated, but we can compute **bounds on the p-value**. For a one-sided test, the upper bound (most conservative) is:
-
-`$$p\text{-value}_{\text{upper}} = P\left(\text{observed or more extreme} \mid \text{maximally unfavorable bias}\right)$$`
-
-This is calculated using a binomial distribution with a shifted probability `\(p = \Gamma/(1+\Gamma)\)` instead of `\(0.5\)`.
+`$$p = \frac{\Gamma}{1 + \Gamma}$$`
 
 ---
-### Numerical Example: Effect of Γ
 
-Let's recompute the p-value for different `\(\Gamma\)` values, assuming `\(n_{10}=5, n_{01}=2\)`:
+### Effect of `\(\Gamma\)` on the Upper‑Bound p‑Value
 
-| `\(\Gamma\)` | Probability under null (upper bound) | P-value (upper bound) |
-|----------|--------------------------------------|------------------------|
-| 1.0      | 0.5                                  | 0.227                  |
-| 1.5      | `\(1.5/(1+1.5) = 0.6\)`                 | `\(P(X \geq 5 \mid p=0.6)\)` |
-| 2.0      | `\(2/(1+2) = 0.667\)`                    | ...                    |
-| 3.0      | `\(3/(1+3) = 0.75\)`                     | ...                    |
+| `\(\Gamma\)` | Null probability `\(p = \Gamma/(1+\Gamma)\)` | Upper‑bound p‑value `\(P(X \geq 8)\)` |
+|------------|--------------------------------------------|-------------------------------------|
+| 1.0        | 0.500                                      | 0.0195                              |
+| 1.5        | 0.600                                      | ?                                   |
+| 2.0        | 0.667                                      | ?                                   |
+| 2.5        | 0.714                                      | ?                                   |
+| 3.0        | 0.750                                      | ?                                   |
+
+We can compute the exact values in R.
 
 ---
-### Numerical Example: Effect of Γ
-
-We can compute:
 
 
 ``` r
 # Function to compute upper bound p-value for given gamma
-rosenbaum_p &lt;- function(gamma, n10, n01) {
-  n &lt;- n10 + n01
+rosenbaum_p &lt;- function(gamma, n_a, n_b) {
+  n &lt;- n_a + n_b
   p &lt;- gamma / (1 + gamma)
-  # one-sided: probability of seeing at least n10 successes
-  sum(dbinom(n10:n, size = n, prob = p))
+  sum(dbinom(n_a:n, size = n, prob = p))
 }
 
 gammas &lt;- c(1, 1.5, 2, 2.5, 3)
 results &lt;- data.frame(
   Gamma = gammas,
-  p_upper = sapply(gammas, rosenbaum_p, n10 = 5, n01 = 2)
+  p_upper = sapply(gammas, rosenbaum_p, n_a = 8, n_b = 1)
 )
 results
 ```
 
 ```
-##   Gamma   p_upper
-## 1   1.0 0.2265625
-## 2   1.5 0.4199040
-## 3   2.0 0.5706447
-## 4   2.5 0.6792299
-## 5   3.0 0.7564087
+##   Gamma    p_upper
+## 1   1.0 0.01953125
+## 2   1.5 0.07054387
+## 3   2.0 0.14306762
+## 4   2.5 0.22264119
+## 5   3.0 0.30033875
 ```
 
 ---
+
 ### Interpreting the Results
 
-| Gamma | Upper bound p-value |
-|-------|---------------------|
-| 1.0   | 0.227               |
-| 1.5   | 0.390               |
-| 2.0   | 0.556               |
-| 2.5   | 0.692               |
-| 3.0   | 0.800               |
+- At `\(\Gamma = 1.5\)`, the upper‑bound p‑value is 0.0705 – still significant.
+- At `\(\Gamma = 2.0\)`, the upper‑bound p‑value is 0.1431 – still significant.
+- At `\(\Gamma = 2.5\)`, the upper‑bound p‑value crosses 0.2226 – now above 0.05.
 
-As `\(\Gamma\)` increases, the p-value grows. Even at `\(\Gamma=1.5\)`, the upper bound p-value is 0.39 – still above 0.05. In this example, the result is not significant at any `\(\Gamma\)` (because it wasn't at `\(\Gamma=1\)`). 
-
-But if the initial p-value had been 0.03 at `\(\Gamma=1\)`, we would look for the `\(\Gamma\)` at which the upper bound crosses 0.05. That `\(\Gamma\)` is a measure of robustness.
+Thus, the result is robust to an unobserved confounder that increases the odds of treatment by up to **2.0 times**, but it becomes non‑significant if the hidden bias is stronger than that.
 
 ---
+
 ### Summary: Rosenbaum Bounds
 
 - Rosenbaum bounds assess sensitivity to an unmeasured confounder in matched studies.
@@ -677,8 +665,35 @@ But if the initial p-value had been 0.03 at `\(\Gamma=1\)`, we would look for th
 - For each `\(\Gamma\)`, we compute the **worst‑case p‑value**.
 - If the p‑value remains below 0.05 even at moderate `\(\Gamma\)` (say, `\(\Gamma = 2\)`), the result is robust.
 - If it crosses 0.05 at a small `\(\Gamma\)`, the result is sensitive.
+- **Important**: Rosenbaum bounds are conservative – they assume the worst possible pattern of hidden bias. If the result survives, it is robust to any such bias.
 
-**Important**: Rosenbaum bounds are conservative – they assume the worst possible pattern of hidden bias. If the result survives, it is robust to any such bias.
+---
+### Interpreting the Results
+
+- At `\(\Gamma=1.5\)`, the upper‑bound p‑value is r round(results$p_upper[2], 4) – still significant.
+
+- At `\(\Gamma=2.0\)`, the upper‑bound p‑value is r round(results$p_upper[3], 4) – still significant.
+
+- At `\(\Gamma=2.5\)`, the upper‑bound p‑value crosses r round(results$p_upper[4], 4) – now above 0.05.
+
+Thus, the result is robust to an unobserved confounder that increases the odds of treatment by up to 2.0 times, but it becomes non‑significant if the hidden bias is stronger than that.
+
+---
+Summary: Rosenbaum Bounds
+
+- Rosenbaum bounds assess sensitivity to an unmeasured confounder in matched studies.
+
+- The sensitivity parameter `\(\Gamma\)` quantifies how much hidden bias could affect treatment assignment.
+
+- For each `\(\Gamma\)`, we compute the worst‑case p‑value.
+
+---
+
+- If the p‑value remains below 0.05 even at moderate `\(\Gamma\)` (say, `\(\Gamma=2\)`), the result is robust.
+
+- If it crosses 0.05 at a small `\(\Gamma\)`, the result is sensitive.
+
+**Important: Rosenbaum bounds are conservative – they assume the worst possible pattern of hidden bias. If the result survives, it is robust to any such bias.**
 
 ---
 ### Application in R
@@ -690,21 +705,17 @@ The `rbounds` package implements Rosenbaum bounds for matched data:
 library(rbounds)
 # Suppose we have matched data with outcomes
 # psens() for binary outcomes, hlsens() for continuous
-psens(n10 = 5, n01 = 2, Gamma = 1.5)
+psens(x=c(38, 23, 41, 18, 37, 36, 23, 62, 31, 34, 24, 14, 21, 17, 16, 20,
+         15, 10, 45, 39, 22, 35, 49, 48, 44, 35, 43, 39, 34, 13, 73, 25,
+         27), y = c(16, 18, 18, 24, 19, 11, 10, 15, 16, 18, 18, 13, 19, 10, 16,
+          16, 24, 13, 9, 14, 21, 19, 7, 18, 19, 12, 11, 22, 25, 16, 13,
+          11, 13), Gamma = 10, GammaInc = 0.5)
 ```
 
 ---
 
 ``` r
 library(sensemakr)
-```
-
-```
-## See details in:
-```
-
-```
-## Carlos Cinelli and Chad Hazlett (2020). Making Sense of Sensitivity: Extending Omitted Variable Bias. Journal of the Royal Statistical Society, Series B (Statistical Methodology).
 ```
 
 ---
@@ -762,6 +773,33 @@ plot(peru.sens2)
 ```
 
 &lt;img src="7synthetic_files/figure-html/unnamed-chunk-26-1.png" width="60%" style="display: block; margin: auto;" /&gt;
+
+---
+### Interpreting the Sensitivity Contour Plot
+
+- **What the plot shows:**  
+  - The **x‑axis** is the hypothetical partial \(R^2\) of an unmeasured confounder with the treatment.  
+  - The **y‑axis** is the partial \(R^2\) of that confounder with the outcome.  
+
+---
+
+- **What the plot shows:**  
+  - Each **red contour** corresponds to a different adjusted treatment effect. The **bold red curve** shows the combinations of confounding strengths that would **reduce the estimated effect to exactly zero** — i.e., fully explain it away.  
+  - The **diamond** marks the benchmark strength of an observed covariate (here, `age`).
+
+---
+
+- **How to read the robustness value (RV):**  
+  - The **robustness value** is the minimum strength of association (partial \(R^2\)) that an unmeasured confounder must have with *both* the treatment and the outcome to make the estimated effect zero.  
+  - A **high RV** (close to 1) means the result is very robust; a **low RV** (close to 0) means the result is fragile.  
+  - In the plot, the RV is shown as the point where the **dashed line** intersects the axes — it’s the smallest circle that touches the zero‑effect contour.
+
+---
+
+- **In our Peru example:**  
+  - The first model (`outsidervote ~ simpletreat`) has a robustness value of 0.106.  
+  - The second model, with more controls, has a robustness value of 0.141.  
+  - This means that after adjusting for covariates, an unmeasured confounder would need to explain about 14.1% of the residual variance of both the treatment and the outcome to nullify the effect — a moderately robust finding.
 
 ---
 ### Manski Bounds: Setting
@@ -842,6 +880,8 @@ We have:
 - `\(D=1\)` (treatment): 297 treated units.
 - `\(D=0\)` (control): 425 control units.
 - Outcome `\(Y\)`: 1 if earnings in 1978 &gt; 0, 0 otherwise.
+
+---
 
 Let's compute the observed shares:
 
@@ -944,6 +984,8 @@ summary(bns_nsw_pool2)
 ## Confidence Interval   -0.014176     0.21192
 ```
 
+---
+
 - `Q=1` means no pooling across observations.
 - `Q=2` pools across neighboring observations vis-a-vis the covariates.
 
@@ -955,6 +997,8 @@ summary(bns_nsw_pool2)
 - They are often wide, but they are **guaranteed** to contain the truth.
 - Adding covariates (or other assumptions) can narrow the bounds.
 - They are useful as a benchmark: if the bounds exclude zero, we have evidence of an effect even without any assumptions.
+
+---
 
 **In practice**, we rarely rely solely on worst‑case bounds; we combine them with plausible assumptions to get tighter intervals. But they remind us that all causal inference rests on assumptions – and show how much those assumptions buy us.
 
@@ -992,6 +1036,8 @@ Since `\(0 \le \beta_W \le 1\)`, we get:
 `$$0 \le \frac{0.55 - 0.6\beta_B}{0.4} \le 1$$`
 
 Multiply by 0.4: `\(0 \le 0.55 - 0.6\beta_B \le 0.4\)`
+
+---
 
 Rearrange for bounds on `\(\beta_B\)`:
 
@@ -1059,6 +1105,8 @@ If we have covariates `\(X\)` observed for all units, we can compute bounds cond
 - Adding covariates, monotonicity, or other assumptions narrows the bounds.
 - The same logic underlies partial identification in many settings.
 
+---
+
 **Key takeaway**: Even when we cannot point‑identify a parameter, we may still learn something useful from the data under minimal assumptions.
 
 ---
@@ -1112,56 +1160,15 @@ The **Super Learner** algorithm (van der Laan et al. 2007) is a popular ensemble
 The weights tell you which algorithms are most useful for your data.
 
 ---
-### Example: Synthetic Control with Ensembles
+### Example: Counterfactual Time Series with Ensembles
 
 Recall our Mali example. Instead of choosing one set of predictors and one weighting scheme, we could:
 
 
 ``` r
 library(SuperLearner)
-```
-
-```
-## Loading required package: nnls
-```
-
-```
-## Loading required package: gam
-```
-
-```
-## Loading required package: splines
-```
-
-```
-## Loading required package: foreach
-```
-
-```
-## Loaded gam 1.22-7
-```
-
-```
-## Super Learner
-```
-
-```
-## Version: 2.0-40
-```
-
-```
-## Package created on 2025-12-14
-```
-
-``` r
 library(origami)
-```
 
-```
-## origami v1.0.7: Generalized Framework for Cross-Validation
-```
-
-``` r
 # Step 1: Subset to pre-treatment period and select relevant columns
 pre_data &lt;- malidata[malidata$year &lt; 1991, 
                      c("WBCode", "year", "lngdpmad", "lngdpmadlag", "lnpop", "openk", "civwar")]
@@ -1170,10 +1177,15 @@ pre_data &lt;- malidata[malidata$year &lt; 1991,
 mali_pre &lt;- pre_data[pre_data$WBCode == "MLI", ]
 donors_pre &lt;- pre_data[pre_data$WBCode != "MLI", ]
 
-# Step 3: Convert civwar to numeric (it's likely binary)
+# Step 3: Convert civwar to numeric
 donors_pre$civwar &lt;- as.numeric(as.character(donors_pre$civwar))
 mali_pre$civwar &lt;- as.numeric(as.character(mali_pre$civwar))
+```
 
+---
+
+
+``` r
 # Step 4: Handle missing values (listwise deletion on predictors only)
 predictors &lt;- c("lngdpmadlag", "lnpop", "openk", "civwar")
 donors_clean &lt;- donors_pre[complete.cases(donors_pre[, predictors]), ]
@@ -1185,7 +1197,12 @@ if (nrow(mali_clean) == 0) stop("No Mali pre-treatment observations with complet
 
 # Step 5: Define algorithm library (install packages if needed)
 SL.library &lt;- c("SL.lm", "SL.mean")  # start simple; add others later
+```
 
+---
+
+
+``` r
 # Step 6: Fit Super Learner
 set.seed(2026)
 sl_fit &lt;- SuperLearner(Y = donors_clean$lngdpmad,
@@ -1204,7 +1221,7 @@ lines(mali_clean$year, pred$pred, col = "red", lty = 2)
 legend("topright", legend = c("Actual", "Ensemble"), col = c("blue", "red"), lty = 1:2)
 ```
 
-![](7synthetic_files/figure-html/ensemble_example-1.png)&lt;!-- --&gt;
+![](7synthetic_files/figure-html/ensemble_example_3-1.png)&lt;!-- --&gt;
 
 ---
 ### Interpreting the Ensemble
@@ -1220,7 +1237,7 @@ sl_fit$coef
 ## 0.9993896397 0.0006103603
 ```
 
-- If `SL.lm` gets weight 0.7 and `SL.ranger` gets weight 0.3, the ensemble relies mostly on linear regression but also uses the random forest to capture nonlinearities.
+- If `SL.lm` gets weight 0.7 and `SL.mean` gets weight 0.3, the ensemble relies mostly on linear regression but also uses the mean. What we see instead is a nearly pure regression.
 - The cross-validated risk tells you how well the ensemble performs.
 
 ---
@@ -1229,17 +1246,37 @@ sl_fit$coef
 
 **Caveat**: The ensemble is only as good as its candidate algorithms. If all algorithms are misspecified, the ensemble will also be misspecified – but it will usually be better than any single one.
 
+## Synthetic Control: Weighted Units
+
+- **Core idea**: The counterfactual for the treated unit is a weighted average of the **donor units**.
+- Weights `\(w_j \ge 0\)`, `\(\sum_j w_j = 1\)`.
+- The resulting counterfactual lies within the **convex hull** of the donor outcomes – no extrapolation.
+- You see exactly which countries contribute and how much.
+
+*Example*: A synthetic Mali might be 60% Burkina Faso + 30% Niger + 10% Senegal.
+
 ---
-### Ensembles vs. Traditional Synthetic Control
 
-| Feature | Traditional SC | Ensemble SC |
-|---------|----------------|-------------|
-| **Model form** | Linear combination of donor units | Any supervised learning algorithm |
-| **Weights** | On donor units | On algorithms (and indirectly on units) |
-| **Flexibility** | Limited to linear combinations | Can capture complex relationships |
-| **Interpretability** | High (weights on units) | Lower (weights on algorithms) |
-| **When to use** | Small donor pool, linearity plausible | Large donor pool, complex relationships |
+## Ensemble Counterfactual: Weighted Algorithms
 
+- In the Mali **Super Learner** example, we built a counterfactual by averaging **prediction models**.
+- Each model (linear regression, random forest, etc.) is fit on the donor data, then applied to Mali.
+- The ensemble weight `\(\alpha_k\)` tells how much we trust each **algorithm**, not each country.
+- The result can fall **outside the range of observed donor outcomes** – it may extrapolate.
+
+---
+
+## Key Differences
+
+| | Synthetic Control | Ensemble (Super Learner) |
+|---|---|---|
+| **What is weighted** | Donor units (countries) | Prediction algorithms |
+| **Constraint** | `\(w_j \ge 0,\ \sum w_j = 1\)` | `\(\alpha_k \ge 0,\ \sum \alpha_k = 1\)` |
+| **Counterfactual** | A blend of real countries | A statistical best‑guess |
+| **Interpretability** | High – see which countries matter | Lower – models are black‑box |
+| **When to use** | Small donor pool, linearity plausible | Many donors, complex patterns |
+
+Both aim to impute `\(Y(0)\)`, but they take different paths to get there.
 ---
 ### Ensembles for Sensitivity Analysis
 
@@ -1250,12 +1287,24 @@ Ensembles can also serve a **sensitivity analysis** role:
 3. Predict outcomes for **all** units under both models.
 4. The difference in predictions gives an estimate of the treatment effect that is **robust** to model choice.
 
+---
+
 If the treatment effect estimate is similar across many model specifications, we gain confidence that it's not an artifact of a particular model.
+
+### A Caution on Cross-Validation with Time Series
+
+- Standard 5‑fold CV randomly partitions rows, assuming independent observations.
+- With panel data (countries × years), random folds can place **future years** in the training set and **past years** in the validation set.
+- This leaks information from the future, leading to **overly optimistic** estimates of model performance.
+- For time‑series forecasting, use **blocked**, **rolling‑origin**, or **time‑series‑specific CV** that respects temporal order.
+- In the Mali example, we used standard CV for simplicity; in practice, use a time‑aware CV scheme for an honest assessment.
 
 ---
 ### Back to the Peru Example
 
 We could use an ensemble to check whether the effect of `simpletreat` on `outsidervote` is robust to how we model the relationship:
+
+---
 
 
 ``` r
@@ -1272,23 +1321,10 @@ treated_data &lt;- peruemotionssmall[peruemotionssmall$simpletreat == 1, ]
 sl_control &lt;- SuperLearner(Y = control_data$outsidervote,
                            X = control_data[, c("age", "Cuzco", "edlevel")],
                            SL.library = c("SL.lm", "SL.glmnet", "SL.mean"))
-```
 
-```
-## Loading required namespace: glmnet
-```
-
-``` r
 # Predict counterfactual outcomes for treated group
 pred_control &lt;- predict(sl_control, newdata = treated_data)$pred
-```
 
-```
-## Warning in predict.SL.glmnet(object = structure(list(object = structure(list(:
-## Removing extra columns in prediction data: simpletreat, outsidervote
-```
-
-``` r
 # Estimated treatment effect = observed - counterfactual
 mean(treated_data$outsidervote - pred_control)
 ```
@@ -1306,10 +1342,21 @@ mean(treated_data$outsidervote - pred_control)
 - The **Super Learner** algorithm provides a principled way to weight models.
 
 **Key takeaway**: When you're unsure which model is correct, don't pick one – average over many.
+
+---
+
+## Final Takeaway
+
+- **Synthetic control** gives you a transparent, unit‑weighted counterfactual when parallel trends is implausible.
+- **Sensitivity analysis** tells you how much hidden bias would be needed to overturn your results.
+- **Ensemble methods** hedge against model misspecification by averaging over many learners.
+- All three tools make your causal claims more credible by **systematically probing** what can go wrong.
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
-<script>var slideshow = remark.create();
+<script>var slideshow = remark.create({
+  "mathjax": true
+});
 if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
   window.dispatchEvent(new Event('resize'));
 });

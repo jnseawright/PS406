@@ -52,6 +52,8 @@ BibOptions(check.entries = FALSE,
 
 peruemotions <- read.csv("https://github.com/jnseawright/PS406/raw/main/data/peruemotions.csv")
 
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+
 qog_std_ts_jan22 <- read.csv("https://github.com/jnseawright/PS406/raw/main/data/qog_std_ts_jan22.csv")
 ```
 ```{r xaringan-themer, include=FALSE, warning=FALSE}
@@ -628,6 +630,10 @@ p3
 ---
 ### Picking Control Variables
 
+- Now that we’ve seen how to discover effect heterogeneity, we turn to the complementary problem of selecting controls from a large set of covariates.
+
+---
+
 Our causal forest analysis assumed our set of controls was correctly chosen. But in many real-world settings, especially with many potential confounders, how do we make that choice in a principled way? This is the problem of high-dimensional confounding, and it leads us to a different set of ML tools designed for variable selection.
 
 ---
@@ -868,6 +874,11 @@ selected_df <- data.frame(
 kable(selected_df, caption = "Variables selected by Outcome‑Adaptive LASSO for the treatment model",
       align = c("l", "c"))
 ```
+
+---
+### Turning to Text
+
+All the methods we’ve discussed assume we have a well‑defined set of numeric covariates; but what if our confounders or treatments are embedded in text? We now explore ML tools for text‑based causal inference.
 
 ---
 ### Textual Data and Causal Inference
@@ -1458,3 +1469,13 @@ When incorporating text into causal research:
 
 *   Separate training models from causal inference.
 *   Remember that text models do measurement, and your causal inference design is still a separate step.
+
+---
+
+## Summary: Machine Learning for Causal Inference
+
+- **Doubly robust estimation** uses ML to estimate nuisance functions. As long as either the propensity score or the outcome model is correct, the treatment effect estimate s consistent.
+- **Causal forests** discover heterogeneous treatment effects without pre‑specifying interactions, using honest splitting and AIPW for valid inference.
+- **Variable selection** with double selection or outcome‑adaptive LASSO offers a principled way to choose confounders from many potential controls.
+- **Text as data** can play three roles: **outcome**, **treatment**, or **confounder**.
+- **Takeaway**: When models or confounders are high‑dimensional, machine learning can be an honest alternative to just picking an arbitrary parametric model.
