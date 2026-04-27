@@ -591,12 +591,7 @@ rdplot(y = lmb_data$score,
 
 The warning "Mass points detected in the running variable" means that many observations share identical values of the running variable. Here, this happens because vote shares are recorded as rounded percentages, producing heaping at values like 0.50, 0.51, 0.52, etc.
 
----
-
-This matters for two reasons:
-
-- Density testing: The McCrary/rddensity test for manipulation assumes the running variable is continuously distributed. With mass points, the density is lumpy by construction, which can produce false positives. rddensity handles this automatically by adjusting the estimator, but you should be aware the standard version of the test is unreliable here.
-- Bin construction: rdplot() adjusts its binning algorithm when mass points are detected, grouping at the level of unique values rather than constructing equal-width bins. The plot you see already reflects this adjustment.
+- Generally, we assume the running variable is continuous and smooth, so this points toward a violation of the setup, although not all violations are created equal.
 
 ---
 
@@ -758,7 +753,7 @@ summary(lm_narrow)
 ---
 ### 1. Local Randomization View
 
--   Estimate: NA with SE NA.
+-   Estimate: 21.284 with SE 1.951.
 -   This is intuitive but:
     -   Comparatively small sample (915 observations).
     -   Sensitive to exact window choice.
