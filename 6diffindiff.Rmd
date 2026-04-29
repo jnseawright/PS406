@@ -45,6 +45,8 @@ BibOptions(check.entries = FALSE,
 # bibliography.
 
 peruemotions <- read.csv("https://github.com/jnseawright/PS406/raw/main/data/peruemotions.csv")
+
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
 ```
 ```{r xaringan-themer, include=FALSE, warning=FALSE}
 library(xaringanthemer,MnSymbol)
@@ -58,15 +60,31 @@ style_mono_accent(
 ```
 
 
+###Today's Plan
+
+1.  Why DiD?
+2.  Classic DiD Estimation
+3.  Fixed-Effects Models
+4.  Parallel Trends
+5.  Staggered Treatments and Negative Weights
+6.  Modern DiD Estimators
+7.  Conclusion
+
+---
+### Why DiD? Connecting to What We Know
+
+- In week 3 we saw that DiD compares cases before and after some (hopefully as-if random) event, using comparisons with differences in cases that did not experience the event to remove effects of shared events or trends. Today we get into the details of how that actually works in practice.
+- Like RDD, DiD involves structured comparisons around a threshold. However, here, the threshold is a moment in time defined by an event rather than a cutpoint on a selection variable defined by a rule.
+
+---
+
+
 ### Before and After
 
-Suppose we have a set of confounders that:
+The structure of DiD comparisons, in which we compare before and after across treatment cases and control cases, eliminates certain categories of confounders:
 
-1. Varies across cases but is fixed over time, and/or
-
-2. Is completely shared across cases but varies over time.
-
-We need to difference out these time-invariant confounders and common time shocks.
+- those that vary across units but are constant over time
+- those that vary over time but are constant across units
 
 ---
 ### The Difference-in-Differences Estimand
@@ -175,14 +193,14 @@ summary(clfe)
 ---
 ### Interpreting the Organ Donations DiD Results
 
-- The coefficient on `Treated` is about **`r round(coef(clfe)["Treated"], 4)`**.
-- **Interpretation**: California's policy change may have decreased the organ donation rate by approximately `r round(100*coef(clfe)["Treated"], 2)` percentage points relative to what would have happened without the policy, under the parallel trends assumption.
+- The coefficient on `Treated` is about **`r round(coef(clfe)["TreatedTRUE"], 4)`**.
+- **Interpretation**: California's policy change may have decreased the organ donation rate by approximately `r -1*round(100*coef(clfe)["TreatedTRUE"], 2)` percentage points relative to what would have happened without the policy, under the parallel trends assumption.
 - The p-value is `r round(summary(clfe)$coeftable[4], 4)`. This is above conventional significance levels, suggesting no evidence of an effect.
-- The confidence interval can be extracted: `confint(clfe)["Treated",]`.
+- The confidence interval can be extracted: `confint(clfe)["TreatedTRUE",]`.
 
 ---
 
-**Substantive significance**: Is a `r round(100*coef(clfe)["Treated"], 2)` percentage point change large? It depends on the baseline donation rate. The mean donation rate in California before the policy was about `r mean(od$Rate[od$State=="California" & od$Quarter_Num < 4], na.rm=TRUE)` percent, so the estimated increase represents a relative change of roughly `r round(100*coef(clfe)["Treated"] / mean(od$Rate[od$State=="California" & od$Quarter_Num < 4], na.rm=TRUE), 1)`%.
+**Substantive significance**: Is a `r round(100*coef(clfe)["TreatedTRUE"], 2)` percentage point change large? It depends on the baseline donation rate. The mean donation rate in California before the policy was about `r mean(od$Rate[od$State=="California" & od$Quarter_Num < 4], na.rm=TRUE)` percent, so the estimated increase represents a relative change of roughly `r round(100*coef(clfe)["TreatedTRUE"] / mean(od$Rate[od$State=="California" & od$Quarter_Num < 4], na.rm=TRUE), 1)`%.
 
 ---
 ### Testing Parallel Trends: Pre-Treatment Analysis
@@ -254,7 +272,7 @@ In our example, the test barely passes, so the standard DiD estimate is perhaps 
 
 | Question | Answer |
 |----------|--------|
-| Estimated effect | `r round(100*coef(clfe)["Treated"], 2)` percentage point increase |
+| Estimated effect | `r round(100*coef(clfe)["TreatedTRUE"], 2)` percentage point decrease |
 | Statistical significance | p = `r round(summary(clfe)$coeftable[4], 4)` |
 | Parallel trends? | Pre-trend test p = `r round(summary(odparalleltrends.lm)$coef["Quarter_Num:calind", "Pr(>|t|)"], 4)` – marginally not rejected |
 | Credibility of DiD | Acceptable, given the evidence |
@@ -466,6 +484,11 @@ The aggregated ATT should be close to the true value of 1.5.
 ---
 ### Current Solutions
 
+Statisticians, methodologists, and econometricians have developed a wide range of methods to better estimate when there is staggered treatment timing.
+
+---
+### Current Solutions
+
 ```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
 include_graphics("images/Roth1.png")
 ```
@@ -492,7 +515,7 @@ Nonetheless, the current status quo in applied social-science methods is that yo
 
 *   The issues with traditional methods are widely known and can be extreme.
 *   Choosing virtually any of the contemporary methods will usually be better than the traditional methods when there is staggered timing.
-
+*   Staggered timing and parallel trends failures can occur together, compounding the problem.
 
 ---
 ### For example...
@@ -509,7 +532,7 @@ This helps eliminate biases caused by improper weighting of heterogeneous treatm
 
 ---
 
-The ife or interactive fixed-effects counterfactual estimator adds a layer of factor analysis to try to remove time-varying confounders that might be the source of problems for parallel trends.
+The ife or interactive fixed-effects counterfactual estimator works for staggered treatment effects, and also adds a layer of factor analysis to try to remove time-varying confounders that might be the source of problems for parallel trends.
 
 ---
 ```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}

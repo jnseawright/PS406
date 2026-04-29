@@ -49,6 +49,8 @@ BibOptions(check.entries = FALSE,
 # bibliography.
 
 peruemotions <- read.csv("https://github.com/jnseawright/PS406/raw/main/data/peruemotions.csv")
+
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
 ```
 ```{r xaringan-themer, include=FALSE, warning=FALSE}
 library(xaringanthemer,MnSymbol)
@@ -82,7 +84,7 @@ style_mono_accent(
 ### Why RDD? (cont.)
 
 - The key tradeoff relative to IV: RDD doesn't require finding an external instrument, but the estimates are local to units near the cutoff. Whether that local effect is the one you care about is a substantive question worth asking about any application. (This is similar to whether the estimates local to the effects of an instrument are worthwhile.)
-- Unlike DiD (next week's topic), there's no parallel trends assumption — but there is the continuity assumption, which we'll examine carefully today.
+- Unlike DiD (next week's topic), there's no parallel trends assumption, but there is the continuity assumption, which we'll examine carefully today.
 ---
 ### The Key Assumption
 

@@ -46,15 +46,31 @@ pre[class] {
 
 
 
+###Today's Plan
+
+1.  Why DiD?
+2.  Classic DiD Estimation
+3.  Fixed-Effects Models
+4.  Parallel Trends
+5.  Staggered Treatments and Negative Weights
+6.  Modern DiD Estimators
+7.  Conclusion
+
+---
+### Why DiD? Connecting to What We Know
+
+- In week 3 we saw that DiD compares cases before and after some (hopefully as-if random) event, using comparisons with differences in cases that did not experience the event to remove effects of shared events or trends. Today we get into the details of how that actually works in practice.
+- Like RDD, DiD involves structured comparisons around a threshold. However, here, the threshold is a moment in time defined by an event rather than a cutpoint on a selection variable defined by a rule.
+
+---
+
+
 ### Before and After
 
-Suppose we have a set of confounders that:
+The structure of DiD comparisons, in which we compare before and after across treatment cases and control cases, eliminates certain categories of confounders:
 
-1. Varies across cases but is fixed over time, and/or
-
-2. Is completely shared across cases but varies over time.
-
-We need to difference out these time-invariant confounders and common time shocks.
+- those that vary across units but are constant over time
+- those that vary over time but are constant across units
 
 ---
 ### The Difference-in-Differences Estimand
@@ -176,14 +192,14 @@ summary(clfe)
 ---
 ### Interpreting the Organ Donations DiD Results
 
-- The coefficient on `Treated` is about **NA**.
-- **Interpretation**: California's policy change may have decreased the organ donation rate by approximately NA percentage points relative to what would have happened without the policy, under the parallel trends assumption.
+- The coefficient on `Treated` is about **-0.0225**.
+- **Interpretation**: California's policy change may have decreased the organ donation rate by approximately 2.25 percentage points relative to what would have happened without the policy, under the parallel trends assumption.
 - The p-value is 0.2752. This is above conventional significance levels, suggesting no evidence of an effect.
-- The confidence interval can be extracted: `confint(clfe)["Treated",]`.
+- The confidence interval can be extracted: `confint(clfe)["TreatedTRUE",]`.
 
 ---
 
-**Substantive significance**: Is a NA percentage point change large? It depends on the baseline donation rate. The mean donation rate in California before the policy was about 0.2713333 percent, so the estimated increase represents a relative change of roughly NA%.
+**Substantive significance**: Is a -2.25 percentage point change large? It depends on the baseline donation rate. The mean donation rate in California before the policy was about 0.2713333 percent, so the estimated increase represents a relative change of roughly -8.3%.
 
 ---
 ### Testing Parallel Trends: Pre-Treatment Analysis
@@ -278,7 +294,7 @@ In our example, the test barely passes, so the standard DiD estimate is perhaps 
 
 | Question | Answer |
 |----------|--------|
-| Estimated effect | NA percentage point increase |
+| Estimated effect | -2.25 percentage point decrease |
 | Statistical significance | p = 0.2752 |
 | Parallel trends? | Pre-trend test p = 0.0861 – marginally not rejected |
 | Credibility of DiD | Acceptable, given the evidence |
@@ -387,20 +403,6 @@ The Goodman‑Bacon decomposition splits the TWFE estimator into three types of 
 
 ``` r
 library(bacondecomp)
-```
-
-```
-## 
-## Attaching package: 'bacondecomp'
-```
-
-```
-## The following object is masked from 'package:causaldata':
-## 
-##     castle
-```
-
-``` r
 # Prepare data with id, time, outcome, treatment
 bacon_out &lt;- bacon(y ~ treat,
                    data = df,
@@ -476,15 +478,6 @@ This means the TWFE estimator may even have the **wrong sign** if the heterogene
 df$time_to_treat &lt;- ifelse(df$group == "early", df$time - 2,
                     ifelse(df$group == "late", df$time - 3, NA))
 es &lt;- feols(y ~ i(time_to_treat, ref = -1) | id + time, data = df)
-```
-
-```
-## NOTE: 1,212 observations removed because of NA values (RHS: 1,212).
-```
-
-```
-## The variable 'time_to_treat::1' has been removed because of collinearity (see
-## $collin.var).
 ```
 
 ---
@@ -597,6 +590,11 @@ The aggregated ATT should be close to the true value of 1.5.
 ---
 ### Current Solutions
 
+Statisticians, methodologists, and econometricians have developed a wide range of methods to better estimate when there is staggered treatment timing.
+
+---
+### Current Solutions
+
 &lt;img src="images/Roth1.png" width="90%" style="display: block; margin: auto;" /&gt;
 
 ---
@@ -619,7 +617,7 @@ Nonetheless, the current status quo in applied social-science methods is that yo
 
 *   The issues with traditional methods are widely known and can be extreme.
 *   Choosing virtually any of the contemporary methods will usually be better than the traditional methods when there is staggered timing.
-
+*   Staggered timing and parallel trends failures can occur together, compounding the problem.
 
 ---
 ### For example...
@@ -636,7 +634,7 @@ This helps eliminate biases caused by improper weighting of heterogeneous treatm
 
 ---
 
-The ife or interactive fixed-effects counterfactual estimator adds a layer of factor analysis to try to remove time-varying confounders that might be the source of problems for parallel trends.
+The ife or interactive fixed-effects counterfactual estimator works for staggered treatment effects, and also adds a layer of factor analysis to try to remove time-varying confounders that might be the source of problems for parallel trends.
 
 ---
 
@@ -651,227 +649,8 @@ vdemeu &lt;- read.csv("data/vdemeu.csv")
 vdemeu &lt;- vdemeu[vdemeu$year&lt;2013,]
 eufect &lt;- fect(v2x_libdem ~ accession, index = c("country_name", "year"), force = "two-way",
                data = vdemeu, method="fe",min.T0=1, se=1)
-```
-
-```
-## For identification purposes, units whose number of untreated periods &lt;1 are dropped automatically.
-```
-
-```
-## Parallel computing ...
-```
-
-```
-## Warning: UNRELIABLE VALUE: One of the foreach() iterations ('doFuture-1')
-## unexpectedly generated random numbers without declaring so. There is a risk
-## that those random numbers are not statistically sound and the overall results
-## might be invalid. To fix this, use '%dorng%' from the 'doRNG' package instead
-## of '%dopar%'. This ensures that proper, parallel-safe random numbers are
-## produced. To disable this check, set option 'doFuture.rng.onMisuse' to
-## "ignore". [future 'doFuture-1' (dc0db54f59303dabc8c576d190d36950-1); on
-## dc0db54f59303dabc8c576d190d36950@WITPOLD2GQD2Z3&lt;10004&gt;]
-```
-
-```
-## Warning: UNRELIABLE VALUE: One of the foreach() iterations ('doFuture-2')
-## unexpectedly generated random numbers without declaring so. There is a risk
-## that those random numbers are not statistically sound and the overall results
-## might be invalid. To fix this, use '%dorng%' from the 'doRNG' package instead
-## of '%dopar%'. This ensures that proper, parallel-safe random numbers are
-## produced. To disable this check, set option 'doFuture.rng.onMisuse' to
-## "ignore". [future 'doFuture-2' (dc0db54f59303dabc8c576d190d36950-2); on
-## dc0db54f59303dabc8c576d190d36950@WITPOLD2GQD2Z3&lt;10004&gt;]
-```
-
-```
-## Warning: UNRELIABLE VALUE: One of the foreach() iterations ('doFuture-3')
-## unexpectedly generated random numbers without declaring so. There is a risk
-## that those random numbers are not statistically sound and the overall results
-## might be invalid. To fix this, use '%dorng%' from the 'doRNG' package instead
-## of '%dopar%'. This ensures that proper, parallel-safe random numbers are
-## produced. To disable this check, set option 'doFuture.rng.onMisuse' to
-## "ignore". [future 'doFuture-3' (dc0db54f59303dabc8c576d190d36950-3); on
-## dc0db54f59303dabc8c576d190d36950@WITPOLD2GQD2Z3&lt;10004&gt;]
-```
-
-```
-## Warning: UNRELIABLE VALUE: One of the foreach() iterations ('doFuture-4')
-## unexpectedly generated random numbers without declaring so. There is a risk
-## that those random numbers are not statistically sound and the overall results
-## might be invalid. To fix this, use '%dorng%' from the 'doRNG' package instead
-## of '%dopar%'. This ensures that proper, parallel-safe random numbers are
-## produced. To disable this check, set option 'doFuture.rng.onMisuse' to
-## "ignore". [future 'doFuture-4' (dc0db54f59303dabc8c576d190d36950-4); on
-## dc0db54f59303dabc8c576d190d36950@WITPOLD2GQD2Z3&lt;10004&gt;]
-```
-
-```
-## Warning: UNRELIABLE VALUE: One of the foreach() iterations ('doFuture-5')
-## unexpectedly generated random numbers without declaring so. There is a risk
-## that those random numbers are not statistically sound and the overall results
-## might be invalid. To fix this, use '%dorng%' from the 'doRNG' package instead
-## of '%dopar%'. This ensures that proper, parallel-safe random numbers are
-## produced. To disable this check, set option 'doFuture.rng.onMisuse' to
-## "ignore". [future 'doFuture-5' (dc0db54f59303dabc8c576d190d36950-5); on
-## dc0db54f59303dabc8c576d190d36950@WITPOLD2GQD2Z3&lt;10004&gt;]
-```
-
-```
-## Warning: UNRELIABLE VALUE: One of the foreach() iterations ('doFuture-6')
-## unexpectedly generated random numbers without declaring so. There is a risk
-## that those random numbers are not statistically sound and the overall results
-## might be invalid. To fix this, use '%dorng%' from the 'doRNG' package instead
-## of '%dopar%'. This ensures that proper, parallel-safe random numbers are
-## produced. To disable this check, set option 'doFuture.rng.onMisuse' to
-## "ignore". [future 'doFuture-6' (dc0db54f59303dabc8c576d190d36950-6); on
-## dc0db54f59303dabc8c576d190d36950@WITPOLD2GQD2Z3&lt;10004&gt;]
-```
-
-```
-## Warning: UNRELIABLE VALUE: One of the foreach() iterations ('doFuture-7')
-## unexpectedly generated random numbers without declaring so. There is a risk
-## that those random numbers are not statistically sound and the overall results
-## might be invalid. To fix this, use '%dorng%' from the 'doRNG' package instead
-## of '%dopar%'. This ensures that proper, parallel-safe random numbers are
-## produced. To disable this check, set option 'doFuture.rng.onMisuse' to
-## "ignore". [future 'doFuture-7' (dc0db54f59303dabc8c576d190d36950-7); on
-## dc0db54f59303dabc8c576d190d36950@WITPOLD2GQD2Z3&lt;10004&gt;]
-```
-
-```
-## Warning: UNRELIABLE VALUE: One of the foreach() iterations ('doFuture-8')
-## unexpectedly generated random numbers without declaring so. There is a risk
-## that those random numbers are not statistically sound and the overall results
-## might be invalid. To fix this, use '%dorng%' from the 'doRNG' package instead
-## of '%dopar%'. This ensures that proper, parallel-safe random numbers are
-## produced. To disable this check, set option 'doFuture.rng.onMisuse' to
-## "ignore". [future 'doFuture-8' (dc0db54f59303dabc8c576d190d36950-8); on
-## dc0db54f59303dabc8c576d190d36950@WITPOLD2GQD2Z3&lt;10004&gt;]
-```
-
-```
-## 
-```
-
-```
-## F-test Failed. The estimated covariance matrix is singular.
-```
-
-```
-## 
-```
-
-``` r
 euife &lt;- fect(v2x_libdem ~ accession, index = c("country_name", "year"), force = "two-way",
                data = vdemeu, method="ife",min.T0=1, se=1)
-```
-
-```
-## For identification purposes, units whose number of untreated periods &lt;1 are dropped automatically.
-```
-
-```
-## Parallel computing ...
-```
-
-```
-## Warning: UNRELIABLE VALUE: One of the foreach() iterations ('doFuture-1')
-## unexpectedly generated random numbers without declaring so. There is a risk
-## that those random numbers are not statistically sound and the overall results
-## might be invalid. To fix this, use '%dorng%' from the 'doRNG' package instead
-## of '%dopar%'. This ensures that proper, parallel-safe random numbers are
-## produced. To disable this check, set option 'doFuture.rng.onMisuse' to
-## "ignore". [future 'doFuture-1' (dc0db54f59303dabc8c576d190d36950-9); on
-## dc0db54f59303dabc8c576d190d36950@WITPOLD2GQD2Z3&lt;10004&gt;]
-```
-
-```
-## Warning: UNRELIABLE VALUE: One of the foreach() iterations ('doFuture-2')
-## unexpectedly generated random numbers without declaring so. There is a risk
-## that those random numbers are not statistically sound and the overall results
-## might be invalid. To fix this, use '%dorng%' from the 'doRNG' package instead
-## of '%dopar%'. This ensures that proper, parallel-safe random numbers are
-## produced. To disable this check, set option 'doFuture.rng.onMisuse' to
-## "ignore". [future 'doFuture-2' (dc0db54f59303dabc8c576d190d36950-10); on
-## dc0db54f59303dabc8c576d190d36950@WITPOLD2GQD2Z3&lt;10004&gt;]
-```
-
-```
-## Warning: UNRELIABLE VALUE: One of the foreach() iterations ('doFuture-3')
-## unexpectedly generated random numbers without declaring so. There is a risk
-## that those random numbers are not statistically sound and the overall results
-## might be invalid. To fix this, use '%dorng%' from the 'doRNG' package instead
-## of '%dopar%'. This ensures that proper, parallel-safe random numbers are
-## produced. To disable this check, set option 'doFuture.rng.onMisuse' to
-## "ignore". [future 'doFuture-3' (dc0db54f59303dabc8c576d190d36950-11); on
-## dc0db54f59303dabc8c576d190d36950@WITPOLD2GQD2Z3&lt;10004&gt;]
-```
-
-```
-## Warning: UNRELIABLE VALUE: One of the foreach() iterations ('doFuture-4')
-## unexpectedly generated random numbers without declaring so. There is a risk
-## that those random numbers are not statistically sound and the overall results
-## might be invalid. To fix this, use '%dorng%' from the 'doRNG' package instead
-## of '%dopar%'. This ensures that proper, parallel-safe random numbers are
-## produced. To disable this check, set option 'doFuture.rng.onMisuse' to
-## "ignore". [future 'doFuture-4' (dc0db54f59303dabc8c576d190d36950-12); on
-## dc0db54f59303dabc8c576d190d36950@WITPOLD2GQD2Z3&lt;10004&gt;]
-```
-
-```
-## Warning: UNRELIABLE VALUE: One of the foreach() iterations ('doFuture-5')
-## unexpectedly generated random numbers without declaring so. There is a risk
-## that those random numbers are not statistically sound and the overall results
-## might be invalid. To fix this, use '%dorng%' from the 'doRNG' package instead
-## of '%dopar%'. This ensures that proper, parallel-safe random numbers are
-## produced. To disable this check, set option 'doFuture.rng.onMisuse' to
-## "ignore". [future 'doFuture-5' (dc0db54f59303dabc8c576d190d36950-13); on
-## dc0db54f59303dabc8c576d190d36950@WITPOLD2GQD2Z3&lt;10004&gt;]
-```
-
-```
-## Warning: UNRELIABLE VALUE: One of the foreach() iterations ('doFuture-6')
-## unexpectedly generated random numbers without declaring so. There is a risk
-## that those random numbers are not statistically sound and the overall results
-## might be invalid. To fix this, use '%dorng%' from the 'doRNG' package instead
-## of '%dopar%'. This ensures that proper, parallel-safe random numbers are
-## produced. To disable this check, set option 'doFuture.rng.onMisuse' to
-## "ignore". [future 'doFuture-6' (dc0db54f59303dabc8c576d190d36950-14); on
-## dc0db54f59303dabc8c576d190d36950@WITPOLD2GQD2Z3&lt;10004&gt;]
-```
-
-```
-## Warning: UNRELIABLE VALUE: One of the foreach() iterations ('doFuture-7')
-## unexpectedly generated random numbers without declaring so. There is a risk
-## that those random numbers are not statistically sound and the overall results
-## might be invalid. To fix this, use '%dorng%' from the 'doRNG' package instead
-## of '%dopar%'. This ensures that proper, parallel-safe random numbers are
-## produced. To disable this check, set option 'doFuture.rng.onMisuse' to
-## "ignore". [future 'doFuture-7' (dc0db54f59303dabc8c576d190d36950-15); on
-## dc0db54f59303dabc8c576d190d36950@WITPOLD2GQD2Z3&lt;10004&gt;]
-```
-
-```
-## Warning: UNRELIABLE VALUE: One of the foreach() iterations ('doFuture-8')
-## unexpectedly generated random numbers without declaring so. There is a risk
-## that those random numbers are not statistically sound and the overall results
-## might be invalid. To fix this, use '%dorng%' from the 'doRNG' package instead
-## of '%dopar%'. This ensures that proper, parallel-safe random numbers are
-## produced. To disable this check, set option 'doFuture.rng.onMisuse' to
-## "ignore". [future 'doFuture-8' (dc0db54f59303dabc8c576d190d36950-16); on
-## dc0db54f59303dabc8c576d190d36950@WITPOLD2GQD2Z3&lt;10004&gt;]
-```
-
-```
-## 
-```
-
-```
-## F-test Failed. The estimated covariance matrix is singular.
-```
-
-```
-## 
 ```
 
 ---
@@ -888,8 +667,8 @@ eufect
 ## 
 ## ATT:
 ##                               ATT    S.E. CI.lower CI.upper   p.value
-## Tr obs equally weighted   -0.2067 0.06935  -0.3426 -0.07079 0.0028750
-## Tr units equally weighted -0.2188 0.06533  -0.3468 -0.09075 0.0008109
+## Tr obs equally weighted   -0.2067 0.05359  -0.3117  -0.1017 1.145e-04
+## Tr units equally weighted -0.2188 0.04286  -0.3028  -0.1348 3.303e-07
 ```
 
 ---
@@ -906,8 +685,8 @@ euife
 ## 
 ## ATT:
 ##                               ATT    S.E. CI.lower CI.upper   p.value
-## Tr obs equally weighted   -0.2067 0.05321  -0.3110  -0.1024 1.024e-04
-## Tr units equally weighted -0.2188 0.04462  -0.3062  -0.1313 9.417e-07
+## Tr obs equally weighted   -0.2067 0.05714  -0.3187 -0.09472 2.972e-04
+## Tr units equally weighted -0.2188 0.04581  -0.3086 -0.12901 1.784e-06
 ```
 
 ---
