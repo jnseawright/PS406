@@ -196,7 +196,7 @@ summary(clfe)
 - The coefficient on `Treated` is about **`r round(coef(clfe)["TreatedTRUE"], 4)`**.
 - **Interpretation**: California's policy change may have decreased the organ donation rate by approximately `r -1*round(100*coef(clfe)["TreatedTRUE"], 2)` percentage points relative to what would have happened without the policy, under the parallel trends assumption.
 - The p-value is `r round(summary(clfe)$coeftable[4], 4)`. This is above conventional significance levels, suggesting no evidence of an effect.
-- The confidence interval can be extracted: `confint(clfe)["TreatedTRUE",]`.
+- The confidence interval can be extracted: `r confint(clfe)["TreatedTRUE",]`.
 
 ---
 
@@ -205,14 +205,14 @@ summary(clfe)
 ---
 ### Testing Parallel Trends: Pre-Treatment Analysis
 
-```{r, echo = FALSE, out.width="80%", fig.retina = 1, fig.align='center'}
+```{r, echo = FALSE, out.width="70%", fig.retina = 1, fig.align='center'}
 include_graphics("images/parallel1.png")
 ```
 
 ---
 ### Testing Parallel Trends: Pre-Treatment Analysis
 
-```{r, echo = FALSE, out.width="80%", fig.retina = 1, fig.align='center'}
+```{r, echo = FALSE, out.width="70%", fig.retina = 1, fig.align='center'}
 include_graphics("images/parallel2.png")
 ```
 
@@ -232,7 +232,7 @@ summary(odparalleltrends.lm)
 
 ---
 
-**Interpretation**: The p-value > 0.05 suggests that we cannot reject the null hypothesis of parallel pre-treatment trends. This provides some support for the parallel trends assumption.
+**Interpretation**: The p-value > 0.05 suggests that we cannot reject the null hypothesis of parallel pre-treatment trends. This provides some support for the parallel trends assumption. However, the relatively low p-value suggests that there is some evidence of divergent pre-treatment trends, so we should not rest easy.
 
 - This linear trend test is a simple diagnostic; event‑study plots provide a more flexible check of parallel trends.
 
@@ -349,7 +349,7 @@ summary(twfe)
 ---
 ### A Simple Example
 
-The true average treatment effect on the treated (ATT) is about `(0.3*2 + 0.3*1)/0.6 = 1.5`, but TWFE gives `r round(coef(twfe), 3)` – biased downward.
+The true average treatment effect on the treated (ATT) is about `(0.3*2 + 0.3*1)/0.6 = 1.5`, but TWFE gives `r round(coef(twfe), 3)` which is slightly biased downward.
 
 ---
 ### Bacon Decomposition
@@ -540,7 +540,7 @@ library(fect)
 ```
 
 ---
-```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
+```{r vdemeu_dataprep, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
 vdemeu <- read.csv("data/vdemeu.csv")
 vdemeu <- vdemeu[vdemeu$year<2013,]
 eufect <- fect(v2x_libdem ~ accession, index = c("country_name", "year"), force = "two-way",
@@ -550,12 +550,12 @@ euife <- fect(v2x_libdem ~ accession, index = c("country_name", "year"), force =
 ```
 
 ---
-```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
+```{r fe_results, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
 eufect
 ```
 
 ---
-```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
+```{r ife_results, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
 euife
 ```
 

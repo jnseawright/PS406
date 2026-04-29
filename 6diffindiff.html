@@ -195,7 +195,7 @@ summary(clfe)
 - The coefficient on `Treated` is about **-0.0225**.
 - **Interpretation**: California's policy change may have decreased the organ donation rate by approximately 2.25 percentage points relative to what would have happened without the policy, under the parallel trends assumption.
 - The p-value is 0.2752. This is above conventional significance levels, suggesting no evidence of an effect.
-- The confidence interval can be extracted: `confint(clfe)["TreatedTRUE",]`.
+- The confidence interval can be extracted: -0.0630125, 0.0180946.
 
 ---
 
@@ -204,12 +204,12 @@ summary(clfe)
 ---
 ### Testing Parallel Trends: Pre-Treatment Analysis
 
-&lt;img src="images/parallel1.png" width="80%" style="display: block; margin: auto;" /&gt;
+&lt;img src="images/parallel1.png" width="70%" style="display: block; margin: auto;" /&gt;
 
 ---
 ### Testing Parallel Trends: Pre-Treatment Analysis
 
-&lt;img src="images/parallel2.png" width="80%" style="display: block; margin: auto;" /&gt;
+&lt;img src="images/parallel2.png" width="70%" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -251,7 +251,7 @@ summary(odparalleltrends.lm)
 
 ---
 
-**Interpretation**: The p-value &gt; 0.05 suggests that we cannot reject the null hypothesis of parallel pre-treatment trends. This provides some support for the parallel trends assumption.
+**Interpretation**: The p-value &gt; 0.05 suggests that we cannot reject the null hypothesis of parallel pre-treatment trends. This provides some support for the parallel trends assumption. However, the relatively low p-value suggests that there is some evidence of divergent pre-treatment trends, so we should not rest easy.
 
 - This linear trend test is a simple diagnostic; event‑study plots provide a more flexible check of parallel trends.
 
@@ -386,7 +386,7 @@ summary(twfe)
 ---
 ### A Simple Example
 
-The true average treatment effect on the treated (ATT) is about `(0.3*2 + 0.3*1)/0.6 = 1.5`, but TWFE gives 1.48 – biased downward.
+The true average treatment effect on the treated (ATT) is about `(0.3*2 + 0.3*1)/0.6 = 1.5`, but TWFE gives 1.48 which is slightly biased downward.
 
 ---
 ### Bacon Decomposition
@@ -667,8 +667,8 @@ eufect
 ## 
 ## ATT:
 ##                               ATT    S.E. CI.lower CI.upper   p.value
-## Tr obs equally weighted   -0.2067 0.05359  -0.3117  -0.1017 1.145e-04
-## Tr units equally weighted -0.2188 0.04286  -0.3028  -0.1348 3.303e-07
+## Tr obs equally weighted   -0.2067 0.05278  -0.3102  -0.1033 8.985e-05
+## Tr units equally weighted -0.2188 0.04365  -0.3043  -0.1332 5.374e-07
 ```
 
 ---
@@ -685,8 +685,8 @@ euife
 ## 
 ## ATT:
 ##                               ATT    S.E. CI.lower CI.upper   p.value
-## Tr obs equally weighted   -0.2067 0.05714  -0.3187 -0.09472 2.972e-04
-## Tr units equally weighted -0.2188 0.04581  -0.3086 -0.12901 1.784e-06
+## Tr obs equally weighted   -0.2067 0.05203  -0.3087  -0.1047 7.104e-05
+## Tr units equally weighted -0.2188 0.04831  -0.3135  -0.1241 5.938e-06
 ```
 
 ---
