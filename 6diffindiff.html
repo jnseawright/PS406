@@ -230,6 +230,10 @@ summary(clfe)
 
 - OLS standard errors that ignore this within-unit correlation will be wrong.
 
+---
+
+### Clustering Standard Errors in DiD
+
 - The standard fix is to cluster standard errors at the level of the treatment-assignment unit. In the organ donations example, treatment varies at the state level, so we cluster by state.
 
 ---
@@ -396,7 +400,7 @@ iplot(es_model,
 
 The parallel trends assumption we have been working with is unconditional:
 
-`$$\small E[Y_{i,2}(0) - Y_{i,1}(0) | D_i = 1] = E[Y_{i,2}(0) - Y_{i,1}(0) | D_i = 0]$$`
+`$$\tiny E[Y_{i,2}(0) - Y_{i,1}(0) | D_i = 1] = E[Y_{i,2}(0) - Y_{i,1}(0) | D_i = 0]$$`
 
 This requires treated and control units to have had the same trend on average *with no adjustment for any differences in their characteristics*.
 
@@ -407,7 +411,7 @@ This requires treated and control units to have had the same trend on average *w
 
 - We can instead invoke conditional parallel trends:
 
-`$$\mathbb{E}[Y_{i,t}(0) - Y_{i,t-1}(0) \vert{} X_i, D_i=1] = \mathbb{E}[Y_{i,t}(0) - Y_{i,t-1}(0) \vert{} X_i, D_i=0]$$`
+`$$\small\mathbb{E}[Y_{i,t}(0) - Y_{i,t-1}(0) \vert{} X_i, D_i=1] = \mathbb{E}[Y_{i,t}(0) - Y_{i,t-1}(0) \vert{} X_i, D_i=0]$$`
 
 ---
 ### Implementing Conditional Parallel Trends
@@ -445,6 +449,8 @@ cs_cond &lt;- att_gt(yname = "y",
                   data = df,
                   control_group = "notyettreated")
 ```
+
+---
 
 The xformla argument specifies covariates used to adjust for differences in trends — these should be pre-treatment and not affected by treatment.
 
@@ -529,6 +535,9 @@ Setting anticipation = 1 tells the estimator to treat the period immediately bef
 - Always plot the event study. Significant pre-trends are the primary signal of anticipation, though they can also indicate violations of parallel trends for other reasons.
 
 - Think substantively. Was the policy announced before it took effect? Were units aware of impending treatment? 
+
+---
+### Handling Anticipation: Practical Guidance
 
 - Robustness check: Re-estimate with anticipation = 1 (or 2) and compare results. If estimates change substantially, the findings are sensitive to anticipation assumptions.
 
@@ -681,10 +690,6 @@ summary(bacon_out)
 
 The output shows the weight and estimate for each 2×2 comparison, highlighting which groups contribute negatively. Look for comparisons with negative weights; these indicate potential bias.
 
----
-### Intuition for Negative Weights
-
-When treatment effects vary over time, the early‑treated vs. late‑treated comparison can be **contaminated**:
 
 ---
 ### Intuition for Negative Weights
@@ -863,6 +868,9 @@ What if, in addition to having staggered timing of treatment adoption and hetero
 
 *   The fect package implements interactive fixed effects (IFE) estimators that allow for unobserved time-varying confounders through a factor structure.
 
+---
+### IFE
+
 *   The IFE model assumes that unobserved confounders follow a factor structure, which is learned from the data and is more flexible than fixed effects.
 
 *   If the true confounding structure has more factors than the model allows, or if the factors are nonlinear, bias remains.
@@ -907,9 +915,9 @@ eufect
 ##     se = 1, min.T0 = 1)
 ## 
 ## ATT:
-##                               ATT    S.E. CI.lower CI.upper   p.value
-## Tr obs equally weighted   -0.2067 0.05869  -0.3217 -0.09168 4.284e-04
-## Tr units equally weighted -0.2188 0.04968  -0.3162 -0.12142 1.063e-05
+##                               ATT    S.E. CI.lower CI.upper  p.value
+## Tr obs equally weighted   -0.2067 0.06721  -0.3385 -0.07497 0.002102
+## Tr units equally weighted -0.2188 0.05704  -0.3306 -0.10700 0.000125
 ```
 
 ---
@@ -926,8 +934,8 @@ euife
 ## 
 ## ATT:
 ##                               ATT    S.E. CI.lower CI.upper   p.value
-## Tr obs equally weighted   -0.2067 0.05683  -0.3181 -0.09533 2.754e-04
-## Tr units equally weighted -0.2188 0.04739  -0.3117 -0.12592 3.893e-06
+## Tr obs equally weighted   -0.2067 0.06383  -0.3318  -0.0816 1.202e-03
+## Tr units equally weighted -0.2188 0.05171  -0.3201  -0.1174 2.323e-05
 ```
 
 ---
