@@ -95,6 +95,17 @@ The estimator:
 `$$\hat{\tau}_{DiD} = (\bar{Y}_{T,2} - \bar{Y}_{T,1}) - (\bar{Y}_{C,2} - \bar{Y}_{C,1})$$`
 
 ---
+### Parallel Trends
+
+The validity of DiD rests on the **parallel trends assumption**:
+
+&gt; In the absence of the treatment, the average outcome for the treated group would have changed by the same amount as the average outcome for the control group.
+
+Formally:
+
+`$$\small E[Y_{i,2}(0) - Y_{i,1}(0) | D_i = 1] = E[Y_{i,2}(0) - Y_{i,1}(0) | D_i = 0]$$`
+
+---
 &lt;img src="images/miamiboatlift.JPG" width="90%" style="display: block; margin: auto;" /&gt;
 
 ---
@@ -111,6 +122,10 @@ The estimator:
 
 ---
 &lt;img src="images/marielconclusions.JPG" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+
+What we've just seen is a DiD comparison: Miami before/after vs. comparison cities before/after.
 
 ---
 
@@ -148,6 +163,12 @@ did2
 Starting simple, if we think *all* the confounding variables are constant either in time or space, then the model we want may be something like:
 
 `$$y_{i,t} = \alpha_{i} + \gamma_{t} + \beta_{1}Treatment_{i,t} + \epsilon_{i,t}$$`
+
+---
+
+A classic difference-in-differences example involves how to structure asking people to sign up for organ donations.
+
+Kessler and Roth (2014) studied a policy enacted by the state of California in the third quarter of 2011 to adopt an active-choice phrasing for their organ donation sign-up question.
 
 ---
 
@@ -202,6 +223,74 @@ summary(clfe)
 **Substantive significance**: Is a -2.25 percentage point change large? It depends on the baseline donation rate. The mean donation rate in California before the policy was about 0.2713333 percent, so the estimated increase represents a relative change of roughly -8.3%.
 
 ---
+
+### Clustering Standard Errors in DiD
+
+- In most DiD applications, observations within the same unit are correlated over time. Because the same unit appears in time periods before and after the treatment and may have unobserved factors that stay steady over time, model error terms tend to be correlated. 
+
+- OLS standard errors that ignore this within-unit correlation will be wrong.
+
+- The standard fix is to cluster standard errors at the level of the treatment-assignment unit. In the organ donations example, treatment varies at the state level, so we cluster by state.
+
+---
+###Clustering Standard Errors in DiD
+
+
+``` r
+clfe_clustered &lt;- feols(Rate ~ Treated | State + Quarter,
+                        data = od,
+                        cluster = ~State)
+summary(clfe_clustered)
+```
+
+```
+## OLS estimation, Dep. Var.: Rate
+## Observations: 162
+## Fixed-effects: State: 27,  Quarter: 6
+## Standard-errors: Clustered (State) 
+##              Estimate Std. Error  t value  Pr(&gt;|t|)    
+## TreatedTRUE -0.022459   0.006131 -3.66304 0.0011185 ** 
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## RMSE: 0.021982     Adj. R2: 0.974196
+##                  Within R2: 0.009221
+```
+
+---
+
+The estimates are the same, whether we cluster (**-0.0225**) or not (**-0.0225**).
+
+However, the standard errors change from (**0.0205**) when not clustering to (**0.0061**), a very substantial change that might have major implications for how we approach the inference.
+
+---
+
+### Clustering Standard Errors in DiD
+
+- With only 27 states, clustering may itself be unreliable. 
+
+- Cluster-robust inference works best with 50 or more clusters. With few clusters, consider bias-corrected cluster-robust standard errors from the clubSandwich package.
+
+---
+
+
+``` r
+library(clubSandwich)
+
+coef_test(clfe,
+          vcov = "CR2",
+          cluster = od$State,
+          test = "Satterthwaite")
+```
+
+```
+## Alternative hypothesis: two-sided 
+##        Coef. Estimate       SE Null value    t-stat d.f. (Satt) p-val (Satt)
+##  TreatedTRUE  -0.0225 9.44e-20          0 -2.38e+17           1       &lt;0.001
+##  Sig.
+##   ***
+```
+
+---
 ### Testing Parallel Trends: Pre-Treatment Analysis
 
 &lt;img src="images/parallel1.png" width="70%" style="display: block; margin: auto;" /&gt;
@@ -216,66 +305,82 @@ summary(clfe)
 
 ``` r
 od$calind &lt;- 1*(od$State=='California')
-odparalleltrends.lm &lt;- lm(Rate~Quarter_Num+Quarter_Num:calind, data=od[od$Quarter_Num&lt;4,])
+odparalleltrends.lm &lt;- lm(Rate~calind+Quarter_Num+Quarter_Num:calind, data=od[od$Quarter_Num&lt;4,])
 summary(odparalleltrends.lm)
 ```
 
 ```
 ## 
 ## Call:
-## lm(formula = Rate ~ Quarter_Num + Quarter_Num:calind, data = od[od$Quarter_Num &lt; 
-##     4, ])
+## lm(formula = Rate ~ calind + Quarter_Num + Quarter_Num:calind, 
+##     data = od[od$Quarter_Num &lt; 4, ])
 ## 
 ## Residuals:
 ##      Min       1Q   Median       3Q      Max 
-## -0.31778 -0.11098  0.00612  0.11568  0.32600 
+## -0.31823 -0.11065  0.00177  0.11505  0.32507 
 ## 
 ## Coefficients:
 ##                     Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)         0.433635   0.046060   9.415  1.7e-14 ***
-## Quarter_Num         0.005181   0.021380   0.242   0.8092    
-## Quarter_Num:calind -0.074189   0.042673  -1.739   0.0861 .  
+## (Intercept)         0.440173   0.047082   9.349 2.55e-14 ***
+## calind             -0.176540   0.244648  -0.722    0.473    
+## Quarter_Num         0.002379   0.021795   0.109    0.913    
+## calind:Quarter_Num  0.001471   0.113250   0.013    0.990    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
-## Residual standard error: 0.1567 on 78 degrees of freedom
-## Multiple R-squared:  0.03746,	Adjusted R-squared:  0.01278 
-## F-statistic: 1.518 on 2 and 78 DF,  p-value: 0.2256
+## Residual standard error: 0.1572 on 77 degrees of freedom
+## Multiple R-squared:  0.04393,	Adjusted R-squared:  0.006676 
+## F-statistic: 1.179 on 3 and 77 DF,  p-value: 0.3232
 ```
 
 ---
 - This regression uses only the **pre-treatment period** (quarters 1–3) and models the donation rate as a function of time (`Quarter_Num`) and an interaction between time and being California (`calind`).
 - The coefficient on `Quarter_Num` is the time trend for the control group.
 - The coefficient on `Quarter_Num:calind` is the **difference in trends** between California and the control group.
-- Here, the interaction coefficient is -0.0742 with p = 0.0861.
+- Here, the interaction coefficient is NA with p = 0.9897.
 
 ---
 
-**Interpretation**: The p-value &gt; 0.05 suggests that we cannot reject the null hypothesis of parallel pre-treatment trends. This provides some support for the parallel trends assumption. However, the relatively low p-value suggests that there is some evidence of divergent pre-treatment trends, so we should not rest easy.
+**Interpretation**: The p-value &gt; 0.05 suggests that we cannot reject the null hypothesis of parallel pre-treatment trends. This provides some support for the parallel trends assumption.
 
 - This linear trend test is a simple diagnostic; event‑study plots provide a more flexible check of parallel trends.
 
 ---
-### Visualizing the Pre-Trends
+### Visualizing Parallel Trends: The Event Study Plot
+
+An event study is the best way to visually assess the parallel trends assumption. It plots the treatment effect in "event time" — years before and after the democratization event.
+
+We can create one by interacting our treatment indicator with dummies for years relative to the event.
+---
 
 
 ``` r
-library(interactions)
-interact_plot(odparalleltrends.lm, pred="Quarter_Num", modx="calind", interval=TRUE)
+od &lt;- od %&gt;%
+  mutate(time_to_treat = Quarter_Num - 4)
+
+library(fixest)
+
+es_model &lt;- feols(Rate ~ i(time_to_treat, calind, ref = -1) | State + Quarter,
+                  data = od,
+                  cluster = ~State)
+```
+                  
+---
+
+
+``` r
+iplot(es_model,
+      xlab = 'Years Relative to Law',
+      main = 'Effect of Law on Organ Donation')
 ```
 
-![](6diffindiff_files/figure-html/plot_pretrend-1.png)&lt;!-- --&gt;
-
-- The plot shows the fitted linear trends for California (red) and the control group (blue) during the pre-treatment period.
-- The two lines are roughly parallel – the slopes are not significantly different, as indicated by the overlapping confidence bands.
-- This visual evidence aligns with the statistical test: no strong violation of parallel trends in the pre-treatment window.
-
-**Caveat**: Passing a pre-trend test does not *prove* that trends would have remained parallel after treatment – it only makes the assumption more plausible.
+![](6diffindiff_files/figure-html/effect_study_2-1.png)&lt;!-- --&gt;
 
 ---
-### What If the Pre-Trend Test Failed?
 
-- If the interaction were significant, it would indicate that California and the control group were already on different trajectories before the policy.
+### What If the Pre-Trend Test Fails?
+
+- If (like here) the plot shows significant results in time periods before zero, it indicates that California and the control group were already on different trajectories before the policy.
 - In that case, the DiD estimate would be biased because the counterfactual trend for California would not be the control group's trend.
 
 ---
@@ -287,17 +392,147 @@ interact_plot(odparalleltrends.lm, pred="Quarter_Num", modx="calind", interval=T
 
 ---
 
-In our example, the test barely passes, so the standard DiD estimate is perhaps a bit more credible.
+### Conditional Parallel Trends
+
+The parallel trends assumption we have been working with is unconditional:
+
+`$$\small E[Y_{i,2}(0) - Y_{i,1}(0) | D_i = 1] = E[Y_{i,2}(0) - Y_{i,1}(0) | D_i = 0]$$`
+
+This requires treated and control units to have had the same trend on average *with no adjustment for any differences in their characteristics*.
 
 ---
-### Summary: Organ Donations DiD
+### Conditional Parallel Trends
 
-| Question | Answer |
-|----------|--------|
-| Estimated effect | -2.25 percentage point decrease |
-| Statistical significance | p = 0.2752 |
-| Parallel trends? | Pre-trend test p = 0.0861 – marginally not rejected |
-| Credibility of DiD | Acceptable, given the evidence |
+- This is often implausible. 
+
+- We can instead invoke conditional parallel trends:
+
+`$$\mathbb{E}[Y_{i,t}(0) - Y_{i,t-1}(0) \vert{} X_i, D_i=1] = \mathbb{E}[Y_{i,t}(0) - Y_{i,t-1}(0) \vert{} X_i, D_i=0]$$`
+
+---
+### Implementing Conditional Parallel Trends
+
+- In the classic TWFE framework, adding time-varying covariates to the regression partly addresses this, but can introduce post-treatment bias if covariates are themselves affected by treatment.
+
+- The cleaner approach is to use pre-treatment covariates interacted with time indicators:
+
+---
+
+
+``` r
+#IF THERE WERE A BASELINE COVARIATE IN OUR DATA
+clfe_cond &lt;- feols(Rate ~ Treated + baseline_covariate:Quarter | 
+                     State + Quarter,
+                   data = od,
+                   cluster = ~State)
+```
+
+---
+### Implementing Conditional Parallel Trends
+
+
+The Callaway-Sant'Anna estimator handles this more rigorously via its doubly robust approach. 
+
+- It models both the outcome trend and the propensity to be treated, and is consistent if either model is correctly specified.
+
+
+``` r
+cs_cond &lt;- att_gt(yname = "y",
+                  tname = "time",
+                  idname = "id",
+                  gname = "first_treat",
+                  xformla = ~baseline_covariate,  # covariates here
+                  data = df,
+                  control_group = "notyettreated")
+```
+
+The xformla argument specifies covariates used to adjust for differences in trends — these should be pre-treatment and not affected by treatment.
+
+---
+### Failing Conditional Parallel Trends
+
+Conditioning on covariates relaxes the assumption but does not eliminate it. Conditional parallel trends can still fail if:
+
+- Important confounders are unobserved.
+- The covariates used are themselves affected by anticipation of treatment.
+- The propensity model or outcome model is misspecified.
+
+---
+### What Conditional Parallel Trends Means
+
+It also changes the estimand: you are recovering a covariate-adjusted ATT, which may differ from the unconditional ATT if treatment effect heterogeneity is correlated with covariates.
+
+- This is the same weighting issue we discussed with OLS regression.
+
+---
+### Anticipation Effects: When the Pre-Period Is Contaminated
+
+What if units change their behavior before treatment begins, in anticipation of the upcoming policy?
+
+---
+### Anticipation Effects: When the Pre-Period Is Contaminated
+
+For example:
+
+- Firms begin hiring or laying off workers as soon as a minimum wage increase is announced, before it takes effect.
+- Countries seeking EU membership begin democratic reforms in order to qualify for membership.
+- Voters change preferences once an electoral reform is passed, before the first election under the new rules.
+
+---
+### Anticipation Effects: Formal Statement
+
+If the potential outcomes in the absense of anticipation effects might be represented as:
+
+`$$Y_{it}(0) = \alpha_i + \delta_t + \epsilon_{it} \text{ for all } t &lt; g_i$$`
+the potential outcomes when there is anticipation instead are as:
+
+`$$Y_{it}(0) = \alpha_i + \delta_t + \sum_{k=-K}^{M} \tau_k D_{it}^{(k)} + \epsilon_{it}$$`
+
+---
+
+On the last slide, `\(D_{it}^{(k)}=1\)` if unit `\(i\)` is `\(k\)` periods away from treatment at time `\(t\)`, with negative `\(k\)` indicating periods before treatment.
+
+---
+### Diagnosing Anticipation
+
+The event study plot is the key diagnostic. 
+
+- If there are no anticipation effects, leads (pre-treatment coefficients) should be flat and near zero.
+
+- If pre-treatment coefficients are significantly different from zero and trend upward toward the treatment date, anticipation is likely present.
+
+---
+### Handling Anticipation in Callaway-Sant'Anna
+
+The did package allows you to specify the number of anticipation periods directly:
+
+
+``` r
+# Allow for 1 period of anticipation
+cs_anticipation &lt;- att_gt(yname = "y",
+                           tname = "time",
+                           idname = "id",
+                           gname = "first_treat",
+                           anticipation = 1,      # shift "pre" window back by 1
+                           data = df,
+                           control_group = "notyettreated")
+summary(cs_anticipation)
+```
+
+---
+
+Setting anticipation = 1 tells the estimator to treat the period immediately before the nominal treatment date as part of the treatment window, using an earlier period as the clean baseline.
+
+---
+### Handling Anticipation: Practical Guidance
+
+- Always plot the event study. Significant pre-trends are the primary signal of anticipation, though they can also indicate violations of parallel trends for other reasons.
+
+- Think substantively. Was the policy announced before it took effect? Were units aware of impending treatment? 
+
+- Robustness check: Re-estimate with anticipation = 1 (or 2) and compare results. If estimates change substantially, the findings are sensitive to anticipation assumptions.
+
+- Anticipation and conditional parallel trends can interact: if some units anticipated treatment and others did not, the contamination of the pre-period is itself heterogeneous.
 
 ---
 ### Timing
@@ -351,10 +586,10 @@ df &lt;- data.frame(
 df$treat &lt;- ifelse(df$group == "early" &amp; df$time &gt;= 2, 1,
             ifelse(df$group == "late" &amp; df$time &gt;= 3, 1, 0))
 
-# Heterogeneous effects: early effect = 2, late effect = 1, no effect for never
+# Heterogeneous effects: early effect grows over time, late effect = 1, no effect for never
 df$y0 &lt;- rnorm(n * 3, mean = 0, sd = 1)
-df$effect &lt;- ifelse(df$group == "early" &amp; df$time == 2, 2,
-             ifelse(df$group == "early" &amp; df$time == 3, 2,
+df$effect &lt;- ifelse(df$group == "early" &amp; df$time == 2, 1,
+             ifelse(df$group == "early" &amp; df$time == 3, 3,
              ifelse(df$group == "late" &amp; df$time == 3, 1, 0)))
 df$y &lt;- df$y0 + df$effect
 ```
@@ -376,17 +611,17 @@ summary(twfe)
 ## Fixed-effects: id: 1,000,  time: 3
 ## Standard-errors: IID 
 ##       Estimate Std. Error t value  Pr(&gt;|t|)    
-## treat  1.48028   0.068645 21.5643 &lt; 2.2e-16 ***
+## treat  1.07618   0.076217   14.12 &lt; 2.2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## RMSE: 0.83017     Adj. R2: 0.354945
-##                 Within R2: 0.188878
+## RMSE: 0.92174     Adj. R2: 0.289449
+##                 Within R2: 0.090774
 ```
 
 ---
 ### A Simple Example
 
-The true average treatment effect on the treated (ATT) is about `(0.3*2 + 0.3*1)/0.6 = 1.5`, but TWFE gives 1.48 which is slightly biased downward.
+The true average treatment effect on the treated (ATT) is about `(0.3*1*1 + 0.3*3*1 + 0.3*1*1)/0.9 = 1.7`, but TWFE gives 1.076 which is biased downward.
 
 ---
 ### Bacon Decomposition
@@ -411,10 +646,10 @@ bacon_out &lt;- bacon(y ~ treat,
 ```
 
 ```
-##                       type weight avg_est
-## 1 Earlier vs Later Treated 0.1347 1.96571
-## 2 Later vs Earlier Treated 0.1347 1.01080
-## 3     Treated vs Untreated 0.7306 1.47734
+##                       type weight  avg_est
+## 1 Earlier vs Later Treated 0.1347  0.96571
+## 2 Later vs Earlier Treated 0.1347 -0.98920
+## 3     Treated vs Untreated 0.7306  1.47734
 ```
 
 ---
@@ -425,13 +660,13 @@ summary(bacon_out)
 ```
 
 ```
-##     treated      untreated           estimate         weight      
-##  Min.   :2.0   Min.   :    2.00   Min.   :1.011   Min.   :0.1347  
-##  1st Qu.:2.0   1st Qu.:    2.75   1st Qu.:1.021   1st Qu.:0.1347  
-##  Median :2.5   Median :50001.00   Median :1.471   Median :0.2475  
-##  Mean   :2.5   Mean   :50000.75   Mean   :1.480   Mean   :0.2500  
-##  3rd Qu.:3.0   3rd Qu.:99999.00   3rd Qu.:1.930   3rd Qu.:0.3628  
-##  Max.   :3.0   Max.   :99999.00   Max.   :1.966   Max.   :0.3702  
+##     treated      untreated           estimate           weight      
+##  Min.   :2.0   Min.   :    2.00   Min.   :-0.9892   Min.   :0.1347  
+##  1st Qu.:2.0   1st Qu.:    2.75   1st Qu.: 0.4770   1st Qu.:0.1347  
+##  Median :2.5   Median :50001.00   Median : 0.9951   Median :0.2475  
+##  Mean   :2.5   Mean   :50000.75   Mean   : 0.7298   Mean   :0.2500  
+##  3rd Qu.:3.0   3rd Qu.:99999.00   3rd Qu.: 1.2479   3rd Qu.:0.3628  
+##  Max.   :3.0   Max.   :99999.00   Max.   : 1.9182   Max.   :0.3702  
 ##      type          
 ##  Length:4          
 ##  Class :character  
@@ -533,8 +768,8 @@ summary(cs_out)
 ## 
 ## Group-Time Average Treatment Effects:
 ##  Group Time ATT(g,t) Std. Error [95% Simult.  Conf. Band]  
-##      2    2   1.9238     0.1047        1.6710      2.1765 *
-##      2    3   1.9432     0.1055        1.6886      2.1977 *
+##      2    2   0.9238     0.1047        0.6710      1.1765 *
+##      2    3   2.9432     0.1055        2.6886      3.1977 *
 ##      3    2  -0.0725     0.1086       -0.3345      0.1895  
 ##      3    3   1.0607     0.1100        0.7953      1.3262 *
 ## ---
@@ -551,14 +786,14 @@ summary(cs_out)
 
 ``` r
 # Aggregate to overall ATT
-agg &lt;- aggte(cs_out, type = "simple")
+agg &lt;- aggte(cs_out, type = "simple", na.rm=TRUE)
 summary(agg)
 ```
 
 ```
 ## 
 ## Call:
-## aggte(MP = cs_out, type = "simple")
+## aggte(MP = cs_out, type = "simple", na.rm = TRUE)
 ## 
 ## Reference: Callaway, Brantly and Pedro H.C. Sant'Anna.  "Difference-in-Differences with Multiple Time Periods." Journal of Econometrics, Vol. 225, No. 2, pp. 200-230, 2021. &lt;https://doi.org/10.1016/j.jeconom.2020.12.001&gt;, &lt;https://arxiv.org/abs/1803.09015&gt; 
 ## 
@@ -577,7 +812,7 @@ summary(agg)
 ---
 ### Example: Callaway &amp; Sant'Anna
 
-The aggregated ATT should be close to the true value of 1.5.
+The aggregated ATT has a confidence interval that clearly covers the true value of 1.7.
 
 ---
 ### Summary: Key Takeaways
@@ -591,6 +826,8 @@ The aggregated ATT should be close to the true value of 1.5.
 ### Current Solutions
 
 Statisticians, methodologists, and econometricians have developed a wide range of methods to better estimate when there is staggered treatment timing.
+
+- Roth et al. provide an inventory of many methods for solving problems we discussed today, as well as additional recent innovations.
 
 ---
 ### Current Solutions
@@ -624,7 +861,11 @@ Nonetheless, the current status quo in applied social-science methods is that yo
 
 What if, in addition to having staggered timing of treatment adoption and heterogeneous effects, we also have problems with parallel trends because of time-varying unobserved confounders? 
 
-*   The fect package implements interactive fixed effects estimators that allow for unobserved time-varying confounders through a factor structure.
+*   The fect package implements interactive fixed effects (IFE) estimators that allow for unobserved time-varying confounders through a factor structure.
+
+*   The IFE model assumes that unobserved confounders follow a factor structure, which is learned from the data and is more flexible than fixed effects.
+
+*   If the true confounding structure has more factors than the model allows, or if the factors are nonlinear, bias remains.
 
 ---
 
@@ -667,8 +908,8 @@ eufect
 ## 
 ## ATT:
 ##                               ATT    S.E. CI.lower CI.upper   p.value
-## Tr obs equally weighted   -0.2067 0.05278  -0.3102  -0.1033 8.985e-05
-## Tr units equally weighted -0.2188 0.04365  -0.3043  -0.1332 5.374e-07
+## Tr obs equally weighted   -0.2067 0.05869  -0.3217 -0.09168 4.284e-04
+## Tr units equally weighted -0.2188 0.04968  -0.3162 -0.12142 1.063e-05
 ```
 
 ---
@@ -685,9 +926,18 @@ euife
 ## 
 ## ATT:
 ##                               ATT    S.E. CI.lower CI.upper   p.value
-## Tr obs equally weighted   -0.2067 0.05203  -0.3087  -0.1047 7.104e-05
-## Tr units equally weighted -0.2188 0.04831  -0.3135  -0.1241 5.938e-06
+## Tr obs equally weighted   -0.2067 0.05683  -0.3181 -0.09533 2.754e-04
+## Tr units equally weighted -0.2188 0.04739  -0.3117 -0.12592 3.893e-06
 ```
+
+---
+### Why Negative Results?
+
+- Original EU members were established democracies and saw no change (positive or negative) after joining.
+
+- More recent members have frequently experienced democratic backsliding in the period shortly after joining.
+
+- Is this causal evidence that the EU hurts democracy, evidence of a measurement ceiling effect for earlier countries that biases the results, or just a coincidence?
 
 ---
 ### Difference-in-Differences: Key Takeaways

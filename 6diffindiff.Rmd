@@ -109,6 +109,17 @@ The estimator:
 $$\hat{\tau}_{DiD} = (\bar{Y}_{T,2} - \bar{Y}_{T,1}) - (\bar{Y}_{C,2} - \bar{Y}_{C,1})$$
 
 ---
+### Parallel Trends
+
+The validity of DiD rests on the **parallel trends assumption**:
+
+> In the absence of the treatment, the average outcome for the treated group would have changed by the same amount as the average outcome for the control group.
+
+Formally:
+
+$$\small E[Y_{i,2}(0) - Y_{i,1}(0) | D_i = 1] = E[Y_{i,2}(0) - Y_{i,1}(0) | D_i = 0]$$
+
+---
 ```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
 library(knitr)
 include_graphics("images/miamiboatlift.JPG")
@@ -141,6 +152,10 @@ include_graphics("images/marielconclusions.JPG")
 
 ---
 
+What we've just seen is a DiD comparison: Miami before/after vs. comparison cities before/after.
+
+---
+
 ```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
 mariel <- read.csv("data/mariel.csv")
 
@@ -165,6 +180,12 @@ did2
 Starting simple, if we think *all* the confounding variables are constant either in time or space, then the model we want may be something like:
 
 $$y_{i,t} = \alpha_{i} + \gamma_{t} + \beta_{1}Treatment_{i,t} + \epsilon_{i,t}$$
+
+---
+
+A classic difference-in-differences example involves how to structure asking people to sign up for organ donations.
+
+Kessler and Roth (2014) studied a policy enacted by the state of California in the third quarter of 2011 to adopt an active-choice phrasing for their organ donation sign-up question.
 
 ---
 ```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
@@ -203,6 +224,51 @@ summary(clfe)
 **Substantive significance**: Is a `r round(100*coef(clfe)["TreatedTRUE"], 2)` percentage point change large? It depends on the baseline donation rate. The mean donation rate in California before the policy was about `r mean(od$Rate[od$State=="California" & od$Quarter_Num < 4], na.rm=TRUE)` percent, so the estimated increase represents a relative change of roughly `r round(100*coef(clfe)["TreatedTRUE"] / mean(od$Rate[od$State=="California" & od$Quarter_Num < 4], na.rm=TRUE), 1)`%.
 
 ---
+
+### Clustering Standard Errors in DiD
+
+- In most DiD applications, observations within the same unit are correlated over time. Because the same unit appears in time periods before and after the treatment and may have unobserved factors that stay steady over time, model error terms tend to be correlated. 
+
+- OLS standard errors that ignore this within-unit correlation will be wrong.
+
+- The standard fix is to cluster standard errors at the level of the treatment-assignment unit. In the organ donations example, treatment varies at the state level, so we cluster by state.
+
+---
+###Clustering Standard Errors in DiD
+
+```{r, clustered_ses_at_state, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
+clfe_clustered <- feols(Rate ~ Treated | State + Quarter,
+                        data = od,
+                        cluster = ~State)
+summary(clfe_clustered)
+```
+
+---
+
+The estimates are the same, whether we cluster (**`r round(coef(clfe_clustered)["TreatedTRUE"], 4)`**) or not (**`r round(coef(clfe)["TreatedTRUE"], 4)`**).
+
+However, the standard errors change from (**`r round(se(clfe)["TreatedTRUE"], 4)`**) when not clustering to (**`r round(se(clfe_clustered)["TreatedTRUE"], 4)`**), a very substantial change that might have major implications for how we approach the inference.
+
+---
+
+### Clustering Standard Errors in DiD
+
+- With only 27 states, clustering may itself be unreliable. 
+
+- Cluster-robust inference works best with 50 or more clusters. With few clusters, consider bias-corrected cluster-robust standard errors from the clubSandwich package.
+
+---
+
+```{r, clustered_ses_at_state_2, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
+library(clubSandwich)
+
+coef_test(clfe,
+          vcov = "CR2",
+          cluster = od$State,
+          test = "Satterthwaite")
+```
+
+---
 ### Testing Parallel Trends: Pre-Treatment Analysis
 
 ```{r, echo = FALSE, out.width="70%", fig.retina = 1, fig.align='center'}
@@ -220,7 +286,7 @@ include_graphics("images/parallel2.png")
 ---
 ```{r interpret_pretrend, echo = TRUE}
 od$calind <- 1*(od$State=='California')
-odparalleltrends.lm <- lm(Rate~Quarter_Num+Quarter_Num:calind, data=od[od$Quarter_Num<4,])
+odparalleltrends.lm <- lm(Rate~calind+Quarter_Num+Quarter_Num:calind, data=od[od$Quarter_Num<4,])
 summary(odparalleltrends.lm)
 ```
 
@@ -228,32 +294,46 @@ summary(odparalleltrends.lm)
 - This regression uses only the **pre-treatment period** (quarters 1–3) and models the donation rate as a function of time (`Quarter_Num`) and an interaction between time and being California (`calind`).
 - The coefficient on `Quarter_Num` is the time trend for the control group.
 - The coefficient on `Quarter_Num:calind` is the **difference in trends** between California and the control group.
-- Here, the interaction coefficient is `r round(coef(odparalleltrends.lm)["Quarter_Num:calind"], 4)` with p = `r round(summary(odparalleltrends.lm)$coef["Quarter_Num:calind", "Pr(>|t|)"], 4)`.
+- Here, the interaction coefficient is `r round(coef(odparalleltrends.lm)["Quarter_Num:calind"], 4)` with p = `r round(summary(odparalleltrends.lm)$coef["calind:Quarter_Num", "Pr(>|t|)"], 4)`.
 
 ---
 
-**Interpretation**: The p-value > 0.05 suggests that we cannot reject the null hypothesis of parallel pre-treatment trends. This provides some support for the parallel trends assumption. However, the relatively low p-value suggests that there is some evidence of divergent pre-treatment trends, so we should not rest easy.
+**Interpretation**: The p-value > 0.05 suggests that we cannot reject the null hypothesis of parallel pre-treatment trends. This provides some support for the parallel trends assumption.
 
 - This linear trend test is a simple diagnostic; event‑study plots provide a more flexible check of parallel trends.
 
 ---
-### Visualizing the Pre-Trends
+### Visualizing Parallel Trends: The Event Study Plot
 
-```{r plot_pretrend, echo = TRUE}
-library(interactions)
-interact_plot(odparalleltrends.lm, pred="Quarter_Num", modx="calind", interval=TRUE)
+An event study is the best way to visually assess the parallel trends assumption. It plots the treatment effect in "event time" — years before and after the democratization event.
+
+We can create one by interacting our treatment indicator with dummies for years relative to the event.
+---
+
+```{r effect_study, echo = TRUE}
+od <- od %>%
+  mutate(time_to_treat = Quarter_Num - 4)
+
+library(fixest)
+
+es_model <- feols(Rate ~ i(time_to_treat, calind, ref = -1) | State + Quarter,
+                  data = od,
+                  cluster = ~State)
+```
+                  
+---
+
+```{r effect_study_2, echo = TRUE}
+iplot(es_model,
+      xlab = 'Years Relative to Law',
+      main = 'Effect of Law on Organ Donation')
 ```
 
-- The plot shows the fitted linear trends for California (red) and the control group (blue) during the pre-treatment period.
-- The two lines are roughly parallel – the slopes are not significantly different, as indicated by the overlapping confidence bands.
-- This visual evidence aligns with the statistical test: no strong violation of parallel trends in the pre-treatment window.
-
-**Caveat**: Passing a pre-trend test does not *prove* that trends would have remained parallel after treatment – it only makes the assumption more plausible.
-
 ---
-### What If the Pre-Trend Test Failed?
 
-- If the interaction were significant, it would indicate that California and the control group were already on different trajectories before the policy.
+### What If the Pre-Trend Test Fails?
+
+- If (like here) the plot shows significant results in time periods before zero, it indicates that California and the control group were already on different trajectories before the policy.
 - In that case, the DiD estimate would be biased because the counterfactual trend for California would not be the control group's trend.
 
 ---
@@ -265,17 +345,144 @@ interact_plot(odparalleltrends.lm, pred="Quarter_Num", modx="calind", interval=T
 
 ---
 
-In our example, the test barely passes, so the standard DiD estimate is perhaps a bit more credible.
+### Conditional Parallel Trends
+
+The parallel trends assumption we have been working with is unconditional:
+
+$$\small E[Y_{i,2}(0) - Y_{i,1}(0) | D_i = 1] = E[Y_{i,2}(0) - Y_{i,1}(0) | D_i = 0]$$
+
+This requires treated and control units to have had the same trend on average *with no adjustment for any differences in their characteristics*.
 
 ---
-### Summary: Organ Donations DiD
+### Conditional Parallel Trends
 
-| Question | Answer |
-|----------|--------|
-| Estimated effect | `r round(100*coef(clfe)["TreatedTRUE"], 2)` percentage point decrease |
-| Statistical significance | p = `r round(summary(clfe)$coeftable[4], 4)` |
-| Parallel trends? | Pre-trend test p = `r round(summary(odparalleltrends.lm)$coef["Quarter_Num:calind", "Pr(>|t|)"], 4)` – marginally not rejected |
-| Credibility of DiD | Acceptable, given the evidence |
+- This is often implausible. 
+
+- We can instead invoke conditional parallel trends:
+
+$$\mathbb{E}[Y_{i,t}(0) - Y_{i,t-1}(0) \vert{} X_i, D_i=1] = \mathbb{E}[Y_{i,t}(0) - Y_{i,t-1}(0) \vert{} X_i, D_i=0]$$
+
+---
+### Implementing Conditional Parallel Trends
+
+- In the classic TWFE framework, adding time-varying covariates to the regression partly addresses this, but can introduce post-treatment bias if covariates are themselves affected by treatment.
+
+- The cleaner approach is to use pre-treatment covariates interacted with time indicators:
+
+---
+
+```{r conditional_parallel_trends, echo = TRUE, eval=FALSE}
+#IF THERE WERE A BASELINE COVARIATE IN OUR DATA
+clfe_cond <- feols(Rate ~ Treated + baseline_covariate:Quarter | 
+                     State + Quarter,
+                   data = od,
+                   cluster = ~State)
+```
+
+---
+### Implementing Conditional Parallel Trends
+
+
+The Callaway-Sant'Anna estimator handles this more rigorously via its doubly robust approach. 
+
+- It models both the outcome trend and the propensity to be treated, and is consistent if either model is correctly specified.
+
+```{r conditional_parallel_trends_2, echo = TRUE, eval=FALSE}
+cs_cond <- att_gt(yname = "y",
+                  tname = "time",
+                  idname = "id",
+                  gname = "first_treat",
+                  xformla = ~baseline_covariate,  # covariates here
+                  data = df,
+                  control_group = "notyettreated")
+```
+
+The xformla argument specifies covariates used to adjust for differences in trends — these should be pre-treatment and not affected by treatment.
+
+---
+### Failing Conditional Parallel Trends
+
+Conditioning on covariates relaxes the assumption but does not eliminate it. Conditional parallel trends can still fail if:
+
+- Important confounders are unobserved.
+- The covariates used are themselves affected by anticipation of treatment.
+- The propensity model or outcome model is misspecified.
+
+---
+### What Conditional Parallel Trends Means
+
+It also changes the estimand: you are recovering a covariate-adjusted ATT, which may differ from the unconditional ATT if treatment effect heterogeneity is correlated with covariates.
+
+- This is the same weighting issue we discussed with OLS regression.
+
+---
+### Anticipation Effects: When the Pre-Period Is Contaminated
+
+What if units change their behavior before treatment begins, in anticipation of the upcoming policy?
+
+---
+### Anticipation Effects: When the Pre-Period Is Contaminated
+
+For example:
+
+- Firms begin hiring or laying off workers as soon as a minimum wage increase is announced, before it takes effect.
+- Countries seeking EU membership begin democratic reforms in order to qualify for membership.
+- Voters change preferences once an electoral reform is passed, before the first election under the new rules.
+
+---
+### Anticipation Effects: Formal Statement
+
+If the potential outcomes in the absense of anticipation effects might be represented as:
+
+$$Y_{it}(0) = \alpha_i + \delta_t + \epsilon_{it} \text{ for all } t < g_i$$
+the potential outcomes when there is anticipation instead are as:
+
+$$Y_{it}(0) = \alpha_i + \delta_t + \sum_{k=-K}^{M} \tau_k D_{it}^{(k)} + \epsilon_{it}$$
+
+---
+
+On the last slide, $D_{it}^{(k)}=1$ if unit $i$ is $k$ periods away from treatment at time $t$, with negative $k$ indicating periods before treatment.
+
+---
+### Diagnosing Anticipation
+
+The event study plot is the key diagnostic. 
+
+- If there are no anticipation effects, leads (pre-treatment coefficients) should be flat and near zero.
+
+- If pre-treatment coefficients are significantly different from zero and trend upward toward the treatment date, anticipation is likely present.
+
+---
+### Handling Anticipation in Callaway-Sant'Anna
+
+The did package allows you to specify the number of anticipation periods directly:
+
+```{r anticipation, echo = TRUE, eval=FALSE}
+# Allow for 1 period of anticipation
+cs_anticipation <- att_gt(yname = "y",
+                           tname = "time",
+                           idname = "id",
+                           gname = "first_treat",
+                           anticipation = 1,      # shift "pre" window back by 1
+                           data = df,
+                           control_group = "notyettreated")
+summary(cs_anticipation)
+```
+
+---
+
+Setting anticipation = 1 tells the estimator to treat the period immediately before the nominal treatment date as part of the treatment window, using an earlier period as the clean baseline.
+
+---
+### Handling Anticipation: Practical Guidance
+
+- Always plot the event study. Significant pre-trends are the primary signal of anticipation, though they can also indicate violations of parallel trends for other reasons.
+
+- Think substantively. Was the policy announced before it took effect? Were units aware of impending treatment? 
+
+- Robustness check: Re-estimate with anticipation = 1 (or 2) and compare results. If estimates change substantially, the findings are sensitive to anticipation assumptions.
+
+- Anticipation and conditional parallel trends can interact: if some units anticipated treatment and others did not, the contamination of the pre-period is itself heterogeneous.
 
 ---
 ### Timing
@@ -328,10 +535,10 @@ df <- data.frame(
 df$treat <- ifelse(df$group == "early" & df$time >= 2, 1,
             ifelse(df$group == "late" & df$time >= 3, 1, 0))
 
-# Heterogeneous effects: early effect = 2, late effect = 1, no effect for never
+# Heterogeneous effects: early effect grows over time, late effect = 1, no effect for never
 df$y0 <- rnorm(n * 3, mean = 0, sd = 1)
-df$effect <- ifelse(df$group == "early" & df$time == 2, 2,
-             ifelse(df$group == "early" & df$time == 3, 2,
+df$effect <- ifelse(df$group == "early" & df$time == 2, 1,
+             ifelse(df$group == "early" & df$time == 3, 3,
              ifelse(df$group == "late" & df$time == 3, 1, 0)))
 df$y <- df$y0 + df$effect
 ```
@@ -349,7 +556,7 @@ summary(twfe)
 ---
 ### A Simple Example
 
-The true average treatment effect on the treated (ATT) is about `(0.3*2 + 0.3*1)/0.6 = 1.5`, but TWFE gives `r round(coef(twfe), 3)` which is slightly biased downward.
+The true average treatment effect on the treated (ATT) is about `(0.3*1*1 + 0.3*3*1 + 0.3*1*1)/0.9 = 1.7`, but TWFE gives `r round(coef(twfe), 3)` which is biased downward.
 
 ---
 ### Bacon Decomposition
@@ -419,7 +626,9 @@ es <- feols(y ~ i(time_to_treat, ref = -1) | id + time, data = df)
 ---
 ### Diagnosing the Problem
 ```{r event_study_2, echo = FALSE, eval = TRUE}
-iplot(es)
+iplot(es,
+      xlab = 'Time Relative to Treatment',
+      main = 'Effect Size')
 ```
 
 ---
@@ -464,14 +673,14 @@ summary(cs_out)
 
 ```{r cs_example_2, echo = TRUE, eval = TRUE}
 # Aggregate to overall ATT
-agg <- aggte(cs_out, type = "simple")
+agg <- aggte(cs_out, type = "simple", na.rm=TRUE)
 summary(agg)
 ```
 
 ---
 ### Example: Callaway & Sant'Anna
 
-The aggregated ATT should be close to the true value of 1.5.
+The aggregated ATT has a confidence interval that clearly covers the true value of 1.7.
 
 ---
 ### Summary: Key Takeaways
@@ -485,6 +694,8 @@ The aggregated ATT should be close to the true value of 1.5.
 ### Current Solutions
 
 Statisticians, methodologists, and econometricians have developed a wide range of methods to better estimate when there is staggered treatment timing.
+
+- Roth et al. provide an inventory of many methods for solving problems we discussed today, as well as additional recent innovations.
 
 ---
 ### Current Solutions
@@ -522,7 +733,11 @@ Nonetheless, the current status quo in applied social-science methods is that yo
 
 What if, in addition to having staggered timing of treatment adoption and heterogeneous effects, we also have problems with parallel trends because of time-varying unobserved confounders? 
 
-*   The fect package implements interactive fixed effects estimators that allow for unobserved time-varying confounders through a factor structure.
+*   The fect package implements interactive fixed effects (IFE) estimators that allow for unobserved time-varying confounders through a factor structure.
+
+*   The IFE model assumes that unobserved confounders follow a factor structure, which is learned from the data and is more flexible than fixed effects.
+
+*   If the true confounding structure has more factors than the model allows, or if the factors are nonlinear, bias remains.
 
 ---
 
@@ -558,6 +773,15 @@ eufect
 ```{r ife_results, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
 euife
 ```
+
+---
+### Why Negative Results?
+
+- Original EU members were established democracies and saw no change (positive or negative) after joining.
+
+- More recent members have frequently experienced democratic backsliding in the period shortly after joining.
+
+- Is this causal evidence that the EU hurts democracy, evidence of a measurement ceiling effect for earlier countries that biases the results, or just a coincidence?
 
 ---
 ### Difference-in-Differences: Key Takeaways

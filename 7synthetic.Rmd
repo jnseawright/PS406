@@ -197,8 +197,31 @@ include_graphics("images/DeKadt4.png")
 ```
 
 ---
+### Visualizing the Synthetic Control
+
+```{r synth_plot_1, echo = TRUE, eval = TRUE, out.width="60%"}
+# Plot the results
+smoking_out %>% plot_trends()
+```
+---
+### Visualizing the Synthetic Control
+
+```{r synth_plot_2, echo = TRUE, eval = TRUE, out.width="60%"}
+# Examine weights
+smoking_out %>% plot_weights()
+```
+---
+### Visualizing the Synthetic Control
+
+```{r synth_plot_3, echo = TRUE, eval = TRUE, out.width="80%"}
+# Check balance
+smoking_out %>% grab_balance_table()
+```
+
+
+---
 ```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
-library(Synth)
+library(tidysynth)
 ```
 
 ---
@@ -208,60 +231,118 @@ afripanel <- read.csv("https://github.com/jnseawright/PS406/raw/main/data/afripa
 malidata <- afripanel[afripanel$WBCode=="MLI" | afripanel$cont_dem_ind==1,]
 
 malicontrols <- unique(malidata$WBCode[malidata$WBCode!="MLI"&malidata$WBCode!="ETH"&malidata$WBCode!="SDN"])
+
+na_summary$Country[which(na_summary==100, arr.ind = TRUE)[,1]]
+
+#We need to drop Ethiopia and Sudan due to missing data.
+
+afripanel <- afripanel %>% filter(!Country %in% c("Ethiopia", "Sudan"))
 ```
 
 ---
 ```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
-mali.prep <- dataprep(
-    foo=malidata, 
-    predictors=c(
-      "lngdpmadlag",
-      "lngdpmadlag2",
-      "lngdpmadlag3",
-      "lngdpmadlag4",
-      "lnpop",
-      "ki",
-      "openk",
-      "civwar",
-      "civwarend",
-      "pwt_xrate",
-      "pwt_xrate_lag1",
-      "pwt_xrate_lag2",
-      "pwt_xrate_lag3",
-      "eximdiff",
-      "eximdiff_lag1",
-      "eximdiff_lag2",
-      "wbank",
-      "wbank_lag1",
-      "wbank_lag2",
-      "imfadj",
-      "imfadj_lag1",
-      "imfadj_lag2"
-    ),
-    dependent="lngdpmad",
-    unit.variable="wbcode2",
-    time.variable="year", 
-    treatment.identifier="MLI", 
-    controls.identifier=malicontrols,          
-    time.predictors.prior=c(1975:1990),
-    time.optimize.ssr=c(1975:1991),
-    time.plot=c(1975:2008),
-    unit.names.variable="WBCode"
-)
+mali_out <- afripanel %>%
+  synthetic_control(outcome = lngdpmad,
+                    unit = WBCode,
+                    time = year,
+                    i_unit = "MLI",
+                    i_time = 1991,
+                    generate_placebos = TRUE) %>%
+  generate_predictor(time_window = 1975:1990,
+                     ln_gdp = mean(lngdpmadlag, na.rm = TRUE),
+                     ln_pop = mean(lnpop, na.rm = TRUE),
+                     ki = mean(ki, na.rm = TRUE),
+                     openk  = mean(openk, na.rm = TRUE),
+                     civwar  = mean(civwar, na.rm = TRUE),
+                     civwarend  = mean(civwarend, na.rm = TRUE),
+                     pwtxrate  = mean(pwt_xrate, na.rm = TRUE),
+                     eximdiff  = mean(eximdiff, na.rm = TRUE),
+                     wbank  = mean(wbank, na.rm = TRUE),
+                     imfadj  = mean(imfadj, na.rm = TRUE),) %>%
+  generate_predictor(time_window = 1975:1980,
+                     ln_gdp = mean(lngdpmadlag, na.rm = TRUE),
+                     ln_pop = mean(lnpop, na.rm = TRUE),
+                     ki = mean(ki, na.rm = TRUE),
+                     openk  = mean(openk, na.rm = TRUE),
+                     civwar  = mean(civwar, na.rm = TRUE),
+                     civwarend  = mean(civwarend, na.rm = TRUE),
+                     pwtxrate  = mean(pwt_xrate, na.rm = TRUE),
+                     eximdiff  = mean(eximdiff, na.rm = TRUE),
+                     wbank  = mean(wbank, na.rm = TRUE),
+                     imfadj  = mean(imfadj, na.rm = TRUE),) %>%  
+  generate_predictor(time_window = 1980:1985,
+                     ln_gdp = mean(lngdpmadlag, na.rm = TRUE),
+                     ln_pop = mean(lnpop, na.rm = TRUE),
+                     ki = mean(ki, na.rm = TRUE),
+                     openk  = mean(openk, na.rm = TRUE),
+                     civwar  = mean(civwar, na.rm = TRUE),
+                     civwarend  = mean(civwarend, na.rm = TRUE),
+                     pwtxrate  = mean(pwt_xrate, na.rm = TRUE),
+                     eximdiff  = mean(eximdiff, na.rm = TRUE),
+                     wbank  = mean(wbank, na.rm = TRUE),
+                     imfadj  = mean(imfadj, na.rm = TRUE),) %>%  
+  generate_predictor(time_window = 1985:1990,
+                     ln_gdp = mean(lngdpmadlag, na.rm = TRUE),
+                     ln_pop = mean(lnpop, na.rm = TRUE),
+                     ki = mean(ki, na.rm = TRUE),
+                     openk  = mean(openk, na.rm = TRUE),
+                     civwar  = mean(civwar, na.rm = TRUE),
+                     civwarend  = mean(civwarend, na.rm = TRUE),
+                     pwtxrate  = mean(pwt_xrate, na.rm = TRUE),
+                     eximdiff  = mean(eximdiff, na.rm = TRUE),
+                     wbank  = mean(wbank, na.rm = TRUE),
+                     imfadj  = mean(imfadj, na.rm = TRUE),) %>%
+  generate_weights(optimization_window = 1975:1990) %>%
+  generate_control()
 ```
 
 ---
 ```{r, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
-mali.synth <- synth(mali.prep)
+# Plot the results
+mali_out %>% plot_trends()
 ```
 
 ---
 ```{r, echo = TRUE, out.width="60%", fig.retina = 1, fig.align='center'}
-path.plot(synth.res=mali.synth, dataprep.res=mali.prep,
-           Ylab="Log GDP per capita", Legend=NA, tr.intake=1991,
-           Ylim=c(6,8) , Main="Mali"
-)
+# Examine weights
+mali_out %>% plot_weights()
 ```
+---
+```{r, echo = TRUE, out.width="60%", fig.retina = 1, fig.align='center'}
+# Check balance
+mali_out %>% grab_balance_table()
+```
+
+---
+
+```{r placebo_plot, echo = TRUE, eval = TRUE}
+# Plot the Mali effect against all placebos
+placeboplot <- mali_out %>%
+  plot_placebos(
+    time_window = 1970:2010,
+    prune = TRUE  # Remove placebos with poor pre-treatment fit
+  ) +
+  geom_vline(xintercept = 1991, linetype = "dashed", color = "red") +
+  labs(
+    title = "Placebo Test: Mali vs. Donor Countries",
+    subtitle = "Does the Mali effect stand out from the noise?",
+    x = "Year",
+    y = "Gap: Actual - Synthetic GDP"
+  ) +
+  theme_minimal()
+```
+
+---
+
+```{r placebo_plot_2, echo = FALSE, eval = TRUE}
+placeboplot
+```
+
+---
+
+Synthetic control allows us to use data to ask what a case's counterfactual might have been. While there are assumptions, we are imposing fewer modeling decisions than usual.
+
+For the rest of this week, we will push the concern with minimizing the consequences of modeling decisions even further.
 
 ---
 ### Why Sensitivity Analysis?
