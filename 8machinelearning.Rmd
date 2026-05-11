@@ -57,7 +57,7 @@ knitr::opts_chunk$set(warning = FALSE, message = FALSE)
 qog_std_ts_jan22 <- read.csv("https://github.com/jnseawright/PS406/raw/main/data/qog_std_ts_jan22.csv")
 ```
 ```{r xaringan-themer, include=FALSE, warning=FALSE}
-library(xaringanthemer,MnSymbol)
+library(xaringanthemer)
 style_mono_accent(
   base_color = "#1c5253",
   header_font_google = google_font("Josefin Sans"),
@@ -71,9 +71,6 @@ style_mono_accent(
 ### Heterogeneity
 
 One of the central themes of the course has been causal heterogeneity. Can newer tools associated with machine learning contribute here?
-
-
-Below are revised RMarkdown slides that keep the equations but embed them in a clear narrative with motivation and step-by-step explanation. The goal is to show students **why** this derivation matters and how it leads to using machine learning for causal inference.
 
 ---
 ### The Challenge: Estimating Heterogeneous Treatment Effects
@@ -442,13 +439,50 @@ Now that we have a way to get an *honest* estimate of $\tau$ for any node (using
 Robins, Rotnitzky & Zhao (1994) proved that the asymptotically optimal estimator for $\tau$ is the Augmented Inverse Probability Weighted (AIPW) estimator.
 
 ---
+
+### Why AIPW? The Case for Doubly Robust Estimation
+
+To combine the leaf-level estimates from a causal forest into a single,
+valid estimate of the ATE or CATE, we need an estimator with good
+properties even when our nuisance functions are imperfectly estimated.
+
+The **Augmented Inverse Probability Weighted (AIPW)** estimator has a
+crucial property: it is **doubly robust**. 
+-  It remains consistent if *either* the outcome model $\hat{m}(X)$ *or* the propensity score
+$\hat{e}(X)$ is estimated consistently.
+
+---
+
+- The **IPW term** reweights observations to balance treatment and control.
+- The **augmentation term** corrects for bias in the IPW estimate using the outcome model.
+
+Together, they provide valid inference even when machine learning
+estimators converge slowly.
+
+---
 ```{r, echo = FALSE, out.width="90%", fig.retina = 1, fig.align='center'}
 include_graphics("images/AIPW.png")
 ```
 
+### Reading the AIPW Formula
+
+The formula shown above combines two components for each unit $i$:
+
+$$\hat{\tau}^{AIPW} = \frac{1}{n}\sum_i \left[ \hat{\tau}(X_i) + \frac{W_i - \hat{e}(X_i)}{\hat{e}(X_i)(1-\hat{e}(X_i))} \left(Y_i - \hat{m}(X_i)\right) \right]$$
+
+- The first term $\hat{\tau}(X_i)$ is the causal forest's direct estimate
+  of the CATE at $X_i$.
+- The second term is a bias correction: it is large when the residual
+  $(Y_i - \hat{m}(X_i))$ is large *and* when the unit's treatment
+  probability was far from its propensity score.
+
 ---
 
-Using the AIPW to combine estimates that derive from causal forests gives us a *doubly robust* estimator.
+`get_scores()` in the `grf` package returns AIPW scores. They are the per-unit contributions to this doubly robust estimate.
+
+---
+
+Using the AIPW to combine estimates that derive from causal forests gives us the much-desired doubly robust estimator.
 
 ---
 ```{r cf_with_vdem, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
@@ -699,7 +733,6 @@ library(hdm)
 ```{r carry_out_dualselection, echo = TRUE, out.width="90%", fig.retina = 1, fig.align='center'}
 demgrow.dualselection <- rlassoEffects(wdi_gdpcapgr ~ . - year - cname - cname_qog - cname_year - wdi_gdpgr - wdi_popgr, data=qogimputed1, I=~vdem_libdem)
 demgrow.dualselection
-demgrow.dualselection$selection.matrix
 ```
 
 
@@ -879,6 +912,8 @@ kable(selected_df, caption = "Variables selected by Outcome‑Adaptive LASSO for
 ### Turning to Text
 
 All the methods we’ve discussed assume we have a well‑defined set of numeric covariates; but what if our confounders or treatments are embedded in text? We now explore ML tools for text‑based causal inference.
+
+- Text methods rely on computational infrastructure and often benefit from integration with the methods discussed above that are flexible with high-dimensional data.
 
 ---
 ### Textual Data and Causal Inference
@@ -1297,47 +1332,6 @@ The result is an estimate of the causal effect of perceived gender on citations,
 |------|--------------|----------------|
 | **Estimate effect** | Compares outcomes within matched pairs | Obtains causal estimate |
 
----
-### Illustrative R Workflow (Conceptual)
-
-```{r tirm_code, eval=FALSE, echo=TRUE}
-# 1. Fit a Structural Topic Model with treatment as a covariate
-#    (K = number of topics, chosen based on held-out likelihood)
-#
-# topic_model <- stm(documents, vocab, K = 15,
-#                    prevalence = ~ treatment,   # Topic prevalence varies by gender
-#                    content = ~ treatment,      # Word choice within topics varies by gender
-#                    data = meta)
-
-# 2. Refit the model to get counterfactual topic proportions
-#    (Predict topic props as if all documents were treated, then as if all were control)
-#
-# refit_treated <- refit(topic_model, documents, content_level = "female")
-# refit_control <- refit(topic_model, documents, content_level = "male")
-```
-
----
-
-```{r tirm_code_2, eval=FALSE, echo=TRUE}
-# 3. Project onto the treatment to get a scalar score
-#    (Find the combination of counterfactual topics that best predicts actual treatment)
-#
-# projection <- project(topic_model, documents, interactions = FALSE)
-
-# 4. Perform Coarsened Exact Matching on the projection score
-#
-# matched_data <- cem_match(projection = projection,
-#                           treatment = meta$treatment,
-#                           data = meta,
-#                           projection_breaks = 2)  # Coarsen into bins
-
-# 5. Estimate the ATT
-#
-# att_estimate <- att(matched_data, 
-#                     formula = citations ~ treatment, 
-#                     data = meta)
-# summary(att_estimate)
-```
 
 ---
 

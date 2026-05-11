@@ -55,9 +55,6 @@ pre[class] {
 
 One of the central themes of the course has been causal heterogeneity. Can newer tools associated with machine learning contribute here?
 
-
-Below are revised RMarkdown slides that keep the equations but embed them in a clear narrative with motivation and step-by-step explanation. The goal is to show students **why** this derivation matters and how it leads to using machine learning for causal inference.
-
 ---
 ### The Challenge: Estimating Heterogeneous Treatment Effects
 
@@ -236,8 +233,8 @@ dem.rf
 ##                      Number of trees: 500
 ## No. of variables tried at each split: 2
 ## 
-##           Mean of squared residuals: 0.008672284
-##                     % Var explained: 69.88
+##           Mean of squared residuals: 0.008777696
+##                     % Var explained: 69.52
 ```
 
 ---
@@ -390,11 +387,48 @@ Now that we have a way to get an *honest* estimate of `\(\tau\)` for any node (u
 Robins, Rotnitzky &amp; Zhao (1994) proved that the asymptotically optimal estimator for `\(\tau\)` is the Augmented Inverse Probability Weighted (AIPW) estimator.
 
 ---
-&lt;img src="images/AIPW.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+### Why AIPW? The Case for Doubly Robust Estimation
+
+To combine the leaf-level estimates from a causal forest into a single,
+valid estimate of the ATE or CATE, we need an estimator with good
+properties even when our nuisance functions are imperfectly estimated.
+
+The **Augmented Inverse Probability Weighted (AIPW)** estimator has a
+crucial property: it is **doubly robust**. 
+-  It remains consistent if *either* the outcome model `\(\hat{m}(X)\)` *or* the propensity score
+`\(\hat{e}(X)\)` is estimated consistently.
 
 ---
 
-Using the AIPW to combine estimates that derive from causal forests gives us a *doubly robust* estimator.
+- The **IPW term** reweights observations to balance treatment and control.
+- The **augmentation term** corrects for bias in the IPW estimate using the outcome model.
+
+Together, they provide valid inference even when machine learning
+estimators converge slowly.
+
+---
+&lt;img src="images/AIPW.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+### Reading the AIPW Formula
+
+The formula shown above combines two components for each unit `\(i\)`:
+
+`$$\hat{\tau}^{AIPW} = \frac{1}{n}\sum_i \left[ \hat{\tau}(X_i) + \frac{W_i - \hat{e}(X_i)}{\hat{e}(X_i)(1-\hat{e}(X_i))} \left(Y_i - \hat{m}(X_i)\right) \right]$$`
+
+- The first term `\(\hat{\tau}(X_i)\)` is the causal forest's direct estimate
+  of the CATE at `\(X_i\)`.
+- The second term is a bias correction: it is large when the residual
+  `\((Y_i - \hat{m}(X_i))\)` is large *and* when the unit's treatment
+  probability was far from its propensity score.
+
+---
+
+`get_scores()` in the `grf` package returns AIPW scores. They are the per-unit contributions to this doubly robust estimate.
+
+---
+
+Using the AIPW to combine estimates that derive from causal forests gives us the much-desired doubly robust estimator.
 
 ---
 
@@ -423,7 +457,7 @@ dem.cf
 ## Number of training samples: 401 
 ## Variable importance: 
 ##     1     2     3     4     5     6     7 
-## 0.017 0.488 0.204 0.095 0.086 0.047 0.063
+## 0.014 0.454 0.223 0.090 0.095 0.052 0.071
 ```
 
 ---
@@ -456,8 +490,8 @@ p
 ---
 ### What This Histogram Tells Us
 **Key observations**:
-- **Range**: The CATE estimates range from about -0.95 to 0.5. This is a wide spread.
-- **Average**: The ATE for treatment cases (from `average_treatment_effect`) is about -0.091. The ATE for control cases is about -0.174.
+- **Range**: The CATE estimates range from about -0.88 to 0.6. This is a wide spread.
+- **Average**: The ATE for treatment cases (from `average_treatment_effect`) is about -0.1. The ATE for control cases is about -0.173.
 - **Heterogeneity**: Some countries are estimated to have a **positive** effect (presidential system increases democracy), others a **negative** effect. This suggests the impact of presidential systems is not uniform – it depends on other characteristics.
 
 ---
@@ -479,7 +513,7 @@ ate_treated
 
 ```
 ##    estimate     std.err 
-## -0.09098568  0.01755099
+## -0.09995137  0.01755219
 ```
 
 ``` r
@@ -487,8 +521,8 @@ ate_control
 ```
 
 ```
-##    estimate     std.err 
-## -0.17362656  0.02062002
+##   estimate    std.err 
+## -0.1729999  0.0203515
 ```
 
 ``` r
@@ -731,79 +765,6 @@ demgrow.dualselection
 ## Coefficients:
 ## vdem_libdem  
 ##      0.2207
-```
-
-``` r
-demgrow.dualselection$selection.matrix
-```
-
-```
-##                      vdem_libdem
-## wdi_agedr                  FALSE
-## wdi_araland                FALSE
-## wdi_area                   FALSE
-## wdi_birth                   TRUE
-## wdi_co2                    FALSE
-## wdi_death                  FALSE
-## wdi_enerenew               FALSE
-## wdi_expmil                  TRUE
-## wdi_export                  TRUE
-## wdi_fdiin                  FALSE
-## wdi_fdiout                 FALSE
-## wdi_fertility               TRUE
-## wdi_forest                  TRUE
-## wdi_gdpagr                  TRUE
-## wdi_gdpcapcon2010           TRUE
-## wdi_gdpcapcur              FALSE
-## wdi_gdpcappppcon2017       FALSE
-## wdi_gdpcappppcur           FALSE
-## wdi_gdpind                 FALSE
-## wdi_gdppppcon2017          FALSE
-## wdi_gdppppcur              FALSE
-## wdi_gerp                   FALSE
-## wdi_gerpf                  FALSE
-## wdi_gerpm                  FALSE
-## wdi_gniatlcur              FALSE
-## wdi_gnicapatlcur            TRUE
-## wdi_gnicur                 FALSE
-## wdi_import                 FALSE
-## wdi_inflation               TRUE
-## wdi_internet                TRUE
-## wdi_lfpilo15               FALSE
-## wdi_lifexp                 FALSE
-## wdi_lifexpf                FALSE
-## wdi_lifexpm                FALSE
-## wdi_mobile                 FALSE
-## wdi_mortf                  FALSE
-## wdi_mortinf                FALSE
-## wdi_mortinff               FALSE
-## wdi_mortinfm                TRUE
-## wdi_mortm                  FALSE
-## wdi_mortnn                 FALSE
-## wdi_mortu5                 FALSE
-## wdi_mortu5f                FALSE
-## wdi_mortu5m                FALSE
-## wdi_oilrent                 TRUE
-## wdi_pop                    FALSE
-## wdi_pop14                  FALSE
-## wdi_pop1564                FALSE
-## wdi_pop65                   TRUE
-## wdi_popden                  TRUE
-## wdi_popf                    TRUE
-## wdi_poprul                  TRUE
-## wdi_poprulgr               FALSE
-## wdi_popurb                 FALSE
-## wdi_popurbagr              FALSE
-## wdi_refasy                 FALSE
-## wdi_refori                 FALSE
-## wdi_sva2010                FALSE
-## wdi_svapg                   TRUE
-## wdi_svapgdp                 TRUE
-## wdi_tele                    TRUE
-## wdi_trade                  FALSE
-## wdi_tradeserv               TRUE
-## wdi_wombuslawi              TRUE
-## vdem_libdem                   NA
 ```
 
 
@@ -1104,6 +1065,8 @@ Table: Variables selected by Outcome‑Adaptive LASSO for the treatment model
 ### Turning to Text
 
 All the methods we’ve discussed assume we have a well‑defined set of numeric covariates; but what if our confounders or treatments are embedded in text? We now explore ML tools for text‑based causal inference.
+
+- Text methods rely on computational infrastructure and often benefit from integration with the methods discussed above that are flexible with high-dimensional data.
 
 ---
 ### Textual Data and Causal Inference
@@ -1442,49 +1405,6 @@ The result is an estimate of the causal effect of perceived gender on citations,
 |------|--------------|----------------|
 | **Estimate effect** | Compares outcomes within matched pairs | Obtains causal estimate |
 
----
-### Illustrative R Workflow (Conceptual)
-
-
-``` r
-# 1. Fit a Structural Topic Model with treatment as a covariate
-#    (K = number of topics, chosen based on held-out likelihood)
-#
-# topic_model &lt;- stm(documents, vocab, K = 15,
-#                    prevalence = ~ treatment,   # Topic prevalence varies by gender
-#                    content = ~ treatment,      # Word choice within topics varies by gender
-#                    data = meta)
-
-# 2. Refit the model to get counterfactual topic proportions
-#    (Predict topic props as if all documents were treated, then as if all were control)
-#
-# refit_treated &lt;- refit(topic_model, documents, content_level = "female")
-# refit_control &lt;- refit(topic_model, documents, content_level = "male")
-```
-
----
-
-
-``` r
-# 3. Project onto the treatment to get a scalar score
-#    (Find the combination of counterfactual topics that best predicts actual treatment)
-#
-# projection &lt;- project(topic_model, documents, interactions = FALSE)
-
-# 4. Perform Coarsened Exact Matching on the projection score
-#
-# matched_data &lt;- cem_match(projection = projection,
-#                           treatment = meta$treatment,
-#                           data = meta,
-#                           projection_breaks = 2)  # Coarsen into bins
-
-# 5. Estimate the ATT
-#
-# att_estimate &lt;- att(matched_data, 
-#                     formula = citations ~ treatment, 
-#                     data = meta)
-# summary(att_estimate)
-```
 
 ---
 
