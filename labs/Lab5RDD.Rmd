@@ -33,7 +33,7 @@ Our [original article](https://doi.org/10.1017/S0003055419000613) here is by Tho
 
 Use the [replication data](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/CFASH6).
 
-Use rdrobust to estimate the incumbency advantage for sheriffs at the 50% vote threshold. Report the conventional, bias‑corrected, and robust estimates. Plot the RD graph using rdplot.
+Use rdrobust to estimate the partisan difference for sheriffs at the 50% vote threshold. Report the conventional, bias‑corrected, and robust estimates. Plot the RD graph using rdplot.
 
 ### Problem 2: Manipulation Test
 
