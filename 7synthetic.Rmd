@@ -1085,6 +1085,16 @@ legend("topright", legend = c("Actual", "Ensemble"), col = c("blue", "red"), lty
 ```
 
 ---
+
+```{r ensemble_example_plot, echo = FALSE, eval = TRUE}
+plot(mali_clean$year, mali_clean$lngdpmad, type = "l", col = "blue",
+     ylim = range(c(mali_clean$lngdpmad, pred$pred)),
+     xlab = "Year", ylab = "Log GDP", main = "Mali: Actual vs Ensemble Prediction")
+lines(mali_clean$year, pred$pred, col = "red", lty = 2)
+legend("topright", legend = c("Actual", "Ensemble"), col = c("blue", "red"), lty = 1:2)
+```
+
+---
 ### Interpreting the Ensemble
 
 ```{r ensemble_weights, echo = TRUE, eval = TRUE}
@@ -1100,6 +1110,8 @@ sl_fit$coef
 
 
 **Caveat**: The ensemble is only as good as its candidate algorithms. If all algorithms are misspecified, the ensemble will also be misspecified – but it will usually be better than any single one.
+
+---
 
 ## Synthetic Control: Weighted Units
 
